@@ -1,0 +1,43 @@
+
+<p-toast></p-toast>
+
+<p-contextMenu #cm [model]="items"></p-contextMenu>
+
+<div class="card">
+  <p-table [value]="user" [(contextMenuSelection)]="selectedUser" [contextMenu]="cm" dataKey="code" [tableStyle]="{'min-width': '50rem'}">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Username</th>
+        <th>Role</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-user>
+      <tr [pContextMenuRow]="user">
+        <td>{{user.login}}</td>
+        <td>{{user.role}}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog *ngIf="userDto" [(visible)]="displayDialog" [position]="'right'" [modal]="true" [style]="{width: '50vw'}"
+          [draggable]="false" [resizable]="false">
+  <div class="col-12 md:col-4">
+    <div class="p-inputgroup">
+      <span class="p-inputgroup-addon"><i class="pi pi-user"></i></span>
+      <input
+        type="text"
+        pInputText
+        required
+        placeholder="Username"
+        disabled = true
+        [(ngModel)]="selectedUser.login"/>
+    </div>
+  </div>
+
+  <h3>Доступные Роли:</h3>
+  <p-selectButton [options]="roles" [(ngModel)]="userDto.role" [multiple]="true" optionLabel="name" optionValue="name"></p-selectButton>
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-check" (click)="closeDialog()" label="Ok" styleClass="p-button-text"></p-button>
+  </ng-template>
+</p-dialog>
