@@ -3,6 +3,7 @@ import {Request} from "../../dto/Request";
 import {RequestService} from "../../services/request.service";
 import {RequestPosition} from "../../dto/RequestPosition";
 import {MessageService} from "primeng/api";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-request',
@@ -13,11 +14,13 @@ import {MessageService} from "primeng/api";
 export class RequestComponent implements OnInit {
 
   request: Request[] = [];
-  selectedRequest: Request;
+  selectedRequests: Request[] = [];
 
-  requestPosition: RequestPosition[] = [];
+  requestPositions: RequestPosition[] = [];
 
-  constructor(public requestService: RequestService,) {
+  isProductionPlanMode = false;
+
+  constructor(public requestService: RequestService, public router: Router) {
 
   }
 
@@ -26,10 +29,28 @@ export class RequestComponent implements OnInit {
     console.log(this.request)
   }
 
-  async test(id: number) {
-
-    console.log(await this.requestService.getRequestPositionById(id));
-    this.requestPosition = await this.requestService.getRequestPositionById(id);
+  async test(selected: any) {
+    if (selected.length == 1) {
+      console.log(await this.requestService.getRequestPositionById(selected[0].id));
+      this.requestPositions = await this.requestService.getRequestPositionById(selected[0].id);
+    } else {
+      this.requestPositions = [];
+    }
   }
 
+  onProductionPlanModeChange() {
+    this.isProductionPlanMode = !this.isProductionPlanMode;
+    if (!this.isProductionPlanMode) {
+      this.selectedRequests = [];
+    }
+  }
+
+  test2() {
+    console.log('heyy')
+  }
+
+  sendRequestsPositions() {
+    localStorage.setItem('SendArray', JSON.stringify(this.selectedRequests));
+    this.router.navigate(['/manage']);
+  }
 }

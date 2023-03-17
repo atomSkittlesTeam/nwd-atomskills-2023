@@ -33,7 +33,6 @@ export class UserService extends BaseService {
 
     return await firstValueFrom(this.http.get<any>(url + `/user/${login}/roles`)
     ).then(data => {
-      console.log(data)
       localStorage.setItem("ROLES", data)
     });
   }

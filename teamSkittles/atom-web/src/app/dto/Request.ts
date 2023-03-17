@@ -7,6 +7,7 @@ export class Request {
   number: string;
   date: Data;
   contractor: Constractor;
+  priority: number = 0;
   description: string;
   state: State;
   releaseDate: Data;

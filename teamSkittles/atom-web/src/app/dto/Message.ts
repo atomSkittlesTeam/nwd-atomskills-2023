@@ -1,9 +1,16 @@
 import {Enums} from "./enums";
+import {Data} from "@angular/router";
 
 export class Message {
+  id: number;
   type: Enums;
-  text: string;
+  customText: string;
+  emailSign: boolean;
+  frontSign: boolean;
 
+  objectId: number;
+  objectName: string;
+  instant: Data;
 
   constructor() {
   }

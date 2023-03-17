@@ -5,6 +5,7 @@ import {Router} from "@angular/router";
 import {MenuItem} from "primeng/api";
 import {Message} from "./dto/Message";
 import {Enums} from "./dto/enums";
+import {RequestService} from "./services/request.service";
 
 @Component({
   selector: 'app-root',
@@ -16,13 +17,10 @@ export class AppComponent implements OnInit {
   admin: boolean = false;
   items: MenuItem[] = [];
 
-  newRequests: Message[] = [{
-    type: Enums.newRequests,
-    text: 'afwafawfawf'
-  }];
+  messages: Message[] = [];
   display: boolean = false;
 
-  constructor(public authService: AuthService, public router: Router, private userService: UserService) {
+  constructor(public authService: AuthService, public router: Router, private userService: UserService, public requestService: RequestService) {
     this.admin = !!this.authService.get();
   }
 
@@ -30,7 +28,9 @@ export class AppComponent implements OnInit {
     localStorage.removeItem("AUTH");
   }
 
-  showNewPositions() {
+  async showNewPositions() {
+    this.messages = await this.requestService.getNewMessages();
+    console.log(this.messages)
     this.display = true;
   }
 
@@ -70,7 +70,24 @@ export class AppComponent implements OnInit {
 
   }
 
-  closeInfo() {
-    
+  async closeOneInfo(id: number, idx: number) {
+    this.messages = this.removeObjectWithId(id);
+    await this.requestService.messageSetFrontSing([id])
+  }
+
+  async closeAllInfo() {
+    let ids = this.messages.map(e => e.id)
+    await this.requestService.messageSetFrontSing(ids)
+    this.messages = [];
+  }
+
+  removeObjectWithId(id: number) {
+    const objWithIdIndex = this.messages.findIndex((obj) => obj.id === id);
+
+    if (objWithIdIndex > -1) {
+      this.messages.splice(objWithIdIndex, 1);
+    }
+
+    return this.messages;
   }
 }
