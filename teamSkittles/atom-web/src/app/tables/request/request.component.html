@@ -1,32 +1,59 @@
-
 <ng-container>
+
   <p-splitter [style]="{'height': '100vh'}" layout="vertical">
     <ng-template pTemplate>
       <div class="card">
-        <h5>Single</h5>
-        <p>In single mode, a row is selected on click event of a row. If the row is already selected then the row gets unselected.</p>
-<!--        <p-table [value]="products" selectionMode="single" [(selection)]="selectedProduct1" dataKey="code" [tableStyle]="{'min-width': '50rem'}">-->
-<!--          <ng-template pTemplate="header">-->
-<!--            <tr>-->
-<!--              <th>Code</th>-->
-<!--              <th>Name</th>-->
-<!--              <th>Category</th>-->
-<!--              <th>Quantity</th>-->
-<!--            </tr>-->
-<!--          </ng-template>-->
-<!--          <ng-template pTemplate="body" let-product>-->
-<!--            <tr [pSelectableRow]="product">-->
-<!--              <td>{{product.code}}</td>-->
-<!--              <td>{{product.name}}</td>-->
-<!--              <td>{{product.category}}</td>-->
-<!--              <td>{{product.quantity}}</td>-->
-<!--            </tr>-->
-<!--          </ng-template>-->
-<!--        </p-table>-->
+        <p-table [value]="request" selectionMode="single" [(selection)]="selectedRequest" dataKey="code" [tableStyle]="{'width': '100%'}">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Id</th>
+              <th>Номер</th>
+              <th>Дата</th>
+              <th>Компания</th>
+              <th>Описание</th>
+              <th>Статус</th>
+              <th>Дата Выпуска</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-req>
+            <tr [pSelectableRow]="req" (click)="test(selectedRequest.id)">
+              <td>{{req.id}}</td>
+              <td>{{req.number}}</td>
+              <td>{{req.date}}</td>
+              <td>{{req.contractor.caption}}</td>
+              <td>{{req.description}}</td>
+              <td>{{req.state?.caption}}</td>
+              <td>{{req.releaseDate}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
     </ng-template>
     <ng-template pTemplate>
-      Panel 2
+      <div class="card">
+        <p-table [value]="requestPosition" selectionMode="single" dataKey="code" [tableStyle]="{'width': '100%'}">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Id</th>
+              <th>Номер Запроса</th>
+              <th>Продукт(код)</th>
+              <th>Описание</th>
+              <th>Кол-во</th>
+              <th>Обычные штуки</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-reqP>
+            <tr [pSelectableRow]="reqP" (click)="test(selectedRequest.id)">
+              <td>{{reqP.id}}</td>
+              <td>{{reqP.request.id}}</td>
+              <td>{{reqP.product.code}}</td>
+              <td>{{reqP.product.caption}}</td>
+              <td>{{reqP.quantity}}</td>
+              <td>{{reqP.quantityExec}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
     </ng-template>
   </p-splitter>
 </ng-container>

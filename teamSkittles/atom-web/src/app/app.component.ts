@@ -3,6 +3,8 @@ import {AuthService} from "./services/auth.service";
 import {UserService} from "./services/user.service";
 import {Router} from "@angular/router";
 import {MenuItem} from "primeng/api";
+import {Message} from "./dto/Message";
+import {Enums} from "./dto/enums";
 
 @Component({
   selector: 'app-root',
@@ -14,6 +16,12 @@ export class AppComponent implements OnInit {
   admin: boolean = false;
   items: MenuItem[] = [];
 
+  newRequests: Message[] = [{
+    type: Enums.newRequests,
+    text: 'afwafawfawf'
+  }];
+  display: boolean = false;
+
   constructor(public authService: AuthService, public router: Router, private userService: UserService) {
     this.admin = !!this.authService.get();
   }
@@ -22,6 +30,9 @@ export class AppComponent implements OnInit {
     localStorage.removeItem("AUTH");
   }
 
+  showNewPositions() {
+    this.display = true;
+  }
 
   async ngOnInit(): Promise<void> {
     this.items = [
@@ -57,5 +68,9 @@ export class AppComponent implements OnInit {
     }
 
 
+  }
+
+  closeInfo() {
+    
   }
 }

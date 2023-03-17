@@ -23,7 +23,7 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { RequestComponent } from './tables/request/request.component';
 import {SpeedDialModule} from "primeng/speeddial";
 import {SplitterModule} from "primeng/splitter";
-
+import {SidebarModule} from 'primeng/sidebar'
 @NgModule({
   declarations: [
     AppComponent,
@@ -49,7 +49,7 @@ import {SplitterModule} from "primeng/splitter";
     MultiSelectModule,
     SpeedDialModule,
     SplitterModule,
-
+    SidebarModule
   ],
   providers: [ConfigService, {
     provide: HTTP_INTERCEPTORS,
