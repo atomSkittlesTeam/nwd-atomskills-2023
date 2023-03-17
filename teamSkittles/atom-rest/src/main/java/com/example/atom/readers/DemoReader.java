@@ -20,33 +20,34 @@ public class DemoReader {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public List<DemoDbObject> getDemoDbObjects(RequestDto requestDto) {
-        if(requestDto.getId() == null && requestDto.getStringProperty() == null) {
-            throw new RuntimeException("query is broken");
-        }
-        Boolean whereWasUsed = false;
-        String query = "select * from demo";
-        Map<String, Object> mapParameters = new HashMap<>();
-        if (requestDto.getId() != null) {
-            mapParameters.put("id", requestDto.getId());
-            query += !whereWasUsed? " where" : " and";
-            query += " id = :id";
-            whereWasUsed = true;
-        }
-        if (requestDto.getStringProperty() != null) {
-            mapParameters.put("stringProperty", requestDto.getStringProperty());
-            query += !whereWasUsed? " where" : " and";
-            query += " string_property = :stringProperty";
-            whereWasUsed = true;
-        }
+//        if(requestDto.getId() == null && requestDto.getStringProperty() == null) {
+//            throw new RuntimeException("query is broken");
+//        }
+//        Boolean whereWasUsed = false;
+//        String query = "select * from demo";
+//        Map<String, Object> mapParameters = new HashMap<>();
+//        if (requestDto.getId() != null) {
+//            mapParameters.put("id", requestDto.getId());
+//            query += !whereWasUsed? " where" : " and";
+//            query += " id = :id";
+//            whereWasUsed = true;
+//        }
+//        if (requestDto.getStringProperty() != null) {
+//            mapParameters.put("stringProperty", requestDto.getStringProperty());
+//            query += !whereWasUsed? " where" : " and";
+//            query += " string_property = :stringProperty";
+//            whereWasUsed = true;
+//        }
 
-        SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValues(mapParameters);;
+//        SqlParameterSource namedParameters = new MapSqlParameterSource()
+//                .addValues(mapParameters);;
+//
+//        List<DemoDbObject> demoDbObjects = namedParameterJdbcTemplate
+//                .query(query, namedParameters,
+//                new BeanPropertyRowMapper<>(DemoDbObject.class, false));
 
-        List<DemoDbObject> demoDbObjects = namedParameterJdbcTemplate
-                .query(query, namedParameters,
-                new BeanPropertyRowMapper<>(DemoDbObject.class, false));
-
-        return demoDbObjects;
+//        return demoDbObjects;
+        return null;
     }
 
 

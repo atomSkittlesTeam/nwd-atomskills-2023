@@ -10,4 +10,4 @@ set NWC_MNF_MAX_REPAIRING_DURATION=240
 set NWC_MNF_MIN_BROKEN_CHANCE=1
 set NWC_MNF_MAX_BROKEN_CHANCE=10
 
-java -jar as-environment-service-1.0.0.jar
+.\jre-17.0.6\bin\java.exe -jar as-environment-service-1.0.0.jar

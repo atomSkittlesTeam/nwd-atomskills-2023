@@ -9,13 +9,11 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestDto {
+public class RequestPositionDto {
     private Long id;
-    private String number;
-    private Date date;
-    private ContractorDto contractor;
-    private String description;
-    private StateDto state;
-    private Date releaseDate;
+    private RequestDto request;
+    private ProductDto product;
+    private Integer quantity;
+    private Integer quantityExec;
 
 }
