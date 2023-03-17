@@ -24,13 +24,17 @@ import { RequestComponent } from './tables/request/request.component';
 import {SpeedDialModule} from "primeng/speeddial";
 import {SplitterModule} from "primeng/splitter";
 import {SidebarModule} from 'primeng/sidebar'
+import {ToolbarModule} from "primeng/toolbar";
+import { ManageProductComponent } from './manage-product/manage-product.component';
+import {InputSwitchModule} from "primeng/inputswitch";
 @NgModule({
   declarations: [
     AppComponent,
     LoginFormComponent,
     NavigationComponent,
     AdminComponent,
-    RequestComponent
+    RequestComponent,
+    ManageProductComponent
   ],
   imports: [
     BrowserModule,
@@ -49,7 +53,9 @@ import {SidebarModule} from 'primeng/sidebar'
     MultiSelectModule,
     SpeedDialModule,
     SplitterModule,
-    SidebarModule
+    SidebarModule,
+    ToolbarModule,
+    InputSwitchModule
   ],
   providers: [ConfigService, {
     provide: HTTP_INTERCEPTORS,

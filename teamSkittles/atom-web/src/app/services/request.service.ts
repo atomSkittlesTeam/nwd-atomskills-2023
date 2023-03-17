@@ -7,6 +7,7 @@ import {BaseService} from "./base.service";
 import {User} from "../dto/User";
 import {Request} from "../dto/Request";
 import {RequestPosition} from "../dto/RequestPosition";
+import {Message} from "../dto/Message";
 
 @Injectable({
   providedIn: 'root'
@@ -27,5 +28,15 @@ export class RequestService extends BaseService {
   async getRequestPositionById(id: number) {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.get<RequestPosition[]>(url + `/requests/${id}/items`));
+  }
+
+  async getNewMessages() {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<Message[]>(url + `/requests/new-messages`));
+  }
+
+  async messageSetFrontSing(ids: number[]) {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.post(url + `/requests/message`, ids));
   }
 }

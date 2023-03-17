@@ -1,37 +1,13 @@
-<ng-container>
-
-  <p-splitter [style]="{'height': '100vh'}" layout="vertical">
+<ng-container *ngIf="!isProductionPlanMode; else masterTable">
+  <p-splitter [style]="{'height': '100%'}" layout="vertical">
     <ng-template pTemplate>
       <div class="card">
-        <p-table [value]="request" selectionMode="single" [(selection)]="selectedRequest" dataKey="code" [tableStyle]="{'width': '100%'}">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>Id</th>
-              <th>Номер</th>
-              <th>Дата</th>
-              <th>Компания</th>
-              <th>Описание</th>
-              <th>Статус</th>
-              <th>Дата Выпуска</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-req>
-            <tr [pSelectableRow]="req" (click)="test(selectedRequest.id)">
-              <td>{{req.id}}</td>
-              <td>{{req.number}}</td>
-              <td>{{req.date}}</td>
-              <td>{{req.contractor.caption}}</td>
-              <td>{{req.description}}</td>
-              <td>{{req.state?.caption}}</td>
-              <td>{{req.releaseDate}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
+        <ng-container *ngTemplateOutlet="masterTable"></ng-container>
       </div>
     </ng-template>
     <ng-template pTemplate>
       <div class="card">
-        <p-table [value]="requestPosition" selectionMode="single" dataKey="code" [tableStyle]="{'width': '100%'}">
+        <p-table [value]="requestPositions" selectionMode="single" dataKey="code" [tableStyle]="{'width': '100%'}">
           <ng-template pTemplate="header">
             <tr>
               <th>Id</th>
@@ -43,7 +19,7 @@
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-reqP>
-            <tr [pSelectableRow]="reqP" (click)="test(selectedRequest.id)">
+            <tr [pSelectableRow]="reqP">
               <td>{{reqP.id}}</td>
               <td>{{reqP.request.id}}</td>
               <td>{{reqP.product.code}}</td>
@@ -57,3 +33,49 @@
     </ng-template>
   </p-splitter>
 </ng-container>
+
+<ng-template #masterTable>
+  <p-toolbar>
+    <div class="p-toolbar-group-start">
+      <p-button [label]="isProductionPlanMode ? 'Закрыть режим формирования ПП' : 'Режим формирования ПП'"
+                icon="pi pi-list" styleClass="p-button-success"
+                (onClick)="onProductionPlanModeChange()"></p-button>
+
+      <p-button [label]="'Отправить'" *ngIf="isProductionPlanMode"
+                icon="pi pi-arrow-right" styleClass="p-button-info"
+                (onClick)="sendRequestsPositions()"></p-button>
+    </div>
+  </p-toolbar>
+  <p-table [value]="request" [(selection)]="selectedRequests" [selectionMode]="isProductionPlanMode ? '' : 'multiple'"
+           [metaKeySelection]="!isProductionPlanMode" (onRowSelect)="test2()" dataKey="id"
+           [tableStyle]="{'width': '100%'}">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem" *ngIf="isProductionPlanMode">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th>Id</th>
+        <th>Номер</th>
+        <th>Дата</th>
+        <th>Компания</th>
+        <th>Описание</th>
+        <th>Статус</th>
+        <th>Дата Выпуска</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-req>
+      <tr [pSelectableRow]="req" (click)="test(selectedRequests)">
+        <td *ngIf="isProductionPlanMode">
+          <p-tableCheckbox [value]="req"></p-tableCheckbox>
+        </td>
+        <td>{{req.id}}</td>
+        <td>{{req.number}}</td>
+        <td>{{req.date}}</td>
+        <td>{{req.contractor.caption}}</td>
+        <td>{{req.description}}</td>
+        <td>{{req.state?.caption}}</td>
+        <td>{{req.releaseDate}}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</ng-template>

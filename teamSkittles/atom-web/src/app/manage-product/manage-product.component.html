@@ -1,0 +1,45 @@
+<ng-container>
+  <p-toolbar>
+    <div class="p-toolbar-group-start">
+
+
+      <p-button [label]="'Посчитать автоматически'"
+                icon="pi pi-arrow-right" styleClass="p-button-info"
+                (onClick)="countAutomaticxOrder()"></p-button>
+    </div>
+    <div class="p-toolbar-group-start">
+      <p-inputSwitch [(ngModel)]="isManual"></p-inputSwitch>
+    </div>
+  </p-toolbar>
+  <p-table [value]="selectedIds" [tableStyle]="{'min-width': '50rem'}">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width:3rem" *ngIf="isManual"></th>
+        <th>Приоритет</th>
+        <th>Id</th>
+        <th>Номер</th>
+        <th>Дата</th>
+        <th>Компания</th>
+        <th>Описание</th>
+        <th>Статус</th>
+        <th>Дата Выпуска</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body"  let-req let-index="rowIndex">
+      <tr [pReorderableRow]="isManual ? index : 0" [draggable]="false" (drop)="onDropChange()">
+        <td *ngIf="isManual">
+          <span class="pi pi-bars" pReorderableRowHandle></span>
+        </td>
+        <td>{{req.priority}}</td>
+        <td>{{req.id}}</td>
+        <td>{{req.number}}</td>
+        <td>{{req.date}}</td>
+        <td>{{req.contractor.caption}}</td>
+        <td>{{req.description}}</td>
+        <td>{{req.state?.caption}}</td>
+        <td>{{req.releaseDate}}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+</ng-container>
