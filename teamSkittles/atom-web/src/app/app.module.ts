@@ -22,6 +22,7 @@ import {MultiSelectModule} from "primeng/multiselect";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { RequestComponent } from './tables/request/request.component';
 import {SpeedDialModule} from "primeng/speeddial";
+import {SplitterModule} from "primeng/splitter";
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import {SpeedDialModule} from "primeng/speeddial";
     BrowserAnimationsModule,
     MultiSelectModule,
     SpeedDialModule,
+    SplitterModule,
 
   ],
   providers: [ConfigService, {

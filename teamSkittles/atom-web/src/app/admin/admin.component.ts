@@ -23,8 +23,8 @@ export class AdminComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.roles = await this.rolesService.getRoles().then(data => data.map(role => { // @ts-ignore
-      return {name: role.name.toUpperCase()}}));
+    this.roles = await this.rolesService.getRoles().then(data => data.map(role => {
+      return {name: role.name}}));
     this.items = [
       {label: 'Update', icon: 'pi pi-fw pi-pencil', command: () => this.showDialog()},
       {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => console.log(localStorage.getItem("ROLES"))}
@@ -40,6 +40,7 @@ export class AdminComponent implements OnInit {
   }
 
   closeDialog() {
+
     this.userService.updateUser(this.userDto).then(data => {
       this.selectedUser.role = this.userDto.role;
       this.messageService.add({
@@ -50,7 +51,7 @@ export class AdminComponent implements OnInit {
     }).catch(() => this.messageService.add({
       severity: 'error',
       summary: 'Обновления',
-      detail: 'Юзер не обновлен',
+      detail: 'Юзер не обновлен, возможно вы не админ',
     }));
     this.displayDialog = false;
   }
