@@ -50,4 +50,9 @@ public class RequestController {
         return requestService.getMessageNewRequests();
     }
 
+    @PostMapping("message")
+    public void messageSetFrontSing(@RequestBody List<Long> messageIds) {
+        requestService.messageSetFrontSing(messageIds);
+    }
+
 }

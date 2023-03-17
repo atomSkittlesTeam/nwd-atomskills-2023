@@ -106,4 +106,11 @@ public class RequestService {
         return dtos;
     }
 
+    public void messageSetFrontSing(List<Long> messageIds) {
+        List<Message> messages = messageRepository.findAllById(messageIds);
+        messages.forEach(e -> e.setFrontSign(true));
+        messageRepository.saveAll(messages);
+        messageRepository.flush();
+    }
+
 }
