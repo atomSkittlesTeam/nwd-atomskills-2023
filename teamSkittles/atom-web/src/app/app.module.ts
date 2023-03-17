@@ -20,13 +20,16 @@ import {ConfigService} from "./config/config.service";
 import {AuthHelperInterceptor} from "./config/auth-helper.interceptor";
 import {MultiSelectModule} from "primeng/multiselect";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import { RequestComponent } from './tables/request/request.component';
+import {SpeedDialModule} from "primeng/speeddial";
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginFormComponent,
     NavigationComponent,
-    AdminComponent
+    AdminComponent,
+    RequestComponent
   ],
   imports: [
     BrowserModule,
@@ -43,6 +46,7 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     ContextMenuModule,
     BrowserAnimationsModule,
     MultiSelectModule,
+    SpeedDialModule,
 
   ],
   providers: [ConfigService, {

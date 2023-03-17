@@ -27,7 +27,7 @@ export class AdminComponent implements OnInit {
       return {name: role.name.toUpperCase()}}));
     this.items = [
       {label: 'Update', icon: 'pi pi-fw pi-pencil', command: () => this.showDialog()},
-      {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => console.log('sss')}
+      {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => console.log(localStorage.getItem("ROLES"))}
     ];
     this.user = await this.userService.getUsers();
 

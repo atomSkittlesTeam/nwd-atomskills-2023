@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {firstValueFrom} from "rxjs";
 import {User} from "../dto/User";
-import { ConfigService } from '../config/config.service';
+import {ConfigService} from '../config/config.service';
 import {Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {BaseService} from "./base.service";
@@ -29,9 +29,12 @@ export class UserService extends BaseService {
   async getUserRoles() {
     let login = localStorage.getItem("LOGIN");
     const url = await this.getBackendUrl();
-    console.log(login,"data")
+    console.log(login, "data")
 
     return await firstValueFrom(this.http.get<any>(url + `/user/${login}/roles`)
-    ).then(data => localStorage.setItem("ROLES", data));
+    ).then(data => {
+      console.log(data)
+      localStorage.setItem("ROLES", data)
+    });
   }
 }

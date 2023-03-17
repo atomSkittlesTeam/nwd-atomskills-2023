@@ -1,0 +1,13 @@
+.nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.module-nav {
+  position: absolute;
+  right: 100px;
+  bottom: 100px;
+}
