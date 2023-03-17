@@ -1,6 +1,5 @@
 package com.example.atom.dto;
 
-import com.example.atom.entities.Contractor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

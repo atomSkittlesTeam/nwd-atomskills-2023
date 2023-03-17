@@ -67,7 +67,7 @@ public class RequestService {
         List<Message> listMessages = new ArrayList<>();
         newRequestDtos.forEach(request -> {
             Message message = new Message(Types.newRequests, false,
-                    false, request.getId(), request.getNumber());
+                    false, request.getId(), request.getNumber(), null);
             listMessages.add(message);
         });
         messageRepository.saveAll(listMessages);
@@ -77,7 +77,8 @@ public class RequestService {
     @Transactional
     public void sendMessageOfNewRequests() {
         List<Message> messages = messageRepository.findAll();
-        List<Message> newMessages = messages.stream().filter(e -> e.getEmailSign().equals(false)).toList();
+        List<Message> newMessages = messages.stream().filter(e -> e.getEmailSign().equals(false)
+                && e.getType().equals(Types.newRequests)).toList();
         String numbers = String.join(",", newMessages.stream().map(Message::getObjectName).toList());
         emailService.sendSimpleMessage("sergej.davidyuk@yandex.ru",
                 "Новые реквесты пришли",
@@ -96,7 +97,7 @@ public class RequestService {
         return requestExtensions;
     }
 
-    public List<MessageDto> getMessageNewRequests() {
+    public List<MessageDto> getNewMessages() {
         List<Message> newMessages = messageRepository.findAll().stream()
                 .filter(e -> e.getFrontSign().equals(false)).toList();
         List<MessageDto> dtos = new ArrayList<>();

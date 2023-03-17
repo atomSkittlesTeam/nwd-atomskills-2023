@@ -47,7 +47,7 @@ public class RequestController {
 
     @GetMapping("new-messages")
     public List<MessageDto> getNewMessages() {
-        return requestService.getMessageNewRequests();
+        return requestService.getNewMessages();
     }
 
     @PostMapping("message")
