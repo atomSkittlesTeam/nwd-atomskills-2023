@@ -70,11 +70,11 @@
         </td>
         <td>{{req.id}}</td>
         <td>{{req.number}}</td>
-        <td>{{req.date}}</td>
+        <td>{{getReleaseDate(req.date)}}</td>
         <td>{{req.contractor.caption}}</td>
         <td>{{req.description}}</td>
         <td>{{req.state?.caption}}</td>
-        <td>{{req.releaseDate}}</td>
+        <td>{{getReleaseDate(req.releaseDate)}}</td>
       </tr>
     </ng-template>
   </p-table>
