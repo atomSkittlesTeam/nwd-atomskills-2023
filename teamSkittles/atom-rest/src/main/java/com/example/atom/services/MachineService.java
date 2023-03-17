@@ -44,7 +44,7 @@ public class MachineService {
         listOfMaps.forEach(map -> allMachinesPorts.addAll(map.values().stream().toList()));
         for (Integer port : allMachinesPorts) {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
-            if (machineDto.getState() != null && machineDto.getState().getCode().equals("BROKEN")){
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals("WAITING")){
                 saveMessageOfBrokenMachine(machineDto);
             }
         }
@@ -72,12 +72,14 @@ public class MachineService {
         List<Message> messages = messageRepository.findAll();
         List<Message> newMessages = messages.stream().filter(e -> e.getEmailSign().equals(false)
                 && e.getType().equals(Types.machineBroke)).toList();
-        String numbers = String.join(",", newMessages.stream().map(Message::getObjectName).toList());
-        emailService.sendSimpleMessage("sergej.davidyuk@yandex.ru",
-                "Произошла поломка станка!",
-                ("Станки с кодами: " + numbers + " сломаны"));
-        newMessages.forEach(e -> e.setEmailSign(true));
-        messageRepository.saveAll(newMessages);
+        if (newMessages.size() > 0) {
+            String numbers = String.join(",", newMessages.stream().map(Message::getObjectName).toList());
+            emailService.sendSimpleMessage("sergej.davidyuk@yandex.ru",
+                    "Произошла поломка станка!",
+                    ("Станки с кодами: " + numbers + " сломаны"));
+            newMessages.forEach(e -> e.setEmailSign(true));
+            messageRepository.saveAll(newMessages);
+        }
     }
 
 }
