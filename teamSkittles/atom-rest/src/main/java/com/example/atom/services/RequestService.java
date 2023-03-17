@@ -1,8 +1,6 @@
 package com.example.atom.services;
 
-import com.example.atom.dto.MessageDto;
-import com.example.atom.dto.RequestDto;
-import com.example.atom.dto.Types;
+import com.example.atom.dto.*;
 import com.example.atom.entities.Message;
 import com.example.atom.entities.RequestExtension;
 import com.example.atom.readers.RequestReader;
@@ -14,9 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,7 +31,7 @@ public class RequestService {
     @Autowired
     private EmailServiceImpl emailService;
 
-    @Scheduled(fixedDelay = 1000 * 5)
+    @Scheduled(fixedDelay = 1000 * 20)
     @Transactional
     public void getAllRequestsAndFindNew() {
         //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые
@@ -61,13 +57,14 @@ public class RequestService {
             //если они есть - отсылаю емейл
             sendMessageOfNewRequests();
         }
+        System.out.println("Дернул все реквесты");
     }
 
     public void saveMessagesOfNewRequests(List<RequestDto> newRequestDtos) {
         List<Message> listMessages = new ArrayList<>();
         newRequestDtos.forEach(request -> {
             Message message = new Message(Types.newRequests, false,
-                    false, request.getId(), request.getNumber());
+                    false, request.getId(), request.getNumber(), null);
             listMessages.add(message);
         });
         messageRepository.saveAll(listMessages);
@@ -77,7 +74,8 @@ public class RequestService {
     @Transactional
     public void sendMessageOfNewRequests() {
         List<Message> messages = messageRepository.findAll();
-        List<Message> newMessages = messages.stream().filter(e -> e.getEmailSign().equals(false)).toList();
+        List<Message> newMessages = messages.stream().filter(e -> e.getEmailSign().equals(false)
+                && e.getType().equals(Types.newRequests)).toList();
         String numbers = String.join(",", newMessages.stream().map(Message::getObjectName).toList());
         emailService.sendSimpleMessage("sergej.davidyuk@yandex.ru",
                 "Новые реквесты пришли",
@@ -85,6 +83,7 @@ public class RequestService {
                         + "вот такие номера у новых заказов: " + numbers));
         newMessages.forEach(e -> e.setEmailSign(true));
         messageRepository.saveAll(newMessages);
+        System.out.println("Отправил сообщение о новых реквестах");
     }
 
     public List<RequestExtension> getListEntitiesFromListDtos(List<RequestDto> requestDtos) {
@@ -96,7 +95,7 @@ public class RequestService {
         return requestExtensions;
     }
 
-    public List<MessageDto> getMessageNewRequests() {
+    public List<MessageDto> getNewMessages() {
         List<Message> newMessages = messageRepository.findAll().stream()
                 .filter(e -> e.getFrontSign().equals(false)).toList();
         List<MessageDto> dtos = new ArrayList<>();
@@ -112,5 +111,51 @@ public class RequestService {
         messageRepository.saveAll(messages);
         messageRepository.flush();
     }
+
+    public List<RequestExtension> getOrderedRequests(List<Long> requestIds) {
+        List<RequestExtension> result = new ArrayList<>();
+        List<RequestExtension> requestExtensionList = requestRepository.findAllById(requestIds);
+        Map<Long, RequestExtension> mapRequestExtensionById = requestExtensionList.stream()
+                .collect(Collectors.toMap(RequestExtension::getRequestId, Function.identity()));
+        Map<Long, List<RequestPositionDto>> mapItemsByRequestId = new HashMap<>();
+        List<Long> idsOverTwoDays = new ArrayList<>();
+        List<RequestExtension> requestOverTwoDays = new ArrayList<>();
+        List<Long> idsUnderTwoDays = new ArrayList<>();
+        List<RequestExtension> requestUnderTwoDays = new ArrayList<>();
+        requestExtensionList.forEach(requestExtension -> {
+            List<RequestPositionDto> positionItemsDto = requestReader.getRequestPositionById(requestExtension.getRequestId());
+            mapItemsByRequestId.put(requestExtension.getRequestId(), positionItemsDto);
+        });
+        for (var entry : mapItemsByRequestId.entrySet()) {
+            int requestTime = 0;
+            for(RequestPositionDto dto : entry.getValue()) {
+                int requestPositionTime = dto.getQuantity() * (dto.getProduct().getMillingTime() + dto.getProduct().getLatheTime());
+                requestTime += requestPositionTime;
+            }
+            if(requestTime < 60 * 60 * 24 * 2) {
+                idsUnderTwoDays.add(entry.getKey());
+            } else {
+                idsOverTwoDays.add(entry.getKey());
+            }
+        }
+        idsOverTwoDays.forEach(id -> {
+            requestOverTwoDays.add(mapRequestExtensionById.get(id));
+        });
+        idsUnderTwoDays.forEach(id -> {
+            requestUnderTwoDays.add(mapRequestExtensionById.get(id));
+        });
+        sortList(requestOverTwoDays);
+        sortList(requestUnderTwoDays);
+        result.addAll(requestOverTwoDays);
+        result.addAll(requestUnderTwoDays);
+        return result;
+    }
+
+    private void sortList(List<RequestExtension> list) {
+        Comparator<RequestExtension> c = Comparator.comparing(RequestExtension::getDate)
+                .thenComparing(RequestExtension::getReleaseDate);
+        list.sort(c);
+    }
+
 
 }

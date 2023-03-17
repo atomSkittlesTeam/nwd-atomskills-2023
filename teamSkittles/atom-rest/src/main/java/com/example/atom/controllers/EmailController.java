@@ -18,10 +18,4 @@ public class EmailController {
 
     @Autowired
     EmailServiceImpl emailService;
-
-    @PostMapping("send")
-    public void helloWorld(@RequestBody List<RequestDto> newRequestDtos) {
-        emailService.sendSimpleMessage("sergej.davidyuk@yandex.ru", "А если очень поменять тему?",
-                "Я стараюсь не попасть в спам \n Вот бы не попасть то \nЩа не попаду");
-    }
 }

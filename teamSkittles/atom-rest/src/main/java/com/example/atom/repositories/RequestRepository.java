@@ -1,6 +1,5 @@
 package com.example.atom.repositories;
 
-import com.example.atom.entities.Contractor;
 import com.example.atom.entities.RequestExtension;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

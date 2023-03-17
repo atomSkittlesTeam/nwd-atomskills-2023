@@ -4,13 +4,16 @@ import com.example.atom.dto.ContractorDto;
 import com.example.atom.dto.MessageDto;
 import com.example.atom.dto.RequestDto;
 import com.example.atom.dto.RequestPositionDto;
+import com.example.atom.entities.RequestExtension;
 import com.example.atom.readers.RequestReader;
 import com.example.atom.services.EmailServiceImpl;
 import com.example.atom.services.RequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -47,12 +50,22 @@ public class RequestController {
 
     @GetMapping("new-messages")
     public List<MessageDto> getNewMessages() {
-        return requestService.getMessageNewRequests();
+        return requestService.getNewMessages();
     }
 
     @PostMapping("message")
     public void messageSetFrontSing(@RequestBody List<Long> messageIds) {
         requestService.messageSetFrontSing(messageIds);
+    }
+
+    @PostMapping("ordered-plan")
+    public List<RequestExtension> orderedPlan(@RequestBody List<Long> requestIds) {
+        return requestService.getOrderedRequests(requestIds);
+    }
+
+    @PostMapping("approve-plan")
+    public List<RequestExtension> approvePlan(@RequestBody List<Long> requestIds) {
+        return requestService.getOrderedRequests(requestIds);
     }
 
 }
