@@ -24,12 +24,17 @@ public class UserController {
     }
 
     @GetMapping("{login}/roles")
-    public List<String> getUserRoles(@PathVariable String login) {
+    public String getUserRoles(@PathVariable String login) {
         return userService.getUserRole(login);
     }
 
     @PutMapping("update")
     public UserDto updateUser(@RequestBody UserDto user) {
         return userService.updateUser(user);
+    }
+
+    @DeleteMapping("delete/{login}")
+    public void deleteUser(@PathVariable String login) {
+        userService.deleteUser(login);
     }
 }

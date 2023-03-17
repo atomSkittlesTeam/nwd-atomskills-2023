@@ -11,10 +11,14 @@ import java.util.List;
 @NoArgsConstructor
 public class UserDto {
     public String login;
-    private List<String> role;
+    private String fullName;
+    private String email;
+    private String role;
 
     public UserDto(User user) {
         this.login = user.getLogin();
-        this.role = user.getRoles();
+        this.role = user.getRole();
+        this.email = user.getEmail();
+        this.fullName = user.getFullName();
     }
 }

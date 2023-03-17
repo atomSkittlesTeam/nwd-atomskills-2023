@@ -20,16 +20,19 @@ public class User {
     @Column(nullable = false, unique = true)
     public String login;
     private String password;
+    private String fullName;
+    private String email;
 
-    @ElementCollection(fetch = FetchType.EAGER)
     @JoinTable(
             name = "authorities",
             joinColumns = {@JoinColumn(name = "login")})
     @Column(name = "authority")
-    private List<String> roles;
+    private String role;
 
     public void update(UserDto userDto) {
         this.login = userDto.login;
-        this.roles = userDto.getRole();
+        this.role = userDto.getRole();
+        this.email = userDto.getEmail();
+        this.fullName = userDto.getFullName();
     }
 }
