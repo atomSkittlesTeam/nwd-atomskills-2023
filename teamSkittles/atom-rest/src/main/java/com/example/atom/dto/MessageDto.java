@@ -26,5 +26,13 @@ public class MessageDto {
         this.objectId = message.getObjectId();
         this.objectName = message.getObjectName();
         this.instant = message.getInstant();
+        switch (type) {
+            case newRequests ->
+                    this.customText = "Новая заявка! Номер заявки: " + message.getObjectName();
+            case machineBroke ->
+                    this.customText = "Станок сломан! Номер станка: " + message.getObjectName();
+            case machineRepair ->
+                    this.customText = "Станок отремонтирован! Номер станка: " + message.getObjectName();
+        }
     }
 }
