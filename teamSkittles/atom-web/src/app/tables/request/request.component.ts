@@ -4,6 +4,7 @@ import {RequestService} from "../../services/request.service";
 import {RequestPosition} from "../../dto/RequestPosition";
 import {MessageService} from "primeng/api";
 import {Router} from "@angular/router";
+import {formatDate} from "@angular/common";
 
 @Component({
   selector: 'app-request',
@@ -52,5 +53,9 @@ export class RequestComponent implements OnInit {
   sendRequestsPositions() {
     localStorage.setItem('SendArray', JSON.stringify(this.selectedRequests));
     this.router.navigate(['/manage']);
+  }
+
+  getReleaseDate(date: Date) {
+    return formatDate(date, 'dd/MM/yyyy', 'en');
   }
 }
