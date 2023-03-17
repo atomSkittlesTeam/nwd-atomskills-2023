@@ -12,3 +12,5 @@ spring:
     generate-ddl: true
 server:
   port: 8081
+api:
+  url: "http://192.168.1.44:1040"

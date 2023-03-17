@@ -99,7 +99,7 @@ public class UserService {
     private void generateAdminUser() {
         User admin = new User();
         admin.setLogin("admin");
-        admin.setPassword("");
+        admin.setPassword("admin");
         admin.setEmail("admin@email");
         admin.setFullName("Админ Админыч Админов");
         User user = User.builder()

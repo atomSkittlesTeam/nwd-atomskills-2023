@@ -1,8 +1,9 @@
 package com.example.atom.services;
 
-import com.example.atom.dto.ContractorDto;
 import com.example.atom.dto.DemoDto;
-import com.example.atom.entities.Contractor;
+import com.example.atom.dto.RequestDto;
+import com.example.atom.dto.RequestPositionDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,28 +17,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class DictionaryService {
-
-    private String serverUrl = "server";
+public class RequestService {
+    @Value("${api.url}")
+    private String url;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public List<ContractorDto> getContractors() {
-        String url = UriComponentsBuilder.fromHttpUrl(serverUrl + "/dict/contractors")
+    public List<RequestDto> getRequests() {
+        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/crm/requests")
                 .build(false)
                 .toUriString();
         try {
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<?> entity = new HttpEntity<>(null, headers);
 
-            ResponseEntity<List<DemoDto>> responseEntity = restTemplate.exchange(
+            ResponseEntity<List<RequestDto>> responseEntity = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     entity,
-                    new ParameterizedTypeReference<List<ContractorDto>>() {
+                    new ParameterizedTypeReference<List<RequestDto>>() {
                     });
 
-            List<ContractorDto> result = responseEntity.getBody();
+            List<RequestDto> result = responseEntity.getBody();
             if (result == null)
                 System.out.println("Null");
             return result;
@@ -47,8 +48,62 @@ public class DictionaryService {
         return null;
     }
 
+    public RequestDto getRequestById(Long id) {
+        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/crm/requests/" + id.toString())
+                .build(false)
+                .toUriString();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<?> entity = new HttpEntity<>(null, headers);
+
+            ResponseEntity<RequestDto> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<RequestDto>() {
+                    });
+
+            RequestDto result = responseEntity.getBody();
+            if (result == null)
+                System.out.println("Null");
+            return result;
+        } catch (Exception e) {
+            System.out.println("impossible");
+        }
+        return null;
+    }
+
+    public List<RequestPositionDto> getRequestPositionById(Long id) {
+        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/crm/requests/" + id.toString() + "/items")
+                .build(false)
+                .toUriString();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<?> entity = new HttpEntity<>(null, headers);
+
+            ResponseEntity<List<RequestPositionDto>> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<List<RequestPositionDto>>() {
+                    });
+
+            List<RequestPositionDto> result = responseEntity.getBody();
+            if (result == null)
+                System.out.println("Null");
+            return result;
+        } catch (Exception e) {
+            System.out.println("impossible");
+        }
+        return null;
+    }
+
+
+
+    ////////свалка///////
+
     public List<DemoDto> sendIdToServer(Long id) {
-        String url = UriComponentsBuilder.fromHttpUrl(serverUrl + "/integration/send-id/" + id.toString())
+        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/integration/send-id/" + id.toString())
                 .build(false)
                 .toUriString();
         try {
@@ -74,7 +129,7 @@ public class DictionaryService {
     }
 
     public List<DemoDto> sendDemoToServer(DemoDto demoDto) {
-        String url = UriComponentsBuilder.fromHttpUrl(serverUrl + "/integration/send-dto")
+        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/integration/send-dto")
                 .build(false)
                 .toUriString();
         try {
@@ -99,7 +154,7 @@ public class DictionaryService {
     }
 
     public List<DemoDto> sendDemoListToServer(List<DemoDto> demoDtoList) {
-        String url = UriComponentsBuilder.fromHttpUrl(serverUrl + "/integration/send-dto")
+        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/integration/send-dto")
                 .build(false)
                 .toUriString();
         try {
