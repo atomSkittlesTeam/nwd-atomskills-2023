@@ -1,8 +1,10 @@
 package com.example.atom.controllers;
 
 import com.example.atom.dto.ContractorDto;
+import com.example.atom.dto.MessageDto;
 import com.example.atom.dto.RequestDto;
 import com.example.atom.dto.RequestPositionDto;
+import com.example.atom.readers.RequestReader;
 import com.example.atom.services.EmailServiceImpl;
 import com.example.atom.services.RequestService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,10 @@ import java.util.List;
 public class RequestController {
 
     @Autowired
-    private RequestService dictionaryService;
+    private RequestService requestService;
+
+    @Autowired
+    private RequestReader requestReader;
 
     @GetMapping("debug")
     public void helloWorld() {
@@ -27,17 +32,22 @@ public class RequestController {
 
     @GetMapping("")
     public List<RequestDto> getRequests() {
-        return dictionaryService.getRequests();
+        return requestReader.getRequests();
     }
 
     @GetMapping("{id}")
     public RequestDto getRequestById(@PathVariable Long id) {
-        return dictionaryService.getRequestById(id);
+        return requestReader.getRequestById(id);
     }
 
     @GetMapping("{id}/items")
     public List<RequestPositionDto> getRequestPositionById(@PathVariable Long id) {
-        return dictionaryService.getRequestPositionById(id);
+        return requestReader.getRequestPositionById(id);
+    }
+
+    @GetMapping("new-messages")
+    public List<MessageDto> getNewMessages() {
+        return requestService.getMessageNewRequests();
     }
 
 }

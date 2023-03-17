@@ -1,181 +1,109 @@
 package com.example.atom.services;
 
-import com.example.atom.dto.DemoDto;
+import com.example.atom.dto.MessageDto;
 import com.example.atom.dto.RequestDto;
-import com.example.atom.dto.RequestPositionDto;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import com.example.atom.dto.Types;
+import com.example.atom.entities.Message;
+import com.example.atom.entities.RequestExtension;
+import com.example.atom.readers.RequestReader;
+import com.example.atom.repositories.MessageRepository;
+import com.example.atom.repositories.RequestRepository;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class RequestService {
-    @Value("${api.url}")
-    private String url;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private RequestReader requestReader;
 
-    public List<RequestDto> getRequests() {
-        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/crm/requests")
-                .build(false)
-                .toUriString();
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            HttpEntity<?> entity = new HttpEntity<>(null, headers);
+    @Autowired
+    private RequestRepository requestRepository;
 
-            ResponseEntity<List<RequestDto>> responseEntity = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    new ParameterizedTypeReference<List<RequestDto>>() {
-                    });
+    @Autowired
+    private MessageRepository messageRepository;
 
-            List<RequestDto> result = responseEntity.getBody();
-            if (result == null)
-                System.out.println("Null");
-            return result;
-        } catch (Exception e) {
-            System.out.println("impossible");
+    @Autowired
+    private EmailServiceImpl emailService;
+
+    @Scheduled(fixedDelay = 1000 * 5)
+    @Transactional
+    public void getAllRequestsAndFindNew() {
+        //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые
+        List<RequestDto> allRequests = requestReader.getRequests();
+        List<RequestExtension> requestsFromDB = requestRepository.findAll();
+        List<Long> newIds = CollectionUtils.subtract(
+                allRequests.stream().map(RequestDto::getId).toList(),
+                requestsFromDB.stream().map(RequestExtension::getRequestId).toList()
+        ).stream().toList();
+
+        //формирую лист из новых реквестов
+        Map<Long, RequestDto> mapRequestsByIds = allRequests.stream().collect(Collectors.toMap(RequestDto::getId, Function.identity()));
+        List<RequestDto> newRequestDtos = new ArrayList<>();
+        newIds.forEach(e -> newRequestDtos.add(mapRequestsByIds.get(e)));
+
+        //сохраняю новые реквесты
+        List<RequestExtension> requestExtensions = getListEntitiesFromListDtos(newRequestDtos);
+        requestRepository.saveAll(requestExtensions);
+        requestRepository.flush();
+        if (newRequestDtos.size() > 0) {
+            //если они есть - сохраняю сообщения в базу
+            saveMessagesOfNewRequests(newRequestDtos);
+            //если они есть - отсылаю емейл
+            sendMessageOfNewRequests();
         }
-        return null;
     }
 
-    public RequestDto getRequestById(Long id) {
-        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/crm/requests/" + id.toString())
-                .build(false)
-                .toUriString();
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            HttpEntity<?> entity = new HttpEntity<>(null, headers);
-
-            ResponseEntity<RequestDto> responseEntity = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    new ParameterizedTypeReference<RequestDto>() {
-                    });
-
-            RequestDto result = responseEntity.getBody();
-            if (result == null)
-                System.out.println("Null");
-            return result;
-        } catch (Exception e) {
-            System.out.println("impossible");
-        }
-        return null;
+    public void saveMessagesOfNewRequests(List<RequestDto> newRequestDtos) {
+        List<Message> listMessages = new ArrayList<>();
+        newRequestDtos.forEach(request -> {
+            Message message = new Message(Types.newRequests, false,
+                    false, request.getId(), request.getNumber());
+            listMessages.add(message);
+        });
+        messageRepository.saveAll(listMessages);
+        messageRepository.flush();
     }
 
-    public List<RequestPositionDto> getRequestPositionById(Long id) {
-        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/crm/requests/" + id.toString() + "/items")
-                .build(false)
-                .toUriString();
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            HttpEntity<?> entity = new HttpEntity<>(null, headers);
-
-            ResponseEntity<List<RequestPositionDto>> responseEntity = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    new ParameterizedTypeReference<List<RequestPositionDto>>() {
-                    });
-
-            List<RequestPositionDto> result = responseEntity.getBody();
-            if (result == null)
-                System.out.println("Null");
-            return result;
-        } catch (Exception e) {
-            System.out.println("impossible");
-        }
-        return null;
+    @Transactional
+    public void sendMessageOfNewRequests() {
+        List<Message> messages = messageRepository.findAll();
+        List<Message> newMessages = messages.stream().filter(e -> e.getEmailSign().equals(false)).toList();
+        String numbers = String.join(",", newMessages.stream().map(Message::getObjectName).toList());
+        emailService.sendSimpleMessage("sergej.davidyuk@yandex.ru",
+                "Новые реквесты пришли",
+                ("Пришли новые заказы, количество: " + newMessages.size() + "\n"
+                        + "вот такие номера у новых заказов: " + numbers));
+        newMessages.forEach(e -> e.setEmailSign(true));
+        messageRepository.saveAll(newMessages);
     }
 
-
-
-    ////////свалка///////
-
-    public List<DemoDto> sendIdToServer(Long id) {
-        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/integration/send-id/" + id.toString())
-                .build(false)
-                .toUriString();
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            HttpEntity<?> entity = new HttpEntity<>(null, headers);
-            //HttpEntity<?> entity = new HttpEntity<>(id, headers); //как вариант, id здесь может быть
-
-            ResponseEntity<List<DemoDto>> responseEntity = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    new ParameterizedTypeReference<List<DemoDto>>() {
-                    });
-
-            List<DemoDto> result = responseEntity.getBody();
-            if (result == null)
-                System.out.println("Null");
-            return result;
-        } catch (Exception e) {
-            System.out.println("impossible");
-        }
-        return null;
+    public List<RequestExtension> getListEntitiesFromListDtos(List<RequestDto> requestDtos) {
+        List<RequestExtension> requestExtensions = new ArrayList<>();
+        requestDtos.forEach(dto -> {
+            requestExtensions.add(new RequestExtension(
+                    dto.getId(), dto.getNumber(), dto.getDate(), dto.getReleaseDate()));
+        });
+        return requestExtensions;
     }
 
-    public List<DemoDto> sendDemoToServer(DemoDto demoDto) {
-        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/integration/send-dto")
-                .build(false)
-                .toUriString();
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            HttpEntity<?> entity = new HttpEntity<>(demoDto, headers);
-
-            ResponseEntity<List<DemoDto>> responseEntity = restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    entity,
-                    new ParameterizedTypeReference<List<DemoDto>>() {
-                    });
-
-            List<DemoDto> result = responseEntity.getBody();
-            if (result == null)
-                System.out.println("Null");
-            return result;
-        } catch (Exception e) {
-            System.out.println("impossible");
-        }
-        return new ArrayList<>();
-    }
-
-    public List<DemoDto> sendDemoListToServer(List<DemoDto> demoDtoList) {
-        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/integration/send-dto")
-                .build(false)
-                .toUriString();
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            HttpEntity<?> entity = new HttpEntity<>(demoDtoList, headers);
-
-            ResponseEntity<List<DemoDto>> responseEntity = restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    entity,
-                    new ParameterizedTypeReference<List<DemoDto>>() {
-                    });
-
-            List<DemoDto> result = responseEntity.getBody();
-            if (result == null)
-                System.out.println("Null");
-            return result;
-        } catch (Exception e) {
-            System.out.println("impossible");
-        }
-        return new ArrayList<>();
+    public List<MessageDto> getMessageNewRequests() {
+        List<Message> newMessages = messageRepository.findAll().stream()
+                .filter(e -> e.getFrontSign().equals(false)).toList();
+        List<MessageDto> dtos = new ArrayList<>();
+        newMessages.forEach(message -> {
+            dtos.add(new MessageDto(message));
+        });
+        return dtos;
     }
 
 }
