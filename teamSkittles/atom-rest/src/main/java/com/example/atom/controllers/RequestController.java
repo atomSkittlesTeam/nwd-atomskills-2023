@@ -3,6 +3,7 @@ package com.example.atom.controllers;
 import com.example.atom.dto.ContractorDto;
 import com.example.atom.dto.RequestDto;
 import com.example.atom.dto.RequestPositionDto;
+import com.example.atom.services.EmailServiceImpl;
 import com.example.atom.services.RequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,11 @@ public class RequestController {
 
     @Autowired
     private RequestService dictionaryService;
+
+    @GetMapping("debug")
+    public void helloWorld() {
+        int i = 0;
+    }
 
     @GetMapping("")
     public List<RequestDto> getRequests() {
