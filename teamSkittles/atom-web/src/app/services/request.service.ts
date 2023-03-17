@@ -39,4 +39,8 @@ export class RequestService extends BaseService {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.post(url + `/requests/message`, ids));
   }
+  async orderedPlan(ids: number[]) {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.post<any[]>(url + `/requests/ordered-plan`, ids));
+  }
 }

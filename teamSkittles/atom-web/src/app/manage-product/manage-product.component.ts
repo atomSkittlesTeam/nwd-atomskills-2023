@@ -1,53 +1,53 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Request} from "../dto/Request";
+import {RequestService} from "../services/request.service";
+import {MessageService} from "primeng/api";
 
 @Component({
   selector: 'app-manage-product',
   templateUrl: './manage-product.component.html',
-  styleUrls: ['./manage-product.component.scss']
+  styleUrls: ['./manage-product.component.scss'],
+  providers: [MessageService]
 })
-export class ManageProductComponent implements OnInit, OnDestroy{
-  selectedIds: Request[] = [];
+export class ManageProductComponent implements OnInit, OnDestroy {
+  selectedRequests: Request[] = [];
   cols: any[];
   isManual: boolean = true;
 
-  constructor() {
+  constructor(public requestService: RequestService, public messageService: MessageService) {
     if (localStorage.getItem("SendArray")) {
       // @ts-ignore
-      this.selectedIds = JSON.parse(localStorage.getItem("SendArray"));
+      this.selectedRequests = JSON.parse(localStorage.getItem("SendArray"));
       this.countPriority();
-
     }
   }
 
   ngOnInit(): void {
-    console.log(this.selectedIds);
+    console.log(this.selectedRequests);
   }
+
   countPriority() {
-    this.selectedIds.forEach((e, idx)=> e.priority = idx + 1)
+    this.selectedRequests.forEach((e, idx) => e.priority = idx + 1)
   }
 
   ngOnDestroy(): void {
     localStorage.removeItem("SendArray");
-
   }
-
 
   onDropChange() {
     this.countPriority();
-
-    console.log(this.selectedIds)
   }
 
-  countAutomaticxOrder() {
+  async countAutomaticxOrder() {
     this.isManual = false;
-    
+    await this.requestService.orderedPlan(this.selectedRequests.map(e => e.id)).catch((data) => {
+      this.selectedRequests = data;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Ошибка регистрации',
+        detail: 'Произошла ошибка автоматического расчета',
+      })
+    });
   }
 
-  test(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    console.log('ssss')
-    return null;
-  }
 }

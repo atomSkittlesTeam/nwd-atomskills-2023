@@ -11,7 +11,7 @@
       <p-inputSwitch [(ngModel)]="isManual"></p-inputSwitch>
     </div>
   </p-toolbar>
-  <p-table [value]="selectedIds" [tableStyle]="{'min-width': '50rem'}">
+  <p-table [value]="selectedRequests" [tableStyle]="{'min-width': '50rem'}">
     <ng-template pTemplate="header">
       <tr>
         <th style="width:3rem" *ngIf="isManual"></th>
@@ -34,12 +34,11 @@
         <td>{{req.id}}</td>
         <td>{{req.number}}</td>
         <td>{{req.date}}</td>
-        <td>{{req.contractor.caption}}</td>
         <td>{{req.description}}</td>
-        <td>{{req.state?.caption}}</td>
         <td>{{req.releaseDate}}</td>
       </tr>
     </ng-template>
   </p-table>
 
 </ng-container>
+<p-toast></p-toast>

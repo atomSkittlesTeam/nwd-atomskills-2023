@@ -6,6 +6,7 @@ import {MenuItem} from "primeng/api";
 import {Message} from "./dto/Message";
 import {Enums} from "./dto/enums";
 import {RequestService} from "./services/request.service";
+import {interval} from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -22,6 +23,7 @@ export class AppComponent implements OnInit {
 
   constructor(public authService: AuthService, public router: Router, private userService: UserService, public requestService: RequestService) {
     this.admin = !!this.authService.get();
+    this.getMessagesByTime();
   }
 
   deleteAuthMark() {
@@ -32,6 +34,14 @@ export class AppComponent implements OnInit {
     this.messages = await this.requestService.getNewMessages();
     console.log(this.messages)
     this.display = true;
+  }
+
+  getMessagesByTime() {
+
+    interval(60000).subscribe(async () => {
+      this.messages = await this.requestService.getNewMessages();
+
+    });
   }
 
   async ngOnInit(): Promise<void> {

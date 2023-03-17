@@ -1,4 +1,4 @@
 {
-    "backendUrl": "http://localhost:8081",
-    "backendUrl1": "http://192.168.1.44:8081"
+    "backendUrl2": "http://localhost:8081",
+    "backendUrl": "http://192.168.1.44:8081"
 }
