@@ -35,6 +35,7 @@ public class ProductService {
         List<Product> products = getListEntitiesFromListDtos(allProducts);
         productRepository.saveAll(products);
         productRepository.flush();
+        System.out.println("Перезаписал dict product");
     }
 
     public List<Product> getListEntitiesFromListDtos(List<ProductDto> productDtos) {

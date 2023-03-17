@@ -34,7 +34,7 @@ public class MachineService {
     @Autowired
     private EmailServiceImpl emailService;
 
-    @Scheduled(fixedDelay = 1000 * 1)
+    @Scheduled(fixedDelay = 1000 * 20)
     @Transactional
     public void getAllBrokenMachines() {
         //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые
@@ -49,6 +49,7 @@ public class MachineService {
             }
         }
         sendMessageOfBrokenMachines();
+        System.out.println("Дернул все станки на поломку");
     }
 
     public void saveMessageOfBrokenMachine(MachineDto machineDto) {
@@ -79,6 +80,8 @@ public class MachineService {
                     ("Станки с кодами: " + numbers + " сломаны"));
             newMessages.forEach(e -> e.setEmailSign(true));
             messageRepository.saveAll(newMessages);
+            messageRepository.flush();
+            System.out.println("Отправил сообщение о поломке сообщений");
         }
     }
 
