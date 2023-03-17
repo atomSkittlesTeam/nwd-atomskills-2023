@@ -18,6 +18,8 @@ public class RequestDto {
     private String description;
     private StateDto state;
     private Date releaseDate;
+    private Integer time;
+    private Long priority;
 
     public RequestDto getRequestDtoFromEntity(Request request) {
         this.id = request.getId();
@@ -25,6 +27,7 @@ public class RequestDto {
         this.date = request.getDate();
         this.description = request.getDescription();
         this.releaseDate = request.getReleaseDate();
+        this.time = request.getTime();
         return this;
     }
 

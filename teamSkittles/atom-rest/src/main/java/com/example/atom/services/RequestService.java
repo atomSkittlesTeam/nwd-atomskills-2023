@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,9 @@ public class RequestService {
 
     @Autowired
     private EmailServiceImpl emailService;
+
+    @Autowired
+    private ProductionPlanService productionPlanService;
 
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
@@ -95,7 +99,7 @@ public class RequestService {
         List<Request> requests = new ArrayList<>();
         requestDtos.forEach(dto -> {
             requests.add(new Request(
-                    dto.getId(), dto.getNumber(), dto.getDate(), dto.getDescription(), dto.getReleaseDate()));
+                    dto.getId(), dto.getNumber(), dto.getDate(), dto.getDescription(), dto.getReleaseDate(), null));
         });
         return requests;
     }
@@ -142,6 +146,7 @@ public class RequestService {
             } else {
                 idsOverTwoDays.add(entry.getKey());
             }
+            mapRequestExtensionById.get(entry.getKey()).setTime(requestTime);
         }
         idsOverTwoDays.forEach(id -> {
             requestOverTwoDays.add(mapRequestExtensionById.get(id));
@@ -149,15 +154,21 @@ public class RequestService {
         idsUnderTwoDays.forEach(id -> {
             requestUnderTwoDays.add(mapRequestExtensionById.get(id));
         });
+        requestRepository.saveAll(mapRequestExtensionById.values().stream().toList());
+        requestRepository.flush();
         sortList(requestOverTwoDays);
         sortList(requestUnderTwoDays);
         List<Request> helpList = new ArrayList<>();
         helpList.addAll(requestOverTwoDays);
         helpList.addAll(requestUnderTwoDays);
-        helpList.forEach(res -> {
+        long priority = productionPlanService.getCurrentMaxPriority();
+        for (Request res : helpList) {
             RequestDto dto = new RequestDto();
+            priority++;
+            dto.setPriority(priority);
             result.add(dto.getRequestDtoFromEntity(res));
-        });
+        }
+
         return result;
     }
 

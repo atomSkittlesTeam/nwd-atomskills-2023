@@ -21,6 +21,7 @@ public class Request {
     private Date date;
     private String description;
     private Date releaseDate;
+    private Integer time;
 
 
 //    public RequestExtension(String name, String description) {
