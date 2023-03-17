@@ -1,25 +1,25 @@
 package com.example.atom.entities;
 
-import com.example.atom.dto.RequestDto;
+import com.example.atom.dto.ContractorDto;
+import com.example.atom.dto.StateDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestExtension {
+public class Request {
     @Id
     @Column(name = "id", nullable = false)
-    private Long requestId;
+    private Long id;
     private String number; //номер заказа (по идее)
     private Date date;
+    private String description;
     private Date releaseDate;
 
 

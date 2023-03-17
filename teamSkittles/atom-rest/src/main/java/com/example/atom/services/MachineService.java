@@ -1,16 +1,10 @@
 package com.example.atom.services;
 
 import com.example.atom.dto.MachineDto;
-import com.example.atom.dto.MessageDto;
-import com.example.atom.dto.RequestDto;
 import com.example.atom.dto.Types;
 import com.example.atom.entities.Message;
-import com.example.atom.entities.RequestExtension;
 import com.example.atom.readers.MachineReader;
-import com.example.atom.readers.RequestReader;
 import com.example.atom.repositories.MessageRepository;
-import com.example.atom.repositories.RequestRepository;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,9 +13,6 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class MachineService {
@@ -34,7 +25,7 @@ public class MachineService {
     @Autowired
     private EmailServiceImpl emailService;
 
-    @Scheduled(fixedDelay = 1000 * 20)
+    @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void getAllBrokenMachines() {
         //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые

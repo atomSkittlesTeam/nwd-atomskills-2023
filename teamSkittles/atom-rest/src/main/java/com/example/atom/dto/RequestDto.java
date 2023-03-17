@@ -1,5 +1,6 @@
 package com.example.atom.dto;
 
+import com.example.atom.entities.Request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,5 +18,14 @@ public class RequestDto {
     private String description;
     private StateDto state;
     private Date releaseDate;
+
+    public RequestDto getRequestDtoFromEntity(Request request) {
+        this.id = request.getId();
+        this.number = request.getNumber();
+        this.date = request.getDate();
+        this.description = request.getDescription();
+        this.releaseDate = request.getReleaseDate();
+        return this;
+    }
 
 }

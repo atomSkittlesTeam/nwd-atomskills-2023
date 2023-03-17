@@ -1,13 +1,7 @@
 package com.example.atom.services;
 
-import com.example.atom.dto.MachineDto;
 import com.example.atom.dto.ProductDto;
-import com.example.atom.dto.RequestDto;
-import com.example.atom.dto.Types;
-import com.example.atom.entities.Message;
 import com.example.atom.entities.Product;
-import com.example.atom.entities.RequestExtension;
-import com.example.atom.readers.MachineReader;
 import com.example.atom.readers.ProductReader;
 import com.example.atom.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -27,7 +20,7 @@ public class ProductService {
     @Autowired
     private ProductReader productReader;
 
-    @Scheduled(fixedDelay = 1000 * 20)
+//    @Scheduled(fixedDelay = 1000 * 20)
     @Transactional
     public void getAllProducts() {
         //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые

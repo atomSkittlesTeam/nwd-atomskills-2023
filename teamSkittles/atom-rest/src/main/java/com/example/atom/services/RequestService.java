@@ -2,9 +2,11 @@ package com.example.atom.services;
 
 import com.example.atom.dto.*;
 import com.example.atom.entities.Message;
-import com.example.atom.entities.RequestExtension;
+import com.example.atom.entities.ProductionPlan;
+import com.example.atom.entities.Request;
 import com.example.atom.readers.RequestReader;
 import com.example.atom.repositories.MessageRepository;
+import com.example.atom.repositories.ProductionPlanRepository;
 import com.example.atom.repositories.RequestRepository;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +31,20 @@ public class RequestService {
     private MessageRepository messageRepository;
 
     @Autowired
+    private ProductionPlanRepository productionPlanRepository;
+
+    @Autowired
     private EmailServiceImpl emailService;
 
-    @Scheduled(fixedDelay = 1000 * 20)
+    @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void getAllRequestsAndFindNew() {
         //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые
         List<RequestDto> allRequests = requestReader.getRequests();
-        List<RequestExtension> requestsFromDB = requestRepository.findAll();
+        List<Request> requestsFromDB = requestRepository.findAll();
         List<Long> newIds = CollectionUtils.subtract(
                 allRequests.stream().map(RequestDto::getId).toList(),
-                requestsFromDB.stream().map(RequestExtension::getRequestId).toList()
+                requestsFromDB.stream().map(Request::getId).toList()
         ).stream().toList();
 
         //формирую лист из новых реквестов
@@ -48,8 +53,8 @@ public class RequestService {
         newIds.forEach(e -> newRequestDtos.add(mapRequestsByIds.get(e)));
 
         //сохраняю новые реквесты
-        List<RequestExtension> requestExtensions = getListEntitiesFromListDtos(newRequestDtos);
-        requestRepository.saveAll(requestExtensions);
+        List<Request> requests = getListEntitiesFromListDtos(newRequestDtos);
+        requestRepository.saveAll(requests);
         requestRepository.flush();
         if (newRequestDtos.size() > 0) {
             //если они есть - сохраняю сообщения в базу
@@ -86,13 +91,13 @@ public class RequestService {
         System.out.println("Отправил сообщение о новых реквестах");
     }
 
-    public List<RequestExtension> getListEntitiesFromListDtos(List<RequestDto> requestDtos) {
-        List<RequestExtension> requestExtensions = new ArrayList<>();
+    public List<Request> getListEntitiesFromListDtos(List<RequestDto> requestDtos) {
+        List<Request> requests = new ArrayList<>();
         requestDtos.forEach(dto -> {
-            requestExtensions.add(new RequestExtension(
-                    dto.getId(), dto.getNumber(), dto.getDate(), dto.getReleaseDate()));
+            requests.add(new Request(
+                    dto.getId(), dto.getNumber(), dto.getDate(), dto.getDescription(), dto.getReleaseDate()));
         });
-        return requestExtensions;
+        return requests;
     }
 
     public List<MessageDto> getNewMessages() {
@@ -112,19 +117,19 @@ public class RequestService {
         messageRepository.flush();
     }
 
-    public List<RequestExtension> getOrderedRequests(List<Long> requestIds) {
-        List<RequestExtension> result = new ArrayList<>();
-        List<RequestExtension> requestExtensionList = requestRepository.findAllById(requestIds);
-        Map<Long, RequestExtension> mapRequestExtensionById = requestExtensionList.stream()
-                .collect(Collectors.toMap(RequestExtension::getRequestId, Function.identity()));
+    public List<RequestDto> getOrderedRequests(List<Long> requestIds) {
+        List<RequestDto> result = new ArrayList<>();
+        List<Request> requestExtensionList = requestRepository.findAllById(requestIds);
+        Map<Long, Request> mapRequestExtensionById = requestExtensionList.stream()
+                .collect(Collectors.toMap(Request::getId, Function.identity()));
         Map<Long, List<RequestPositionDto>> mapItemsByRequestId = new HashMap<>();
         List<Long> idsOverTwoDays = new ArrayList<>();
-        List<RequestExtension> requestOverTwoDays = new ArrayList<>();
+        List<Request> requestOverTwoDays = new ArrayList<>();
         List<Long> idsUnderTwoDays = new ArrayList<>();
-        List<RequestExtension> requestUnderTwoDays = new ArrayList<>();
+        List<Request> requestUnderTwoDays = new ArrayList<>();
         requestExtensionList.forEach(requestExtension -> {
-            List<RequestPositionDto> positionItemsDto = requestReader.getRequestPositionById(requestExtension.getRequestId());
-            mapItemsByRequestId.put(requestExtension.getRequestId(), positionItemsDto);
+            List<RequestPositionDto> positionItemsDto = requestReader.getRequestPositionById(requestExtension.getId());
+            mapItemsByRequestId.put(requestExtension.getId(), positionItemsDto);
         });
         for (var entry : mapItemsByRequestId.entrySet()) {
             int requestTime = 0;
@@ -146,15 +151,32 @@ public class RequestService {
         });
         sortList(requestOverTwoDays);
         sortList(requestUnderTwoDays);
-        result.addAll(requestOverTwoDays);
-        result.addAll(requestUnderTwoDays);
+        List<Request> helpList = new ArrayList<>();
+        helpList.addAll(requestOverTwoDays);
+        helpList.addAll(requestUnderTwoDays);
+        helpList.forEach(res -> {
+            RequestDto dto = new RequestDto();
+            result.add(dto.getRequestDtoFromEntity(res));
+        });
         return result;
     }
 
-    private void sortList(List<RequestExtension> list) {
-        Comparator<RequestExtension> c = Comparator.comparing(RequestExtension::getDate)
-                .thenComparing(RequestExtension::getReleaseDate);
+    private void sortList(List<Request> list) {
+        Comparator<Request> c = Comparator.comparing(Request::getDate)
+                .thenComparing(Request::getReleaseDate);
         list.sort(c);
+    }
+
+    public void productionPlanSave(List<Long> requestIds) {
+        List<ProductionPlan> productionPlanList = new ArrayList<>();
+        requestIds.forEach(requestId -> {
+            ProductionPlan productionPlan = new ProductionPlan();
+            productionPlan.setRequestId(requestId);
+            productionPlan.setRequestStatus(RequestStatus.BLANK);
+            productionPlanList.add(productionPlan);
+        });
+        productionPlanRepository.saveAll(productionPlanList);
+        productionPlanRepository.flush();
     }
 
 
