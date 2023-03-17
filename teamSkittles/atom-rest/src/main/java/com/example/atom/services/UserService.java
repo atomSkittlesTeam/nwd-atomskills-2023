@@ -72,7 +72,7 @@ public class UserService {
 
     public boolean isValidatedOfChiefCreate(User userForCreateOrUpdate) {
         Boolean validated = false;
-        User chief = userRepository.findByRole(userForCreateOrUpdate.getRole());
+        User chief = userRepository.findByRole("chief");
         //если есть шеф, и новый пользователь не совпадает с ним по логину, запрещаем
         if(chief != null && !chief.getLogin().equals(userForCreateOrUpdate.getLogin())) {
             throw new RuntimeException("Нельзя создать нового начальника!");
@@ -99,7 +99,7 @@ public class UserService {
     private void generateAdminUser() {
         User admin = new User();
         admin.setLogin("admin");
-        admin.setPassword("");
+        admin.setPassword("admin");
         admin.setEmail("admin@email");
         admin.setFullName("Админ Админыч Админов");
         User user = User.builder()

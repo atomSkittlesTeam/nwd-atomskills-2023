@@ -36,7 +36,7 @@
   </div>
 
   <h3>Доступные Роли:</h3>
-  <p-selectButton [options]="roles" [(ngModel)]="userDto.role" [multiple]="true" optionLabel="name" optionValue="name"></p-selectButton>
+  <p-selectButton [options]="roles" [(ngModel)]="userDto.role" [multiple]="false" optionLabel="name" optionValue="name"></p-selectButton>
   <ng-template pTemplate="footer">
     <p-button icon="pi pi-check" (click)="closeDialog()" label="Ok" styleClass="p-button-text"></p-button>
   </ng-template>

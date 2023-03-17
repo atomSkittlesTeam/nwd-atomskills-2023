@@ -3,7 +3,7 @@ export class  User {
  mail: string = "";
  fullName: string = "";
  password: string = "";
- role?: String[];
+ role?: string;
 
  constructor() {
  }

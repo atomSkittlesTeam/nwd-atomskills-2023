@@ -3,6 +3,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {LoginFormComponent} from "./login-form/login-form.component";
 import {NavigationComponent} from "./navigation/navigation.component";
 import {AdminComponent} from "./admin/admin.component";
+import {RequestComponent} from "./tables/request/request.component";
 
 const routes: Routes = [
   {path: '', component: NavigationComponent},
@@ -10,7 +11,7 @@ const routes: Routes = [
   {path: 'registration', component: LoginFormComponent},
   // {path: 'parsing', component: ParsingComponent},
   {path: 'admin', component: AdminComponent},
-  // {path: 'process', component: ProcessPageComponent},
+  {path: 'request', component: RequestComponent},
   // {path: 'stat', component: StatComponent},
 ];
 

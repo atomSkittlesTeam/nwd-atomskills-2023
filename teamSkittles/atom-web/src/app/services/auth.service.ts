@@ -34,8 +34,8 @@ export class AuthService extends BaseService {
     return await firstValueFrom(this.http.post(url + '/registration', {
       login: login?.login,
       password: login?.password,
-      mail: login?.mail,
-      fullname: login?.fullName
+      email: login?.mail,
+      fullName: login?.fullName
     })).then(data => {
       this.router.navigate(['/login']);
     });
