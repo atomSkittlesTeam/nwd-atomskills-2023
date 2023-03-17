@@ -26,14 +26,9 @@ export class UserService extends BaseService {
     return await firstValueFrom(this.http.put(url + '/user/update', userDto));
   }
 
-  async getUserRoles() {
-    let login = localStorage.getItem("LOGIN");
+  async getUserRoles(login: string) {
     const url = await this.getBackendUrl();
-    console.log(login, "data")
-
-    return await firstValueFrom(this.http.get<any>(url + `/user/${login}/roles`)
-    ).then(data => {
-      localStorage.setItem("ROLES", data)
-    });
+    const role = await firstValueFrom(this.http.get<any>(url + `/user/${login}/roles`));
+    return role[0];
   }
 }

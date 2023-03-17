@@ -5,9 +5,16 @@
 
       <p-button [label]="'Автоматический расчет приоритетов'"
                 icon="pi pi-sort-amount-down-alt" styleClass="p-button-info"
-                (onClick)="countAutomaticxOrder()"></p-button>
+                (onClick)="countAutomaticsOrder()"></p-button>
+
+      <p-button [label]="'Сохранить план'"
+                icon="pi pi-sort-amount-down-alt" styleClass="p-button-info"
+                (onClick)="savePlan()"></p-button>
+
+
     </div>
     <div class="p-toolbar-group-start">
+      <label style="margin-right: 5px; font-weight: bold">Ручной Режим</label>
       <p-inputSwitch [(ngModel)]="isManual"></p-inputSwitch>
     </div>
   </p-toolbar>
@@ -19,13 +26,12 @@
         <th>Id</th>
         <th>Номер</th>
         <th>Дата</th>
-        <th>Компания</th>
         <th>Описание</th>
-        <th>Статус</th>
         <th>Дата Выпуска</th>
+        <th>Утверждение</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body"  let-req let-index="rowIndex">
+    <ng-template pTemplate="body" let-req let-index="rowIndex">
       <tr [pReorderableRow]="isManual ? index : 0" [draggable]="false" (drop)="onDropChange()">
         <td *ngIf="isManual">
           <span class="pi pi-bars" pReorderableRowHandle></span>
@@ -36,6 +42,11 @@
         <td>{{req.date}}</td>
         <td>{{req.description}}</td>
         <td>{{req.releaseDate}}</td>
+        <td>
+          <p-button [disabled]="!(req.productionPlanStatus == StatusRequest.BLANK || req.productionPlanStatus == null) "
+                    icon="pi pi-check" styleClass="p-button-success"
+                    (onClick)="approvePosition(req.id)"></p-button>
+        </td>
       </tr>
     </ng-template>
   </p-table>

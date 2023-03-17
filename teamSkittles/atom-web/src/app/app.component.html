@@ -5,7 +5,7 @@
       <h3 style="cursor: pointer" routerLink="/">Пацаны ваще ребята</h3>
     </div>
     <div class="p-toolbar-group-start">
-      <p-button type="text" class="sidebar" (click)="showNewPositions()" icon="pi pi-bell" label="Уведомления ({{messages.length}})"></p-button>
+      <p-button type="text" class="sidebar" (click)="showNewPositions()" icon="pi pi-bell" label="{{messages.length}}" *ngIf="userAuth"></p-button>
 
 
     </div>
@@ -14,7 +14,7 @@
   <router-outlet></router-outlet>
 </ng-container>
 <p-speedDial [model]="items" class="module-nav" direction="up-left" type="quarter-circle"
-             buttonClassName="p-button-success" *ngIf="admin"></p-speedDial>
+             buttonClassName="p-button-success" *ngIf="userAuth"></p-speedDial>
 <p-sidebar [(visible)]="display" position="right" >
   <div class="container-message" >
     <h3 *ngIf="messages.length == 0">Нет новых сообщений</h3>

@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -24,8 +26,8 @@ public class UserController {
     }
 
     @GetMapping("{login}/roles")
-    public String getUserRoles(@PathVariable String login) {
-        return userService.getUserRole(login);
+    public List<String> getUserRoles(@PathVariable String login) {
+        return Collections.singletonList(userService.getUserRole(login));
     }
 
     @PutMapping("update")
