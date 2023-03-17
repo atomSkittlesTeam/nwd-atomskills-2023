@@ -1,0 +1,14 @@
+.container {
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  inset: 1rem;
+}
+
+.info {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
