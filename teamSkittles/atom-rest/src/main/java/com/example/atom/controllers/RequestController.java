@@ -59,8 +59,13 @@ public class RequestController {
         return requestService.getOrderedRequests(requestIds);
     }
 
-    @PostMapping("approve-plan")
+    @PostMapping("approve-plan/{id}")
     public void approvePlan(@RequestBody List<Long> requestIds) {
+        requestService.productionPlanSave(requestIds);
+    }
+
+    @PostMapping("save-draft")
+    public void savePlanDraft(@RequestBody List<Long> requestIds) {
         requestService.productionPlanSave(requestIds);
     }
 

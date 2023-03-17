@@ -18,7 +18,7 @@ public class RequestDto {
     private String description;
     private StateDto state;
     private Date releaseDate;
-    private Integer time;
+    private Float time; //в базе int, а тут флоат - для нормального отображения часов
     private Long priority;
 
     public RequestDto getRequestDtoFromEntity(Request request) {
@@ -27,7 +27,7 @@ public class RequestDto {
         this.date = request.getDate();
         this.description = request.getDescription();
         this.releaseDate = request.getReleaseDate();
-        this.time = request.getTime();
+        this.time = request.getTime().floatValue() / 3600; //на фронт выкидываем только в часах, а нам интересно полное время
         return this;
     }
 
