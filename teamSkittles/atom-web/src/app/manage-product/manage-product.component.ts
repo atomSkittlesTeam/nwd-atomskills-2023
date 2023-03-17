@@ -41,6 +41,7 @@ export class ManageProductComponent implements OnInit, OnDestroy{
 
   countAutomaticxOrder() {
     this.isManual = false;
+    
   }
 
   test(event: DragEvent) {
