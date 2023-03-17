@@ -3,6 +3,8 @@ package com.example.atom.controllers;
 
 import com.example.atom.entities.User;
 import com.example.atom.repositories.UserRepository;
+import com.example.atom.services.RoleService;
+import com.example.atom.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +18,8 @@ import java.util.List;
 public class AuthController {
 
     private final UserRepository userRepository;
+
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/registration")
@@ -24,8 +28,13 @@ public class AuthController {
         User user = User.builder()
                 .login(newUser.getLogin())
                 .password(passwordEncoder.encode(newUser.getPassword()))
-                .roles(List.of("USER"))
+                .email(newUser.getEmail())
+                .fullName(newUser.getFullName())
+                .role("user")
                 .build();
+        if(!userService.isValidatedOfChiefCreate(user)) {
+            throw new RuntimeException("Нельзя создавать второго шефа!");
+        }
         userRepository.save(user);
     }
 

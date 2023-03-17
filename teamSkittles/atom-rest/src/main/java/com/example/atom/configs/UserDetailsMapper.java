@@ -11,7 +11,7 @@ public class UserDetailsMapper {
 
         return User.withUsername(userCredentials.getLogin())
                 .password(userCredentials.getPassword())
-                .roles(userCredentials.getRoles().toArray(String[]::new))
+                .roles(userCredentials.getRole())
                 .build();
     }
 }

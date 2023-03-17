@@ -81,10 +81,10 @@ public class RoleService {
         Role role3 = new Role("chief", "Роль начальника");
         roles.add(role3);
 
-        Role role4 = new Role("miller", "Роль фрезеровщика");
+        Role role4 = new Role("contragent", "Роль заказчика");
         roles.add(role4);
 
-        Role role5 = new Role("turner", "Роль токаря");
+        Role role5 = new Role("operator", "Роль работника");
         roles.add(role5);
 
         roleRepository.saveAll(roles);
