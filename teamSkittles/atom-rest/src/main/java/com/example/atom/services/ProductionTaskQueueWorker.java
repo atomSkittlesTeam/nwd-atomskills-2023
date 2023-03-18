@@ -77,6 +77,7 @@ public class ProductionTaskQueueWorker {
                                 productionTask.getId(),
                                 productionTaskBatch.getProductionTaskId()
                                 );
+                        latheMachineDtoList.remove(firstFoundedLatheMachine);
                         // проверяем не начали ли фрезеровать
                     } else if (productionTask.getMillingStartTimestamp() == null) {
                         // фрезеруем, если есть доступные
@@ -88,6 +89,7 @@ public class ProductionTaskQueueWorker {
                                 productionTask.getId(),
                                 productionTaskBatch.getProductionTaskId()
                         );
+                        millingMachineDtoList.remove(firstFoundedMillingMachine);
                     }
                 }
             } else {
@@ -101,8 +103,10 @@ public class ProductionTaskQueueWorker {
                                Long batchId,
                                Long batchItemId,
                                Long productionTaskId) {
+        System.out.println("Отправляю " + productId.toString() + " на станок " + machineDto.getCode());
         MachineTaskDto machineTaskDto = new MachineTaskDto(new AdvInfoDto(productId, batchId, batchItemId, productionTaskId));
         machineReader.setStatusToMachine(machineDto.getPort(), MachineState.WORKING, machineTaskDto);
+        System.out.println("!Отправлено! " + productId.toString() + " на станок " + machineDto.getCode() + "!");
     }
 
 }
