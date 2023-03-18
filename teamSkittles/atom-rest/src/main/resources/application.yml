@@ -20,3 +20,8 @@ scheduled:
   repairing-machines: "60000"
   new-requests: "30000"
   queue-view: "35000"
+default-user:
+  login: "admin"
+  password: "admin"
+  email: "admin-user@gmail.com"
+  full-name: "Админ Админович Админов"
