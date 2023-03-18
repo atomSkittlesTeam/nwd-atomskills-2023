@@ -29,6 +29,7 @@ import { ManageProductComponent } from './manage-product/manage-product.componen
 import {InputSwitchModule} from "primeng/inputswitch";
 import {BlockUIModule} from "primeng/blockui";
 import { ProductionTasksComponent } from './tables/production-tasks/production-tasks.component';
+import {CheckboxModule} from "primeng/checkbox";
 @NgModule({
   declarations: [
     AppComponent,
@@ -59,7 +60,8 @@ import { ProductionTasksComponent } from './tables/production-tasks/production-t
         SidebarModule,
         ToolbarModule,
         InputSwitchModule,
-        BlockUIModule
+        BlockUIModule,
+        CheckboxModule
     ],
   providers: [ConfigService, {
     provide: HTTP_INTERCEPTORS,

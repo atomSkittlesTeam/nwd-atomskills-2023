@@ -8,6 +8,7 @@ import {User} from "../dto/User";
 import {Request} from "../dto/Request";
 import {RequestPosition} from "../dto/RequestPosition";
 import {Message} from "../dto/Message";
+import {ProductionTask} from "../dto/ProductionTask";
 
 @Injectable({
   providedIn: 'root'
@@ -67,7 +68,7 @@ export class RequestService extends BaseService {
 
   async getProductionTask() {
     const url = await this.getBackendUrl();
-    return await firstValueFrom(this.http.get<Request[]>(url + `/production/plan/tasks`, {}));
+    return await firstValueFrom(this.http.get<ProductionTask[]>(url + `/production/plan/tasks`, {}));
   }
 
   async approveProductionPlan2(id:number) {

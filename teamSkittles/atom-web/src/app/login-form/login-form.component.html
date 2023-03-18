@@ -56,6 +56,14 @@
       iconPos="left"
       [style]="{'margin-top':'10px'}"
       (click)="sendRequest()"></p-button>
+
+    <p-button
+      *ngIf="!isRegistrationForm"
+      class="button"
+      label="Зарегистрироваться"
+      icon="pi pi-user"
+      [style]="{'margin-top':'10px'}"
+      iconPos="left" routerLink="/registration"></p-button>
   </div>
 </div>
 
