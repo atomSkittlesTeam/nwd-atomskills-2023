@@ -19,6 +19,7 @@ export class AppComponent implements OnInit {
   title = 'atomskittles-webapp';
   userAuth: boolean = false;
   userRole: string = '';
+  userLogin: string | null = '';
   items: MenuItem[] = [];
 
   enums = Enums;
@@ -48,6 +49,7 @@ export class AppComponent implements OnInit {
   public initUser() {
     this.userAuth = this.authService.userAuth;
     this.userRole = this.authService.userRole;
+    this.userLogin = localStorage.getItem("LOGIN");
   }
 
   async showNewPositions() {

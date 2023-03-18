@@ -6,6 +6,20 @@
   margin-bottom: 15px;
 }
 
+#toolbar-by-id {
+  position: absolute; top: 0; width: 100%;
+}
+
+.logo:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.login-label {
+  font-size: x-large;
+  margin-right: 10px;
+}
+
 .module-nav {
   position: absolute;
   right: 100px;

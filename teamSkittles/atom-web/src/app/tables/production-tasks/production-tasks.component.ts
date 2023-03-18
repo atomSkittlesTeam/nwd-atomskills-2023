@@ -53,9 +53,17 @@ export class ProductionTasksComponent implements OnInit {
   }
 
   async checkRequest(selectedProductionTask: ProductionTask) {
-    console.log(selectedProductionTask)
+    this.selectedProductionTask = selectedProductionTask;
     this.productionTaskBatch = await this.requestService.getAllBatchesByTask(selectedProductionTask.id);
-    console.log(this.productionTaskBatch);
+
+  }
+
+  async refreshMain() {
+    this.productionTask = await this.requestService.getAllTasks();
+  }
+
+  async refreshDitail() {
+    this.productionTaskBatch = await this.requestService.getAllBatchesByTask(this.selectedProductionTask.id);
 
   }
 }

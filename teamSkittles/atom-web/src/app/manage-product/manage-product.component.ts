@@ -28,7 +28,6 @@ export class ManageProductComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    console.log(this.selectedRequests, '2');
     const result = await this.requestService.getBlank();
     this.selectedRequests = result.concat(this.selectedRequests);
     this.countPriority();
@@ -38,8 +37,20 @@ export class ManageProductComponent implements OnInit, OnDestroy {
 
   blocked: any = false;
 
-  countPriority() {
-    this.selectedRequests.forEach((e, idx) => e.priority = idx + 1)
+  countPriority(isManual = false) {
+    const approved = this.selectedRequests.filter(r => !this.isEnabled(r))
+    const notApproved = this.selectedRequests.filter(r => this.isEnabled(r))
+    this.selectedRequests = approved.concat(notApproved);
+    this.selectedRequests.forEach((e, idx) => {
+      e.priority = idx + 1
+    });
+    if (isManual) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Вы поменяли приоритет заказа',
+      })
+    }
+
   }
 
   isEnabled(request: Request) {
@@ -51,7 +62,7 @@ export class ManageProductComponent implements OnInit, OnDestroy {
   }
 
   onDropChange() {
-    this.countPriority();
+    this.countPriority(true);
   }
 
   async countAutomaticsOrder() {
@@ -141,5 +152,9 @@ export class ManageProductComponent implements OnInit, OnDestroy {
       });
       this.blocked = false;
     });
+  }
+
+  refreshMain() {
+
   }
 }
