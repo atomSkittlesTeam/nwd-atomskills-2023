@@ -21,11 +21,12 @@
     <div class="message" class="{{message.type}}" *ngFor="let message of messages; let idx = index;">
       <div class="message__icon" (click)="closeOneInfo(message.id, idx)"><i class="pi pi-times"></i></div>
       <div class="message__text">{{message.customText}}</div>
-      <p-button
-        [pTooltip]="'Отправить на починку'"
-        class="approve"
-        icon="pi pi-check" styleClass="p-button-success"
-        (click)="confirm(message)"
+      <p-button *ngIf="message.type === enums.machineBroke"
+                [pTooltip]="'Создать заявку на ремонт'"
+                tooltipPosition="left"
+                class="approve"
+                icon="pi pi-check" styleClass="p-button-success"
+                (click)="confirm(message, idx)"
       ></p-button>
     </div>
   </div>

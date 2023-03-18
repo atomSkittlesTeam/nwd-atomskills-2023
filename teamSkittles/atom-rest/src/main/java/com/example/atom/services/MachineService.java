@@ -93,10 +93,10 @@ public class MachineService {
         return this.getMachinesByStatus(MachineState.WAITING);
     }
 
-    public MachineDto getAllBrokenMachinesByStatusAndId(Long id) { //мне приходит ид сломанного, я его верну
+    public MachineDto getAllBrokenMachinesByStatusAndId(String code) { //мне приходит ид сломанного, я его верну
         MachineDto result = new MachineDto();
         List<MachineDto> allBrokenMachines = this.getMachinesByStatus(MachineState.BROKEN);
-        allBrokenMachines = allBrokenMachines.stream().filter(e -> e.getId().equals(id)).toList();
+        allBrokenMachines = allBrokenMachines.stream().filter(e -> e.getCode().equals(code)).toList();
         if(!allBrokenMachines.isEmpty()) {
             result = allBrokenMachines.get(0);
         }

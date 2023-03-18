@@ -77,8 +77,9 @@ export class RequestService extends BaseService {
     return await firstValueFrom(this.http.post<Request[]>(url + `/production/plan/tasks/${id}`, {}));
   }
 
-  async sendMachineToRepairing(machineId: number) {
+  async sendMachineToRepairing(machineCode: string) {
+    console.log(machineCode, 'ssa')
     const url = await this.getBackendUrl();
-    return await firstValueFrom(this.http.get<Request[]>(url + `machine/get-broken-machine-by-id/${machineId}`, {}));
+    return await firstValueFrom(this.http.get<Request[]>(url + `/machine/get-broken-machine-by-id/${machineCode}`, {}));
   }
 }

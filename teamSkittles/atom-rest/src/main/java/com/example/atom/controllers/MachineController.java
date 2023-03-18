@@ -26,9 +26,9 @@ public class MachineController {
     @Autowired
     private MachineReader machineReader;
 
-    @GetMapping("get-broken-machine-by-id/{id}")
-    public void getPlan(@PathVariable Long id) {
-        MachineDto machineDto = machineService.getAllBrokenMachinesByStatusAndId(id);
+    @GetMapping("get-broken-machine-by-id/{code}")
+    public void getPlan(@PathVariable String code) {
+        MachineDto machineDto = machineService.getAllBrokenMachinesByStatusAndId(code);
         machineReader.setStatusToMachine(machineDto.getPort(), MachineState.REPAIRING, null);
     }
 

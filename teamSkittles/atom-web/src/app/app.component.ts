@@ -91,6 +91,7 @@ export class AppComponent implements OnInit {
       this.router.navigate(['/login']);
     }
     this.messages = await this.requestService.getNewMessages();
+    localStorage.setItem("MACHINES_BROKEN", JSON.stringify(this.messages.map(e => e.type === Enums.machineBroke))) 
   }
 
   async closeOneInfo(id: number, idx: number) {
@@ -114,12 +115,12 @@ export class AppComponent implements OnInit {
     return this.messages;
   }
 
-  confirm(message: Message) {
+  confirm(message: Message, indexMesage: number) {
     this.confirmationService.confirm({
       message: `Вы уверены что хотите отправить станок ${message.objectName} в ремонт?`,
-      accept: () => {
-        this.requestService.sendMachineToRepairing(message.objectId).
-        then(data => {
+      accept: async () => {
+        await this.requestService.sendMachineToRepairing(message.objectName).then(data => {
+          // this.closeOneInfo(message.id, indexMesage);
           this.messageService.add({
             severity: 'success',
             summary: 'Обновился',
@@ -130,7 +131,7 @@ export class AppComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Ошибка при отправке',
-            detail: e.error.message
+            detail: e.error?.message
           })
         });
       }
