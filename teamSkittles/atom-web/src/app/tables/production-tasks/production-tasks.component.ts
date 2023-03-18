@@ -4,6 +4,8 @@ import {Request} from "../../dto/Request";
 import {RequestService} from "../../services/request.service";
 import {MessageService} from "primeng/api";
 import {ProductionTask} from "../../dto/ProductionTask";
+import {ProductionTaskBatch} from "../../dto/ProductionTaskBatch";
+import {ProductionTaskBatchItem} from "../../dto/ProductionTaskBatchItem";
 
 @Component({
   selector: 'app-production-tasks',
@@ -14,7 +16,16 @@ import {ProductionTask} from "../../dto/ProductionTask";
 export class ProductionTasksComponent implements OnInit {
 
   productionTask: ProductionTask[] = [];
-  selectedProductionTask: ProductionTask[] = [];
+  selectedProductionTask: ProductionTask;
+
+  productionTaskBatch: ProductionTaskBatch[] = [];
+
+  //первый детейл
+  selectedProductionTaskBatch: ProductionTaskBatch;
+
+  //Второй детейл
+  productionTaskBatchItem: ProductionTaskBatchItem[] = [];
+  selectedProductionTaskBatchItem: ProductionTaskBatchItem;
   display: any;
   checked: boolean = false;
 
@@ -23,11 +34,12 @@ export class ProductionTasksComponent implements OnInit {
 
   async ngOnInit() {
     this.productionTask = await this.requestService.getAllTasks();
+    console.log()
   }
 
-  showDialog() {
+  async showDialog(batch: ProductionTaskBatch) {
     this.display = true;
-    console.log(this.selectedProductionTask)
+    this.productionTaskBatchItem = await this.requestService.getAllBatchItemsByBatch(batch.id);
   }
 
   formatDate(date: Date) {
@@ -38,5 +50,11 @@ export class ProductionTasksComponent implements OnInit {
     return (request.state?.code === 'DRAFT' || request.state?.code === 'BLANK' || request.state == null)
   }
 
+  async checkRequest(selectedProductionTask: ProductionTask) {
+    console.log(selectedProductionTask)
+    this.productionTaskBatch = await this.requestService.getAllBatchesByTask(selectedProductionTask.id);
+    console.log(this.productionTaskBatch);
+
+  }
 }
 

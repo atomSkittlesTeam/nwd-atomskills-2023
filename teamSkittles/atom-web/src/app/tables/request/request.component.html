@@ -48,6 +48,7 @@
 <ng-template #masterTable>
   <p-toolbar *ngIf="userRole == 'chief'">
     <div class="p-toolbar-group-start">
+      <h3>Список заказов</h3>
       <p-button [label]="isProductionPlanMode ? 'Закрыть режим подбора' : 'Подбор заказов'"
                 icon="pi pi-list" styleClass="p-button-success"
                 (onClick)="onProductionPlanModeChange()"></p-button>
