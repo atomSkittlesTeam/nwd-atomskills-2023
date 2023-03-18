@@ -296,11 +296,11 @@ public class RequestService {
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<?> entity = new HttpEntity<>(null, headers);
 
-            ResponseEntity<List<RequestDto>> responseEntity = restTemplate.exchange(
+            ResponseEntity responseEntity = restTemplate.exchange(
                     url,
                     HttpMethod.PUT,
                     entity,
-                    new ParameterizedTypeReference<List<RequestDto>>() {
+                    new ParameterizedTypeReference<>() {
                     });
         } catch (Exception e) {
             System.out.println("impossible");
