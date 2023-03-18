@@ -7,15 +7,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class MachineTaskDto {
-    @NotNull
-    private Long productId;
 
-    private Long batchId;
+    private AdvInfoDto advInfo;
 
-    private Long batchItemId;
 
-    /*
-        @Param id заказ наряда
-     */
-    private Long productionTaskId;
 }

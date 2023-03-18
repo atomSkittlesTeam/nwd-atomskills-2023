@@ -14,11 +14,17 @@ public class EmailServiceImpl implements EmailService {
 
     public void sendSimpleMessage(
             String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("atomskittles@rambler.ru");
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(text);
-        emailSender.send(message);
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("atomskittles@rambler.ru");
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(text);
+
+            emailSender.send(message);
+
+        } catch (Exception e) {
+            return;
+        }
     }
 }

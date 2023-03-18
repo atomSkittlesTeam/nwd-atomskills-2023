@@ -40,6 +40,7 @@ export class RequestService extends BaseService {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.post(url + `/requests/message`, ids));
   }
+
   async orderedPlan(ids: number[]) {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.post<any[]>(url + `/requests/ordered-plan`, ids));
@@ -50,7 +51,7 @@ export class RequestService extends BaseService {
     return await firstValueFrom(this.http.post<Request[]>(url + `/requests/save-blank`, listRequests));
   }
 
-  async approvePosition(id:number, listRequests: any[]) {
+  async approvePosition(id: number, listRequests: any[]) {
     console.log(id, 'id');
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.post<Request[]>(url + `/requests/approve-plan/${id}`, listRequests));
@@ -61,7 +62,7 @@ export class RequestService extends BaseService {
     return await firstValueFrom(this.http.get<Request[]>(url + `/requests/get-plan`));
   }
 
-  async approveProductionPlan(id:number) {
+  async approveProductionPlan(id: number) {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.post<Request[]>(url + `/production/plan/${id}/task`, {}));
   }
@@ -71,8 +72,13 @@ export class RequestService extends BaseService {
     return await firstValueFrom(this.http.get<ProductionTask[]>(url + `/production/plan/tasks`, {}));
   }
 
-  async approveProductionPlan2(id:number) {
+  async approveProductionPlan2(id: number) {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.post<Request[]>(url + `/production/plan/tasks/${id}`, {}));
+  }
+
+  async sendMachineToRepairing(machineId: number) {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<Request[]>(url + `machine/get-broken-machine-by-id/${machineId}`, {}));
   }
 }
