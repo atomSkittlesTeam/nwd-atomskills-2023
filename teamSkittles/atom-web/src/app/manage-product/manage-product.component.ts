@@ -39,7 +39,16 @@ export class ManageProductComponent implements OnInit, OnDestroy {
   blocked: any = false;
 
   countPriority() {
-    this.selectedRequests.forEach((e, idx) => e.priority = idx + 1)
+    const approved = this.selectedRequests.filter(r => !this.isEnabled(r))
+    const notApproved = this.selectedRequests.filter(r => this.isEnabled(r))
+    this.selectedRequests = approved.concat(notApproved);
+    this.selectedRequests.forEach((e, idx) => {
+      e.priority = idx + 1
+    });
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Вы поменяли приоритет заказа',
+    })
   }
 
   isEnabled(request: Request) {
