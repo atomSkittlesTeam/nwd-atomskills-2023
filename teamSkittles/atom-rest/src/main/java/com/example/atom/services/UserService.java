@@ -74,8 +74,20 @@ public class UserService {
         Boolean validated = false;
         User chief = userRepository.findByRole("chief");
         //если есть шеф, и новый пользователь не совпадает с ним по логину, запрещаем
-        if(chief != null && !chief.getLogin().equals(userForCreateOrUpdate.getLogin())) {
+        if(chief != null && !chief.getLogin().equals(userForCreateOrUpdate.getLogin())
+                && userForCreateOrUpdate.getRole().equals("chief")) {
             throw new RuntimeException("Нельзя создать нового начальника!");
+        }
+        validated = true;
+        return validated;
+    }
+
+    public boolean isValidatedOfDublicateCreate(User userForCreate) {
+        Boolean validated = false;
+        User dublicate = userRepository.findByLogin(userForCreate.login);
+        //если есть дубликат, запрещаем
+        if(dublicate != null) {
+            throw new RuntimeException("Логин неуникален!");
         }
         validated = true;
         return validated;
@@ -84,6 +96,23 @@ public class UserService {
     public User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByLogin(auth.getName());
+    }
+
+    public List<String> getEmailsByRole(String role) {
+        List<User> users = userRepository.findAll().stream().filter(e -> e.getRole().equals(role)).toList();
+        if(users == null || users.isEmpty()) {
+            new RuntimeException("Не найдены пользователи по роли");
+        }
+        return users.stream().map(User::getEmail).toList();
+    }
+
+    public String getEmailByLogin(String login) {
+        //user обязательно один
+        List<User> users = userRepository.findAll().stream().filter(e -> e.getRole().equals(login)).toList();
+        if(users == null || users.isEmpty()) {
+            throw new RuntimeException("Не найден пользователь по логину");
+        }
+        return users.get(0).getEmail();
     }
 
 

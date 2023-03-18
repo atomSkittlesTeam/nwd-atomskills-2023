@@ -25,21 +25,23 @@ public class MachineService {
     @Autowired
     private EmailServiceImpl emailService;
 
+    @Autowired
+    private UserService userService;
+
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void getAllBrokenMachines() {
-        //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые
         LinkedHashMap<String, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
         List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();
         List<Integer> allMachinesPorts = new ArrayList<>();
         listOfMaps.forEach(map -> allMachinesPorts.addAll(map.values().stream().toList()));
         for (Integer port : allMachinesPorts) {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
-            if (machineDto.getState() != null && machineDto.getState().getCode().equals("WAITING")){
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals("BROKEN")){
                 saveMessageOfBrokenMachine(machineDto);
             }
         }
-        sendMessageOfBrokenMachines();
+        sendEmailOfBrokenMachines();
         System.out.println("Дернул все станки на поломку");
     }
 
@@ -60,15 +62,18 @@ public class MachineService {
     }
 
     @Transactional
-    public void sendMessageOfBrokenMachines() {
+    public void sendEmailOfBrokenMachines() {
         List<Message> messages = messageRepository.findAll();
         List<Message> newMessages = messages.stream().filter(e -> e.getEmailSign().equals(false)
                 && e.getType().equals(Types.machineBroke)).toList();
         if (newMessages.size() > 0) {
             String numbers = String.join(",", newMessages.stream().map(Message::getObjectName).toList());
-            emailService.sendSimpleMessage("sergej.davidyuk@yandex.ru",
-                    "Произошла поломка станка!",
-                    ("Станки с кодами: " + numbers + " сломаны"));
+            List<String> emails = userService.getEmailsByRole("chief");
+            emails.forEach(email -> {
+                emailService.sendSimpleMessage(email,
+                        "Произошла поломка станка!",
+                        ("Станки с кодами: " + numbers + " сломаны"));
+            });
             newMessages.forEach(e -> e.setEmailSign(true));
             messageRepository.saveAll(newMessages);
             messageRepository.flush();
