@@ -25,6 +25,9 @@ public class MachineService {
     @Autowired
     private EmailServiceImpl emailService;
 
+    @Autowired
+    private UserService userService;
+
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void getAllBrokenMachines() {
@@ -65,9 +68,12 @@ public class MachineService {
                 && e.getType().equals(Types.machineBroke)).toList();
         if (newMessages.size() > 0) {
             String numbers = String.join(",", newMessages.stream().map(Message::getObjectName).toList());
-            emailService.sendSimpleMessage("sergej.davidyuk@yandex.ru",
-                    "Произошла поломка станка!",
-                    ("Станки с кодами: " + numbers + " сломаны"));
+            List<String> emails = userService.getEmailsByRole("chief");
+            emails.forEach(email -> {
+                emailService.sendSimpleMessage(email,
+                        "Произошла поломка станка!",
+                        ("Станки с кодами: " + numbers + " сломаны"));
+            });
             newMessages.forEach(e -> e.setEmailSign(true));
             messageRepository.saveAll(newMessages);
             messageRepository.flush();
