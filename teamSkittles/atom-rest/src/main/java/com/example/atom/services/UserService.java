@@ -74,8 +74,20 @@ public class UserService {
         Boolean validated = false;
         User chief = userRepository.findByRole("chief");
         //если есть шеф, и новый пользователь не совпадает с ним по логину, запрещаем
-        if(chief != null && !chief.getLogin().equals(userForCreateOrUpdate.getLogin())) {
+        if(chief != null && !chief.getLogin().equals(userForCreateOrUpdate.getLogin())
+                && userForCreateOrUpdate.getRole().equals("chief")) {
             throw new RuntimeException("Нельзя создать нового начальника!");
+        }
+        validated = true;
+        return validated;
+    }
+
+    public boolean isValidatedOfDublicateCreate(User userForCreate) {
+        Boolean validated = false;
+        User dublicate = userRepository.findByLogin(userForCreate.login);
+        //если есть дубликат, запрещаем
+        if(dublicate != null) {
+            throw new RuntimeException("Логин неуникален!");
         }
         validated = true;
         return validated;
