@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from "./services/auth.service";
 import {UserService} from "./services/user.service";
 import {Router} from "@angular/router";
-import {ConfirmationService, MenuItem} from "primeng/api";
+import {ConfirmationService, MenuItem, MessageService} from "primeng/api";
 import {Message} from "./dto/Message";
 import {RequestService} from "./services/request.service";
 import {interval} from "rxjs";
@@ -13,7 +13,7 @@ import {Enums} from "./dto/enums";
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  providers: [ConfirmationService]
+  providers: [ConfirmationService, MessageService]
 })
 export class AppComponent implements OnInit {
   title = 'atomskittles-webapp';
@@ -29,7 +29,13 @@ export class AppComponent implements OnInit {
   Enums = Enums;
   isDialogShown: boolean = false;
 
-  constructor(public authService: AuthService, public router: Router, private userService: UserService, public requestService: RequestService, private confirmationService: ConfirmationService) {
+  constructor(public authService: AuthService,
+              public router: Router,
+              private userService:
+                UserService, public requestService:
+                RequestService,
+              private confirmationService: ConfirmationService,
+              public messageService: MessageService) {
     authService.auth.subscribe(() => this.initUser());
     this.authService.checkAuth();
     this.getMessagesByTime();
@@ -108,11 +114,25 @@ export class AppComponent implements OnInit {
     return this.messages;
   }
 
-  confirm() {
+  confirm(message: Message) {
     this.confirmationService.confirm({
-      message: 'Are you sure that you want to perform this action?',
+      message: `Вы уверены что хотите отправить станок ${message.objectName} в ремонт?`,
       accept: () => {
-        //Actual logic to perform a confirmation
+        this.requestService.sendMachineToRepairing(message.objectId).
+        then(data => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Обновился',
+            detail: 'Отправка прошла успешна',
+          })
+        }).catch((e) => {
+          console.log(e, 'error')
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Ошибка при отправке',
+            detail: e.error.message
+          })
+        });
       }
     });
   }

@@ -25,7 +25,8 @@
         [pTooltip]="'Отправить на починку'"
         class="approve"
         icon="pi pi-check" styleClass="p-button-success"
-        ></p-button>
+        (click)="confirm(message)"
+      ></p-button>
     </div>
   </div>
   <div style="width: 100%; text-align: center; padding-top: 10px">
@@ -33,5 +34,7 @@
   </div>
 </p-sidebar>
 
-<p-confirmDialog [style]="{width: '50vw'}" [acceptLabel]="'Да, отправить заявку'" [rejectIcon]="'Нет'" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+<p-confirmDialog [style]="{width: '50vw'}" [acceptLabel]="'Да, отправить заявку'" [rejectIcon]="'Нет'"
+                 [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
 
+<p-toast></p-toast>
