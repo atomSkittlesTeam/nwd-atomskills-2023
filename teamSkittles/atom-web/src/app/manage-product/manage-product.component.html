@@ -2,13 +2,16 @@
   <p-toolbar>
     <div class="p-toolbar-group-start">
 
+      <p-button [pTooltip]="'К заказам'"
+                icon="pi pi-arrow-left" styleClass="p-button-secondary"
+                routerLink="/request"></p-button>
 
       <p-button [label]="'Автоматический расчет приоритетов'"
                 icon="pi pi-sort-amount-down-alt" styleClass="p-button-info"
                 (onClick)="countAutomaticsOrder()"></p-button>
 
       <p-button [label]="'Сохранить план'"
-                icon="pi pi-sort-amount-down-alt" styleClass="p-button-info"
+                icon="pi pi-save" styleClass="p-button-info"
                 (onClick)="savePlan()"></p-button>
 
 
@@ -18,38 +21,64 @@
       <p-inputSwitch [(ngModel)]="isManual"></p-inputSwitch>
     </div>
   </p-toolbar>
-  <p-table [value]="selectedRequests" [tableStyle]="{'min-width': '50rem'}">
-    <ng-template pTemplate="header">
-      <tr>
-        <th style="width:3rem" *ngIf="isManual"></th>
-        <th>Приоритет</th>
-        <th>Id</th>
-        <th>Номер</th>
-        <th>Дата</th>
-        <th>Описание</th>
-        <th>Дата Выпуска</th>
-        <th>Утверждение</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-req let-index="rowIndex">
-      <tr [pReorderableRow]="isManual ? index : 0" [draggable]="false" (drop)="onDropChange()">
-        <td *ngIf="isManual">
-          <span class="pi pi-bars" pReorderableRowHandle></span>
-        </td>
-        <td>{{req.priority}}</td>
-        <td>{{req.id}}</td>
-        <td>{{req.number}}</td>
-        <td>{{req.date}}</td>
-        <td>{{req.description}}</td>
-        <td>{{req.releaseDate}}</td>
-        <td>
-          <p-button [disabled]="!(req.productionPlanStatus == StatusRequest.BLANK || req.productionPlanStatus == null) "
-                    icon="pi pi-check" styleClass="p-button-success"
-                    (onClick)="approvePosition(req.id)"></p-button>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-
+  <div class="master">
+    <p-table [value]="selectedRequests" [tableStyle]="{'min-width': '50rem'}">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width:3rem" *ngIf="isManual"></th>
+          <th>Приоритет</th>
+          <th>Номер</th>
+          <th>Время выполнения</th>
+          <th>Дата</th>
+          <th>Описание</th>
+          <th>Дата Выпуска</th>
+          <th>Утверждение</th>
+        </tr>
+        <tr>
+          <th style="width:3rem" *ngIf="isManual"></th>
+          <th>
+            <p-columnFilter type="text" field="priority"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="number"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="time"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="date"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="description"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="releaseDate"></p-columnFilter>
+          </th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-req let-index="rowIndex">
+        <tr [pReorderableRow]="isManual ? index : 0" [draggable]="false" (drop)="onDropChange()">
+          <td *ngIf="isManual">
+            <span class="pi pi-bars" pReorderableRowHandle
+                  *ngIf="isEnabled(req)"></span>
+          </td>
+          <td style="pointer-events: none;">{{req.priority}}</td>
+          <td style="pointer-events: none;">{{req.number}}</td>
+          <td style="pointer-events: none;">{{req.time}} {{req.time ? ' ч.' : ''}}</td>
+          <td style="pointer-events: none;">{{formatDate(req.date)}}</td>
+          <td style="pointer-events: none;"> {{req.description}}</td>
+          <td style="pointer-events: none;">{{formatDate(req.releaseDate)}}</td>
+          <td>
+            <p-button
+              [pTooltip]="isEnabled(req) ? 'Утвердить позицию' : 'Позицию нельзя утвердить' "
+              [disabled]="!isEnabled(req)"
+              icon="pi pi-check" styleClass="p-button-success"
+              (onClick)="approvePosition(req.id)"></p-button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
 </ng-container>
 <p-toast></p-toast>

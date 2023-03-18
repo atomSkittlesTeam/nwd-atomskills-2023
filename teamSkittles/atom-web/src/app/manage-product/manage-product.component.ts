@@ -3,6 +3,7 @@ import {Request} from "../dto/Request";
 import {RequestService} from "../services/request.service";
 import {MessageService} from "primeng/api";
 import {StatusRequest} from "../dto/status-request";
+import {formatDate} from "@angular/common";
 
 @Component({
   selector: 'app-manage-product',
@@ -20,16 +21,26 @@ export class ManageProductComponent implements OnInit, OnDestroy {
     if (localStorage.getItem("SendArray")) {
       // @ts-ignore
       this.selectedRequests = JSON.parse(localStorage.getItem("SendArray"));
-      this.countPriority();
+      console.log('1')
+      localStorage.removeItem(("SendArray"))
     }
   }
 
-  ngOnInit(): void {
-    console.log(this.selectedRequests);
+  async ngOnInit() {
+    console.log(this.selectedRequests, '2');
+    const result = await this.requestService.getBlank();
+    this.selectedRequests = result.concat(this.selectedRequests);
+    this.countPriority();
+
   }
 
+  // [ngClass]="{'broken': message.type === 'machineBroke'}"
   countPriority() {
     this.selectedRequests.forEach((e, idx) => e.priority = idx + 1)
+  }
+
+  isEnabled(request: Request) {
+    return (request.state?.code === 'DRAFT' || request.state?.code === 'BLANK' || request.state == null)
   }
 
   ngOnDestroy(): void {
@@ -42,39 +53,54 @@ export class ManageProductComponent implements OnInit, OnDestroy {
 
   async countAutomaticsOrder() {
     this.isManual = false;
-    await this.requestService.orderedPlan(this.selectedRequests.map(e => e.id)).catch((data) => {
+    await this.requestService.orderedPlan(this.selectedRequests
+      .filter(req => req.state.code === "BLANK" || req.state.code === "DRAFT" || req.state.code === null)
+      .map(e => e.requestId)).then(data => {
       this.selectedRequests = data;
+    }).catch((data) => {
       this.messageService.add({
         severity: 'error',
         summary: 'Ошибка регистрации',
-        detail: 'Произошла ошибка автоматического расчета',
+        detail: 'Произошла ошибка',
       })
     });
   }
 
   async savePlan() {
-    await this.requestService.savePlan(this.selectedRequests).catch((data) => {
+    console.log(this.selectedRequests, 'save');
+    await this.requestService.savePlan(this.selectedRequests
+      .filter(req => req.state.code === "BLANK" || req.state.code === "DRAFT" || req.state.code === null))
+      .then(data => {
       this.selectedRequests = data;
+    }).catch((data) => {
       this.messageService.add({
         severity: 'error',
         summary: 'Ошибка регистрации',
-        detail: 'Произошла ошибка автоматического расчета',
+        detail: 'Произошла ошибка',
       })
     });
   }
 
   async approvePosition(id: number) {
+    console.log(this.selectedRequests, 'approvePosition');
 
     await this.requestService.approvePosition(id, this.selectedRequests
-      .filter(req => req.productionPlanStatus == StatusRequest.BLANK || req.productionPlanStatus == null))
-      .catch((data) => {
+      .filter(req => req.state.code === "BLANK" || req.state.code === "DRAFT" || req.state.code === null))
+      .then(data => {
+        console.log(data, 'data')
       this.selectedRequests = data;
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Ошибка регистрации',
-        detail: 'Произошла ошибка автоматического расчета',
-      })
-    });
+    }).catch((data) => {
+        this.selectedRequests = data;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Ошибка регистрации',
+          detail: 'Произошла ошибка ',
+        })
+      });
 
+  }
+
+  formatDate(date: Date) {
+    return formatDate(date, 'dd/MM/yyyy', 'en');
   }
 }

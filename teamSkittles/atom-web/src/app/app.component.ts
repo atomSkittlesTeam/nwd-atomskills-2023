@@ -6,6 +6,7 @@ import {MenuItem} from "primeng/api";
 import {Message} from "./dto/Message";
 import {RequestService} from "./services/request.service";
 import {interval} from "rxjs";
+import {Enums} from "./dto/enums";
 
 
 @Component({
@@ -18,6 +19,9 @@ export class AppComponent implements OnInit {
   userAuth: boolean = false;
   userRole: string = '';
   items: MenuItem[] = [];
+
+  enums = Enums;
+
 
   messages: Message[] = [];
   display: boolean = false;
@@ -38,7 +42,6 @@ export class AppComponent implements OnInit {
   }
 
   async showNewPositions() {
-    this.messages = await this.requestService.getNewMessages();
     this.display = true;
   }
 
@@ -78,8 +81,7 @@ export class AppComponent implements OnInit {
     if (!this.authService.userAuth) {
       this.router.navigate(['/login']);
     }
-
-
+    this.messages = await this.requestService.getNewMessages();
   }
 
   async closeOneInfo(id: number, idx: number) {

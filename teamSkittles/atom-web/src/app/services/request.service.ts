@@ -46,11 +46,16 @@ export class RequestService extends BaseService {
 
   async savePlan(listRequests: any[]) {
     const url = await this.getBackendUrl();
-    return await firstValueFrom(this.http.post<Request[]>(url + `/requests/save-draft`, listRequests));
+    return await firstValueFrom(this.http.post<Request[]>(url + `/requests/save-blank`, listRequests));
   }
 
   async approvePosition(id:number, listRequests: any[]) {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.post<Request[]>(url + `/requests/approve-plan/${id}`, listRequests));
+  }
+
+  async getBlank() {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<Request[]>(url + `/requests/get-plan`));
   }
 }
