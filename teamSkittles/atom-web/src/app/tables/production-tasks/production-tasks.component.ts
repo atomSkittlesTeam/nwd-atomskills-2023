@@ -20,14 +20,16 @@ export class ProductionTasksComponent implements OnInit {
 
   constructor(public requestService: RequestService) {
   }
+
   async ngOnInit() {
     this.productionTask = await this.requestService.getProductionTask();
   }
 
-  test() {
+  showDialog() {
     this.display = true;
     console.log(this.selectedProductionTask)
   }
+
   formatDate(date: Date) {
     return formatDate(date, 'dd/MM/yyyy', 'en');
   }

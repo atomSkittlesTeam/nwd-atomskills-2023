@@ -1,6 +1,6 @@
 import {StatusRequest} from "./status-request";
 
-export class ProductionTaskQueue {
+export class ProductionTaskBatch {
   id: number;
   productionTaskId: number;
   requestPositionId: number;

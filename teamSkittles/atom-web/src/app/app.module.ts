@@ -30,6 +30,7 @@ import {InputSwitchModule} from "primeng/inputswitch";
 import {BlockUIModule} from "primeng/blockui";
 import { ProductionTasksComponent } from './tables/production-tasks/production-tasks.component';
 import {CheckboxModule} from "primeng/checkbox";
+import {ConfirmDialogModule} from "primeng/confirmdialog";
 @NgModule({
   declarations: [
     AppComponent,
@@ -40,29 +41,30 @@ import {CheckboxModule} from "primeng/checkbox";
     ManageProductComponent,
     ProductionTasksComponent
   ],
-    imports: [
-        BrowserModule,
-        HttpClientModule,
-        AppRoutingModule,
-        MessageModule,
-        MessagesModule,
-        FormsModule,
-        ButtonModule,
-        TableModule,
-        ToastModule,
-        DialogModule,
-        SelectButtonModule,
-        ContextMenuModule,
-        BrowserAnimationsModule,
-        MultiSelectModule,
-        SpeedDialModule,
-        SplitterModule,
-        SidebarModule,
-        ToolbarModule,
-        InputSwitchModule,
-        BlockUIModule,
-        CheckboxModule
-    ],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    AppRoutingModule,
+    MessageModule,
+    MessagesModule,
+    FormsModule,
+    ButtonModule,
+    TableModule,
+    ToastModule,
+    DialogModule,
+    SelectButtonModule,
+    ContextMenuModule,
+    BrowserAnimationsModule,
+    MultiSelectModule,
+    SpeedDialModule,
+    SplitterModule,
+    SidebarModule,
+    ToolbarModule,
+    InputSwitchModule,
+    BlockUIModule,
+    CheckboxModule,
+    ConfirmDialogModule
+  ],
   providers: [ConfigService, {
     provide: HTTP_INTERCEPTORS,
     useClass: AuthHelperInterceptor,

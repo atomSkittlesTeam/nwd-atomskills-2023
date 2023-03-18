@@ -21,6 +21,7 @@
   overflow: auto;
 
   .message {
+    position: relative;
     min-height: 95px;
     background: aliceblue;
     display: grid;
@@ -58,4 +59,15 @@
       width: 26rem;
     }
   }
+}
+
+
+.machineBroke {
+  background-color: #ef514054 !important;
+}
+
+.approve {
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }

@@ -53,6 +53,7 @@
                 (onClick)="onProductionPlanModeChange()"></p-button>
 
       <p-button [label]="'Сформировать ПП'" *ngIf="isProductionPlanMode"
+                [disabled]="selectedRequests.length === 0"
                 icon="pi pi-arrow-right" styleClass="p-button-info"
                 (onClick)="sendRequestsPositions()"></p-button>
     </div>
