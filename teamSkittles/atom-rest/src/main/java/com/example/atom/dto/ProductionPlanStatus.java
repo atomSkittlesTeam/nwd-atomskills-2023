@@ -1,5 +1,5 @@
 package com.example.atom.dto;
 
-public enum RequestStatus {
+public enum ProductionPlanStatus {
     BLANK, APPROVED, IN_PRODUCTION
 }
