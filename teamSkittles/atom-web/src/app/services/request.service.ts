@@ -50,16 +50,28 @@ export class RequestService extends BaseService {
   }
 
   async approvePosition(id:number, listRequests: any[]) {
+    console.log(id, 'id');
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.post<Request[]>(url + `/requests/approve-plan/${id}`, listRequests));
-  }
-  async approveProductionPlan(id:number) {
-    const url = await this.getBackendUrl();
-    return await firstValueFrom(this.http.post<Request[]>(url + `/requests/production-plan/${id}`, {}));
   }
 
   async getBlank() {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.get<Request[]>(url + `/requests/get-plan`));
+  }
+
+  async approveProductionPlan(id:number) {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.post<Request[]>(url + `/production/plan/${id}/task`, {}));
+  }
+
+  async getProductionTask() {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<Request[]>(url + `/production/plan/tasks`, {}));
+  }
+
+  async approveProductionPlan2(id:number) {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.post<Request[]>(url + `/production/plan/tasks/${id}`, {}));
   }
 }

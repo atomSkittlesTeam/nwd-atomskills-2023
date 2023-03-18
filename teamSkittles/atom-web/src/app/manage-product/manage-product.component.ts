@@ -59,6 +59,7 @@ export class ManageProductComponent implements OnInit, OnDestroy {
     await this.requestService.orderedPlan(this.selectedRequests
       .filter(req => req.state?.code === "BLANK" || req.state?.code === "DRAFT" || req.state === null)
       .map(e => e.requestId)).then(data => {
+      console.log(data, 'autoOrder');
       this.selectedRequests = data;
       this.messageService.add({
         severity: 'success',
@@ -120,14 +121,25 @@ export class ManageProductComponent implements OnInit, OnDestroy {
     return formatDate(date, 'dd/MM/yyyy', 'en');
   }
 
-  toProduction(request: Request) {
+  async toProduction(request: Request) {
+    console.log(request, 'req')
     this.blocked = true;
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Выполнено',
-      detail: 'Заказ-наряд сформирован',
+    await this.requestService.approveProductionPlan(request.id).then(data => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Выполнено',
+        detail: 'Заказ-наряд сформирован'
+      })
+      request.state.code = StatusRequest.IN_PRODUCTION;
+      this.blocked = false;
+    }).catch((data) => {
+      this.selectedRequests = data;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Ошибка формирования заказ-наряда',
+        detail: 'Произошла ошибка ',
+      });
+      this.blocked = false;
     });
-    request.state.code = StatusRequest.IN_PRODUCTION;
-    this.blocked = false;
   }
 }
