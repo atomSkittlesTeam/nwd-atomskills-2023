@@ -1,5 +1,6 @@
 package com.example.atom.services;
 
+import com.example.atom.dto.AdvInfoDto;
 import com.example.atom.dto.MachineDto;
 import com.example.atom.dto.MachineTaskDto;
 import com.example.atom.entities.MachineState;
@@ -100,7 +101,8 @@ public class ProductionTaskQueueWorker {
                                Long batchId,
                                Long batchItemId,
                                Long productionTaskId) {
-        MachineTaskDto machineTaskDto = new MachineTaskDto(productId, batchId, batchItemId, productionTaskId);
+        MachineTaskDto machineTaskDto = new MachineTaskDto(new AdvInfoDto(productId, batchId, batchItemId, productionTaskId));
         machineReader.setStatusToMachine(machineDto.getPort(), MachineState.WORKING, machineTaskDto);
     }
+
 }

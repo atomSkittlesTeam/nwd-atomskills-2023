@@ -3,6 +3,7 @@ package com.example.atom.readers;
 import com.example.atom.dto.*;
 import com.example.atom.entities.MachineState;
 import com.example.atom.entities.MachineType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -77,14 +78,29 @@ public class MachineReader {
 
     public void setStatusToMachine(Integer port, MachineState status, MachineTaskDto machineTaskDto) {
         String url = UriComponentsBuilder
-                .fromHttpUrl(this.cutUrl + port + "/set/" + status)
+                .fromHttpUrl(this.cutUrl + port + "/set/" + status.toString().toLowerCase())
                 .build(false)
                 .toUriString();
         try {
-            Map<String, String> map = new HashMap<>();
-            map.put("default", "default");
+            Map<String, Object> map = new HashMap<>();
+            if (machineTaskDto == null) {
+                map.put("default", "default");
+
+            } else {
+
+                map.put("advInfo", machineTaskDto);
+//
+//                map.put("productId", machineTaskDto.getProductId().toString());
+//                map.put("batchId", machineTaskDto.getBatchId().toString());
+//                map.put("batchItemId", machineTaskDto.getBatchItemId().toString());
+//                map.put("productionTaskId", machineTaskDto.getProductionTaskId().toString());
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            String jsonInString = mapper.writeValueAsString(machineTaskDto);
             HttpHeaders headers = new HttpHeaders();
-            HttpEntity<?> entity = new HttpEntity<>(machineTaskDto == null ? map : machineTaskDto, headers);
+            HttpEntity<?> entity = new HttpEntity<>(machineTaskDto == null ? map : jsonInString  , headers);
             //HttpEntity<?> entity = new HttpEntity<>(id, headers); //как вариант, id здесь может быть
 
             restTemplate.exchange(
