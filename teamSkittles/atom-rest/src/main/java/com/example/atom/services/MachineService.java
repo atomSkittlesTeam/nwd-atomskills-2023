@@ -8,6 +8,7 @@ import com.example.atom.entities.Message;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public class MachineService {
     @Autowired
     private UserService userService;
 
-    @Scheduled(fixedDelay = 1000 * 60)
+    @Scheduled(fixedDelayString = "${scheduled.broken-machines}")
     @Transactional
     public void getAllBrokenMachines() {
         //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые

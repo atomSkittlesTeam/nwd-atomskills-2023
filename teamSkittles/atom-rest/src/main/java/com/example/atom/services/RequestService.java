@@ -62,7 +62,7 @@ public class RequestService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Scheduled(fixedDelay = 1000 * 60)
+    @Scheduled(fixedDelayString = "${scheduled.new-requests}")
     @Transactional
     public void getAllRequestsAndFindNew() {
         //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые

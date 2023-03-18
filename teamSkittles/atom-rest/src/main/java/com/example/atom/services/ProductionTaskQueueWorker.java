@@ -10,6 +10,7 @@ import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.ProductionTaskBatchItemRepository;
 import com.example.atom.repositories.ProductionTaskBatchRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public class ProductionTaskQueueWorker {
 
     private final MachineReader machineReader;
 
-    @Scheduled(fixedDelay = 1000 * 60)
+    @Scheduled(fixedDelayString = "${scheduled.queue-view}")
     @Transactional
     private void monitorQueue() {
         System.out.println("Запущен мониторинг очереди на станки...");

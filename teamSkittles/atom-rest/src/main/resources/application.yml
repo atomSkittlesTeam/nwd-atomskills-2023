@@ -15,3 +15,7 @@ server:
 api:
   url: "http://192.168.1.44:1040"
   cut-url: "http://192.168.1.44:"
+scheduled:
+  broken-machines: "1000"
+  new-requests: "1000"
+  queue-view: "1000"
