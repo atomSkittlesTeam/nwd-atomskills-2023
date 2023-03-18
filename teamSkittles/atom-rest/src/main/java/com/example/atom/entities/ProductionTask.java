@@ -5,10 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+/*
+    ЗАКАЗ НАРЯД
+
+ */
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class ProductionTask {
 
     @Id
@@ -16,12 +20,20 @@ public class ProductionTask {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    // id позиции плана
+    private Long productionPlanId;
+
+    // id заказа
     private Long requestId;
 
-    private Long requestItemId;
+    // номер заказа
+    private String requestNumber;
 
-    
+    private boolean closed;
 
-
-
+    public ProductionTask(Long productionPlanId, Request request) {
+        this.productionPlanId = productionPlanId;
+        this.requestId = request.getId();
+        this.requestNumber = request.getNumber();
+    }
 }
