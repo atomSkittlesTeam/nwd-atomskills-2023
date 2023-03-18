@@ -1,25 +1,39 @@
 package com.example.atom.services;
 
 import com.example.atom.dto.MachineDto;
+import com.example.atom.dto.MachineHistoryDto;
 import com.example.atom.dto.Types;
 import com.example.atom.entities.MachineState;
 import com.example.atom.entities.MachineType;
 import com.example.atom.entities.Message;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.MessageRepository;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Instant;
+import java.util.*;
 
 @Service
 public class MachineService {
+
+    @Value("${api.url}")
+    private String url;
+
+    @Value("${api.cut-url}")
+    private String cutUrl;
+
     @Autowired
     private MessageRepository messageRepository;
 
@@ -32,10 +46,11 @@ public class MachineService {
     @Autowired
     private UserService userService;
 
+    private final RestTemplate restTemplate = new RestTemplate();
+
     @Scheduled(fixedDelayString = "${scheduled.broken-machines}")
     @Transactional
     public void getAllBrokenMachines() {
-        //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые
         LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
         List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();
         List<Integer> allMachinesPorts = new ArrayList<>();
@@ -46,24 +61,24 @@ public class MachineService {
                 machineReader.setStatusToMachine(port, MachineState.WAITING, null);
             }
             if (machineDto.getState() != null && machineDto.getState().getCode().equals(MachineState.BROKEN.toString())) {
-                saveMessageOfBrokenMachine(machineDto);
+                saveMessageOfMachine(machineDto.getId(), machineDto.getCode(), machineDto.getBeginDateTime(), Types.machineBroke);
             }
         }
         sendEmailOfBrokenMachines();
         System.out.println("Дернул все станки на поломку");
     }
 
-    public void saveMessageOfBrokenMachine(MachineDto machineDto) {
-        List<Message> previousMessagesWithSameMachineId = messageRepository.findAllByObjectId(machineDto.getId());
+    public void saveMessageOfMachine(Long id, String code, Date beginDate, Types type) {
+        List<Message> previousMessagesWithSameMachineId = messageRepository.findAllByObjectId(id);
         if(previousMessagesWithSameMachineId.isEmpty() ||
                 //список совпадений - нулевой - записали
                 (!previousMessagesWithSameMachineId.isEmpty()
         && previousMessagesWithSameMachineId.stream().filter(e ->
-                e.getMachineDate().equals(machineDto.getBeginDateTime().toInstant())).toList().isEmpty())) //список совпадений есть, но
+                e.getMachineDate().equals(beginDate.toInstant())).toList().isEmpty())) //список совпадений есть, но
             //нет совпадений - записали
         {
-            Message message = new Message(Types.machineBroke, false,
-                    false, machineDto.getId(), machineDto.getCode(), machineDto.getBeginDateTime().toInstant());
+            Message message = new Message(type, false,
+                    false, id, code, beginDate.toInstant());
             messageRepository.save(message);
             messageRepository.flush();
         }
@@ -89,6 +104,26 @@ public class MachineService {
         }
     }
 
+    @Transactional
+    public void sendEmailOfRepairedMachines() {
+        List<Message> messages = messageRepository.findAll();
+        List<Message> newMessagesOfRepaired = messages.stream().filter(e -> e.getEmailSign().equals(false)
+                && e.getType().equals(Types.machineRepair)).toList();
+        if (newMessagesOfRepaired.size() > 0) {
+            String numbers = String.join(",", newMessagesOfRepaired.stream().map(Message::getObjectName).toList());
+            List<String> emails = userService.getEmailsByRole("chief");
+            emails.forEach(email -> {
+                emailService.sendSimpleMessage(email,
+                        "Станок снова в строю!",
+                        ("Станки с кодами: " + numbers + " восстановлены"));
+            });
+            newMessagesOfRepaired.forEach(e -> e.setEmailSign(true));
+            messageRepository.saveAll(newMessagesOfRepaired);
+            messageRepository.flush();
+            System.out.println("Отправил сообщение о ремонте сообщений");
+        }
+    }
+
     public List<MachineDto> getAllWaitingMachines() {
         return this.getMachinesByStatus(MachineState.WAITING);
     }
@@ -103,7 +138,7 @@ public class MachineService {
         return result;
     }
 
-    private List<MachineDto> getMachinesByStatus(MachineState status) {
+    public List<MachineDto> getMachinesByStatus(MachineState status) {
         System.out.println("Получение простаивающих станков...");
         LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
         List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();
@@ -114,7 +149,7 @@ public class MachineService {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
             machineDto.setMachineType(this.getType(allMachines, machineDto.getCode()));
             machineDto.setPort(port);
-            if (machineDto.getState() != null && machineDto.getState().getCode().equals(status.toString())) {
+            if (status == null || (machineDto.getState() != null && machineDto.getState().getCode().equals(status.toString()))) {
                 machineDtos.add(machineDto);
             }
         }
@@ -136,5 +171,30 @@ public class MachineService {
             throw new RuntimeException("Невозможно определить тип станка");
         }
         return type;
+    }
+
+    public List<MachineHistoryDto> getHistoryForMachines(int port) {
+        String url = UriComponentsBuilder.fromHttpUrl(this.cutUrl + port + "/status/all")
+                .build(false)
+                .toUriString();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<?> entity = new HttpEntity<>(null, headers);
+
+            ResponseEntity<List<MachineHistoryDto>> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<List<MachineHistoryDto>>() {
+                    });
+
+            List<MachineHistoryDto> result = responseEntity.getBody();
+            if (result == null)
+                System.out.println("Null");
+            return result;
+        } catch (Exception e) {
+            System.out.println("impossible");
+        }
+        return null;
     }
 }

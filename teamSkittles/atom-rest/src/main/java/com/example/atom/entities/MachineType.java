@@ -1,5 +1,5 @@
 package com.example.atom.entities;
 
 public enum MachineType {
-    milling, lathe
+    milling, lathe, unknown
 }
