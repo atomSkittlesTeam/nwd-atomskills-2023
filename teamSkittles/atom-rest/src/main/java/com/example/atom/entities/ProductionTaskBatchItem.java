@@ -40,7 +40,9 @@ public class ProductionTaskBatchItem {
     // время работы на станке
     private Integer millingFactTime;
 
-    private Long machineId;
+    private String latheMachineCode;
+
+    private String millingMachineCode;
 
     private Integer summaryWorkingTimeProduct;
 
