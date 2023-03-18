@@ -1,13 +1,14 @@
 <ng-container>
   <p-toolbar style="position: absolute; top: 0; width: 100%;">
     <div class="p-toolbar-group-start">
-
-      <h3 style="cursor: pointer" routerLink="/">Пацаны ваще ребята</h3>
+      <h3 class="logo" routerLink="/"><img pTooltip="Перейти домой" src="assets/logo.png" alt="MESkittles"
+                                           height="60px"></h3>
     </div>
     <div class="p-toolbar-group-start">
+      <span *ngIf="userLogin" class="login-label">Текущий пользователь: <b
+        [pTooltip]="'Роль пользователя: ' + userRole" [tooltipPosition]="'left'">{{userLogin}}</b></span>
       <p-button type="text" class="sidebar" (click)="showNewPositions()" icon="pi pi-bell" label="{{messages.length}}"
                 *ngIf="userAuth && userRole == 'chief'"></p-button>
-
     </div>
   </p-toolbar>
 

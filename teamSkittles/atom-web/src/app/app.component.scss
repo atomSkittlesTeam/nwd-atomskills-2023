@@ -6,6 +6,16 @@
   margin-bottom: 15px;
 }
 
+.logo:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.login-label {
+  font-size: x-large;
+  margin-right: 10px;
+}
+
 .module-nav {
   position: absolute;
   right: 100px;
