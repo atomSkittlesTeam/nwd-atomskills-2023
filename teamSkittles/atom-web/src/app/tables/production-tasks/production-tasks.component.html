@@ -1,23 +1,43 @@
-<p-dialog [header]="'Детализация партии ' + this.dialogHeader" [(visible)]="display" [style]="{width: '90%', height: '90vh'}">
+<p-dialog [header]="'Детализация партии ' + this.dialogHeader" [(visible)]="display"
+          [style]="{width: '90%', height: '90vh'}">
   <ng-container>
-
-    <hr/>
     <div>
-      <p-table [value]="productionTaskBatchItem" selectionMode="single" dataKey="code"
+      <p-table [value]="productionTaskBatchItem" dataKey="code"
                [tableStyle]="{'width': '100%'}" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-               [rows]="10" [paginator]="true" currentPageReportTemplate="Показаны {first} - {last} из {totalRecords} элементов">
+               [rows]="10" [paginator]="true"
+               currentPageReportTemplate="Показаны {first} - {last} из {totalRecords} элементов">
         <ng-template pTemplate="header">
           <tr>
-            <th pSortableColumn="batchId">Заказ-наряд <p-sortIcon field="batchId"></p-sortIcon></th>
-            <th pSortableColumn="latheFactTime">Время токарной операции <p-sortIcon field="latheFactTime"></p-sortIcon></th>
-            <th pSortableColumn="latherFinishedTimestamp">Время завершения токарной операции <p-sortIcon field="latherFinishedTimestamp"></p-sortIcon></th>
-            <th pSortableColumn="latherMachineCode">Код токарного станка <p-sortIcon field="latherMachineCode"></p-sortIcon></th>
-            <th pSortableColumn="latherStartTimestamp">Дата начала токарной операции <p-sortIcon field="latherStartTimestamp"></p-sortIcon></th>
-            <th pSortableColumn="millingFactTime">Время фрезерной операции <p-sortIcon field="millingFactTime"></p-sortIcon></th>
-            <th pSortableColumn="millingFinishedTimestamp">Время завершения фрезерной операции <p-sortIcon field="millingFinishedTimestamp"></p-sortIcon></th>
-            <th pSortableColumn="millingMachineCode">Код фрезерного станка <p-sortIcon field="millingMachineCode"></p-sortIcon></th>
-            <th pSortableColumn="millingStartTimestamp">Дата начала фрезерной операции <p-sortIcon field="millingStartTimestamp"></p-sortIcon></th>
-            <th pSortableColumn="summaryWorkingTimeProduct">Сумарное время изготовления <p-sortIcon field="summaryWorkingTimeProduct"></p-sortIcon></th>
+            <th pSortableColumn="batchId">Заказ-наряд
+              <p-sortIcon field="batchId"></p-sortIcon>
+            </th>
+            <th pSortableColumn="latheFactTime">Время токарной операции
+              <p-sortIcon field="latheFactTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="latherFinishedTimestamp">Время завершения токарной операции
+              <p-sortIcon field="latherFinishedTimestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="latherMachineCode">Код токарного станка
+              <p-sortIcon field="latherMachineCode"></p-sortIcon>
+            </th>
+            <th pSortableColumn="latherStartTimestamp">Дата начала токарной операции
+              <p-sortIcon field="latherStartTimestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="millingFactTime">Время фрезерной операции
+              <p-sortIcon field="millingFactTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="millingFinishedTimestamp">Время завершения фрезерной операции
+              <p-sortIcon field="millingFinishedTimestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="millingMachineCode">Код фрезерного станка
+              <p-sortIcon field="millingMachineCode"></p-sortIcon>
+            </th>
+            <th pSortableColumn="millingStartTimestamp">Дата начала фрезерной операции
+              <p-sortIcon field="millingStartTimestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="summaryWorkingTimeProduct">Сумарное время изготовления
+              <p-sortIcon field="summaryWorkingTimeProduct"></p-sortIcon>
+            </th>
           </tr>
           <tr>
             <th>
@@ -120,10 +140,10 @@
           <td>{{batch.endBatchTime == null ? 'Завершена' : 'Изготавливается'}}</td>
           <td>
             <p-button
-              [pTooltip]="'Показать диалоговое окно'"
+              [pTooltip]="'Просмотреть партию'"
               class="show-dialog"
               tooltipPosition="left"
-              icon="pi pi-check" styleClass="p-button-success"
+              icon="pi pi-eye" styleClass="p-button-info"
               (onClick)="showDialog(batch)"></p-button>
           </td>
         </tr>
@@ -135,14 +155,6 @@
 <ng-template #masterTable>
   <p-toolbar>
     <div class="p-toolbar-group-start">
-      <!--      <p-button [label]="'Закрыть режим подбора'"-->
-      <!--                icon="pi pi-list" styleClass="p-button-success"-->
-      <!--                (onClick)="onProductionPlanModeChange()"></p-button>-->
-
-      <!--      <p-button [label]="'Сформировать ПП'" *ngIf="isProductionPlanMode"-->
-      <!--                [disabled]="selectedRequests.length === 0"-->
-      <!--                icon="pi pi-arrow-right" styleClass="p-button-info"-->
-      <!--                (onClick)="sendRequestsPositions()"></p-button>-->
     </div>
   </p-toolbar>
   <div [class]="'master'">
@@ -158,10 +170,7 @@
           <th>Дата создания заказ-наряда</th>
           <th>Закрытие</th>
           <th>
-            <div class="field-checkbox">
-              <p-checkbox [(ngModel)]="checked" [binary]="true"></p-checkbox>
-              <label>Активные</label>
-            </div>
+
           </th>
         </tr>
         <tr>
