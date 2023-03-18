@@ -280,4 +280,30 @@ public class RequestService {
             System.out.println("impossible");
         }
     }
+
+    public void sendToCrmCountForBatchItem(Long requestId, Long requestItemId, Long quantity) {
+        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/crm/requests/" +
+                        requestId +
+                        "/items/" +
+                        requestItemId +
+                        "/add-execution-qty" +
+                        "/" +
+                        quantity
+                )
+                .build(false)
+                .toUriString();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<?> entity = new HttpEntity<>(null, headers);
+
+            ResponseEntity<List<RequestDto>> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.PUT,
+                    entity,
+                    new ParameterizedTypeReference<List<RequestDto>>() {
+                    });
+        } catch (Exception e) {
+            System.out.println("impossible");
+        }
+    }
 }
