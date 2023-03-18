@@ -11,12 +11,6 @@
   }
 }
 
-.master {
-  height: calc(50vh - 182px);
-  overflow: auto;
-  position: relative;
-}
-
 .show-dialog {
 
 }
@@ -31,4 +25,20 @@
   background: #32CA7A;
   border: 1px solid #22C55E;
   padding: 5px;
+}
+
+.master {
+  height: calc(50vh - 185px);
+  overflow: auto;
+}
+
+.master-single {
+  height: calc(100vh - 185px);
+  overflow: auto;
+
+}
+
+.detail {
+  height: calc(50vh - 1em - 1px);
+  overflow: auto;
 }

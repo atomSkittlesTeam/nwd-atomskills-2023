@@ -1,8 +1,6 @@
 package com.example.atom.readers;
 
-import com.example.atom.entities.ProductionTask;
-import com.example.atom.entities.ProductionTaskBatchItem;
-import com.example.atom.entities.ProductionTaskBatch;
+import com.example.atom.entities.*;
 import com.example.atom.repositories.ProductionTaskBatchRepository;
 import com.example.atom.repositories.ProductionTaskBatchItemRepository;
 import com.example.atom.repositories.ProductionTaskRepository;
@@ -32,5 +30,9 @@ public class ProductionTaskReader {
 
     public List<ProductionTaskBatchItem> getProductionBatchItems(Long batchId) {
         return productionTaskBatchItemRepository.findAllByBatchId(batchId);
+    }
+
+    public List<ProductionTaskBatchItem> getProductionBatchItemsByMachineCode(String machineCode) {
+        return productionTaskBatchItemRepository.findAllByLatheMachineCodeOrMillingMachineCode(machineCode, machineCode);
     }
 }

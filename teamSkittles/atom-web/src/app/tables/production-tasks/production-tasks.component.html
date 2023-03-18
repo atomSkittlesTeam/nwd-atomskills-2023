@@ -1,76 +1,207 @@
-<div class="container">
+<p-dialog [header]="'Детализация партии ' + this.dialogHeader" [(visible)]="display" [style]="{width: '90%', height: '90vh'}">
+  <ng-container>
 
-
-  <p-table [value]="productionTask" [(selection)]="selectedProductionTask"
-           [tableStyle]="{'min-width': '50rem'}">
-    <ng-template pTemplate="header">
-      <tr>
-        <th style="width: 4rem">
-        </th>
-        <th>Номер заказ-наряда</th>
-        <th>Id плана</th>
-        <th>Id заявки</th>
-        <th>Номер заявки</th>
-        <th>Дата создания таски</th>
-        <th>Закрытие</th>
-        <th>
-          <div class="field-checkbox">
-            <p-checkbox [(ngModel)]="checked" [binary]="true"></p-checkbox>
-            <label>Активные</label>
-          </div>
-        </th>
-      </tr>
-      <tr>
-        <th style="width:4rem"></th>
-        <th>
-          <p-columnFilter type="text" field="id"></p-columnFilter>
-        </th>
-        <th>
-          <p-columnFilter type="text" field="productionPlanId"></p-columnFilter>
-        </th>
-        <th>
-          <p-columnFilter type="text" field="requestId"></p-columnFilter>
-        </th>
-        <th>
-          <p-columnFilter type="text" field="requestNumber"></p-columnFilter>
-        </th>
-        <th>
-          <p-columnFilter type="text" field="creationDate"></p-columnFilter>
-        </th>
-        <th>
-          <p-columnFilter type="text" field="closed"></p-columnFilter>
-        </th>
-        <th>
-          <p-button
-            [pTooltip]="'Показать диалоговое окно'"
-            class="show-dialog"
-            tooltipPosition="left"
-            icon="pi pi-check" styleClass="p-button-success"
-            [disabled]="selectedProductionTask.length != 1"
-            (onClick)="showDialog()"></p-button>
-        </th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-req>
-      <tr [pSelectableRow]="req">
-        <td>
-          <p-tableCheckbox [value]="req"></p-tableCheckbox>
-        </td>
-        <td style="pointer-events: none;">{{req.id}}</td>
-        <td style="pointer-events: none;">{{req.productionPlanId}}</td>
-        <td style="pointer-events: none;">{{req.requestId}}</td>
-        <td style="pointer-events: none;">{{req.requestNumber}}</td>
-        <td style="pointer-events: none;">{{formatDate(req.creationDate)}}</td>
-        <td style="pointer-events: none;"> {{req.closed}}</td>
-        <td style="pointer-events: none;">
-
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-
-</div>
-
-<p-dialog header="Title" [(visible)]="display">
-  Content
+    <hr/>
+    <div>
+      <p-table [value]="productionTaskBatchItem" selectionMode="single" dataKey="code"
+               [tableStyle]="{'width': '100%'}" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+               [rows]="10" [paginator]="true" currentPageReportTemplate="Показаны {first} - {last} из {totalRecords} элементов">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="batchId">Заказ-наряд <p-sortIcon field="batchId"></p-sortIcon></th>
+            <th pSortableColumn="latheFactTime">Время токарной операции <p-sortIcon field="latheFactTime"></p-sortIcon></th>
+            <th pSortableColumn="latherFinishedTimestamp">Время завершения токарной операции <p-sortIcon field="latherFinishedTimestamp"></p-sortIcon></th>
+            <th pSortableColumn="latherMachineCode">Код токарного станка <p-sortIcon field="latherMachineCode"></p-sortIcon></th>
+            <th pSortableColumn="latherStartTimestamp">Дата начала токарной операции <p-sortIcon field="latherStartTimestamp"></p-sortIcon></th>
+            <th pSortableColumn="millingFactTime">Время фрезерной операции <p-sortIcon field="millingFactTime"></p-sortIcon></th>
+            <th pSortableColumn="millingFinishedTimestamp">Время завершения фрезерной операции <p-sortIcon field="millingFinishedTimestamp"></p-sortIcon></th>
+            <th pSortableColumn="millingMachineCode">Код фрезерного станка <p-sortIcon field="millingMachineCode"></p-sortIcon></th>
+            <th pSortableColumn="millingStartTimestamp">Дата начала фрезерной операции <p-sortIcon field="millingStartTimestamp"></p-sortIcon></th>
+            <th pSortableColumn="summaryWorkingTimeProduct">Сумарное время изготовления <p-sortIcon field="summaryWorkingTimeProduct"></p-sortIcon></th>
+          </tr>
+          <tr>
+            <th>
+              <p-columnFilter type="text" field="batchId"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="latheFactTime"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="latherFinishedTimestamp"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="latherMachineCode"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="latherStartTimestamp"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="millingFactTime"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="millingFinishedTimestamp"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="millingMachineCode"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="millingStartTimestamp"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="summaryWorkingTimeProduct"></p-columnFilter>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-bathItem>
+          <tr [pSelectableRow]="bathItem">
+            <td>{{bathItem.batchId}}</td>
+            <td>{{bathItem.latheFactTime}}</td>
+            <td>{{bathItem.latherFinishedTimestamp}}</td>
+            <td>{{bathItem.latherMachineCode}}</td>
+            <td>{{bathItem.latherStartTimestamp}}</td>
+            <td>{{bathItem.millingFactTime}}</td>
+            <td>{{bathItem.millingFinishedTimestamp}}</td>
+            <td>{{bathItem.millingMachineCode}}</td>
+            <td>{{bathItem.millingStartTimestamp}}</td>
+            <td>{{bathItem.summaryWorkingTimeProduct}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </ng-container>
 </p-dialog>
+
+
+<ng-container>
+  <div class="card">
+    <ng-container *ngTemplateOutlet="masterTable"></ng-container>
+  </div>
+  <hr/>
+  <div class="detail">
+    <p-table *ngIf="productionTaskBatch.length > 0"
+             [value]="productionTaskBatch" [(selection)]="selectedProductionTaskBatch"
+             [tableStyle]="{'min-width': '50rem'}">
+      <ng-template pTemplate="header">
+        <tr>
+
+          <th>Название детали</th>
+          <th>Номер партии</th>
+          <th>Кол-во</th>
+          <th>Выполоненое кол-во</th>
+          <th>Состояние партии</th>
+          <th></th>
+
+        </tr>
+        <tr>
+          <th>
+            <p-columnFilter type="text" field="productName"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="id"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="quantity"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="quantityExec"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="closed"></p-columnFilter>
+          </th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-batch>
+        <tr [pSelectableRow]="batch">
+          <td>{{batch.productName}}</td>
+          <td>{{batch.id}}</td>
+          <td>{{batch.quantity}}</td>
+          <td>{{batch.quantityExec}}</td>
+          <td>{{batch.endBatchTime != null ? 'Завершена' : 'Изготавливается'}}</td>
+          <td>
+            <p-button
+              [pTooltip]="'Показать диалоговое окно'"
+              class="show-dialog"
+              tooltipPosition="left"
+              icon="pi pi-check" styleClass="p-button-success"
+              (onClick)="showDialog(batch)"></p-button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</ng-container>
+
+<ng-template #masterTable>
+  <p-toolbar>
+    <div class="p-toolbar-group-start">
+      <!--      <p-button [label]="'Закрыть режим подбора'"-->
+      <!--                icon="pi pi-list" styleClass="p-button-success"-->
+      <!--                (onClick)="onProductionPlanModeChange()"></p-button>-->
+
+      <!--      <p-button [label]="'Сформировать ПП'" *ngIf="isProductionPlanMode"-->
+      <!--                [disabled]="selectedRequests.length === 0"-->
+      <!--                icon="pi pi-arrow-right" styleClass="p-button-info"-->
+      <!--                (onClick)="sendRequestsPositions()"></p-button>-->
+    </div>
+  </p-toolbar>
+  <div [class]="'master'">
+    <p-table [value]="productionTask" [(selection)]="selectedProductionTask"
+             [tableStyle]="{'min-width': '50rem'}">
+      <ng-template pTemplate="header">
+        <tr>
+
+          <th>Номер заказ-наряда</th>
+          <th>Id плана</th>
+          <th>Id заявки</th>
+          <th>Номер заявки</th>
+          <th>Дата создания заказ-наряда</th>
+          <th>Закрытие</th>
+          <th>
+            <div class="field-checkbox">
+              <p-checkbox [(ngModel)]="checked" [binary]="true"></p-checkbox>
+              <label>Активные</label>
+            </div>
+          </th>
+        </tr>
+        <tr>
+          <th>
+            <p-columnFilter type="text" field="id"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="productionPlanId"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="requestId"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="requestNumber"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="creationDate"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="closed"></p-columnFilter>
+          </th>
+          <th>
+
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-req>
+        <tr [pSelectableRow]="req" (click)="checkRequest(req)">
+
+          <td>{{req.id}}</td>
+          <td>{{req.productionPlanId}}</td>
+          <td>{{req.requestId}}</td>
+          <td>{{req.requestNumber}}</td>
+          <td>{{formatDate(req.creationDate)}}</td>
+          <td> {{req.closed}}</td>
+          <td>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</ng-template>
+
