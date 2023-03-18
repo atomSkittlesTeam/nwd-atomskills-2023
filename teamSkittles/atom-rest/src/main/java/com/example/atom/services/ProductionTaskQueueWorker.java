@@ -15,8 +15,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,6 +63,8 @@ public class ProductionTaskQueueWorker {
                     .collect(Collectors.toMap(ProductionTaskBatch::getId, Function.identity()));
 
             if (!productionQueue.isEmpty()) {
+                List<MachineDto> latheMachineDtoList = machineDtoMap.get(MachineType.lathe);
+                List<MachineDto> millingMachineDtoList = machineDtoMap.get(MachineType.milling);
                 for (ProductionTaskBatchItem productionTask : productionQueue) {
                     // проверяем нужно точить или фрезеровать
 
@@ -68,8 +72,7 @@ public class ProductionTaskQueueWorker {
                     // проверяем не начали ли точить
                     if (productionTask.getLatheStartTimestamp() == null) {
                         // точим если есть доступные станки для точения
-                        List<MachineDto> latheMachineDtoList = machineDtoMap.get(MachineType.lathe);
-                        if (latheMachineDtoList != null) {
+                        if (latheMachineDtoList != null && !latheMachineDtoList.isEmpty()) {
                             MachineDto firstFoundedLatheMachine = latheMachineDtoList.get(0);
                             // отправляем на станок
                             this.sendOnMachine(firstFoundedLatheMachine,
@@ -78,15 +81,14 @@ public class ProductionTaskQueueWorker {
                                     productionTask.getId(),
                                     productionTaskBatch.getProductionTaskId()
                             );
-                            latheMachineDtoList = latheMachineDtoList.stream().filter(e -> e.getId() != firstFoundedLatheMachine.getId()).toList();
-                        } else {
-//                            System.out.println("Токарные станки недоступны");
+                            productionTask.setLatheStartTimestamp(Instant.now());
+                            productionTaskBatchItemRepository.save(productionTask);
+                            latheMachineDtoList = latheMachineDtoList.stream().filter(e -> !e.getId().equals(firstFoundedLatheMachine.getId())).toList();
                         }
                         // проверяем не начали ли фрезеровать
                     } else if (productionTask.getMillingStartTimestamp() == null) {
                         // фрезеруем, если есть доступные
-                        List<MachineDto> millingMachineDtoList = machineDtoMap.get(MachineType.milling);
-                        if (millingMachineDtoList != null) {
+                        if (millingMachineDtoList != null && !millingMachineDtoList.isEmpty()) {
                             MachineDto firstFoundedMillingMachine = millingMachineDtoList.get(0);
                             this.sendOnMachine(firstFoundedMillingMachine,
                                     productionTaskBatch.getProductId(),
@@ -94,11 +96,10 @@ public class ProductionTaskQueueWorker {
                                     productionTask.getId(),
                                     productionTaskBatch.getProductionTaskId()
                             );
-                            millingMachineDtoList = millingMachineDtoList.stream().filter(e -> e.getId() != firstFoundedMillingMachine.getId()).toList();
-                        } else {
-//                            System.out.println("Фрезерные станки недоступны");
+                            productionTask.setMillingStartTimestamp(Instant.now());
+                            productionTaskBatchItemRepository.save(productionTask);
+                            millingMachineDtoList = millingMachineDtoList.stream().filter(e -> !Objects.equals(e.getId(), firstFoundedMillingMachine.getId())).toList();
                         }
-
                     }
                 }
             } else {
