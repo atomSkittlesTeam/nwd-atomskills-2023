@@ -7,6 +7,7 @@
       <tr>
         <th style="width: 4rem">
         </th>
+        <th>Номер заказ-наряда</th>
         <th>Id плана</th>
         <th>Id заявки</th>
         <th>Номер заявки</th>
@@ -21,6 +22,9 @@
       </tr>
       <tr>
         <th style="width:4rem"></th>
+        <th>
+          <p-columnFilter type="text" field="id"></p-columnFilter>
+        </th>
         <th>
           <p-columnFilter type="text" field="productionPlanId"></p-columnFilter>
         </th>
@@ -52,6 +56,7 @@
         <td>
           <p-tableCheckbox [value]="req"></p-tableCheckbox>
         </td>
+        <td style="pointer-events: none;">{{req.id}}</td>
         <td style="pointer-events: none;">{{req.productionPlanId}}</td>
         <td style="pointer-events: none;">{{req.requestId}}</td>
         <td style="pointer-events: none;">{{req.requestNumber}}</td>

@@ -75,4 +75,9 @@ public class ProductionTaskService {
         }
         productionTaskBatchItemRepository.saveAll(queue);
     }
+
+    public List<ProductionTask> getAllProductionTasks() {
+        List<ProductionTask> allTasks = productionTaskRepository.findAll();
+        return allTasks;
+    }
 }

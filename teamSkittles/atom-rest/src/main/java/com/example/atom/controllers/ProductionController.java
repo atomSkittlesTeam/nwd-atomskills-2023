@@ -45,4 +45,9 @@ public class ProductionController {
                                                                  @PathVariable Long batchId) {
         return productionTaskReader.getProductionBatchItems(batchId);
     }
+
+    @GetMapping("all-tasks")
+    public List<ProductionTask> getProductionTasks() {
+        return productionTaskService.getAllProductionTasks();
+    }
 }
