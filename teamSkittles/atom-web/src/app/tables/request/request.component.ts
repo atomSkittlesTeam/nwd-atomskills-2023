@@ -34,7 +34,7 @@ export class RequestComponent implements OnInit {
     console.log(this.request)
   }
 
-  async test(selected: any) {
+  async checkRequest(selected: any) {
     if (selected.length == 1) {
       console.log(await this.requestService.getRequestPositionById(selected[0].id));
       this.requestPositions = await this.requestService.getRequestPositionById(selected[0].id);
@@ -50,15 +50,13 @@ export class RequestComponent implements OnInit {
     }
   }
 
-  test2() {
-    console.log('heyy')
-  }
 
   sendRequestsPositions() {
     this.selectedRequests.forEach(req => req.requestId = req.id);
     localStorage.setItem('SendArray', JSON.stringify(this.selectedRequests));
     this.router.navigate(['/manage']);
   }
+
 
   formatDate(date: Date) {
     return formatDate(date, 'dd/MM/yyyy', 'en');

@@ -1,0 +1,54 @@
+<div class="container">
+  <div class="master">
+    <p-table [value]="selectedRequests" [tableStyle]="{'min-width': '50rem'}">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width:3rem"></th>
+          <th>Приоритет</th>
+          <th>Номер</th>
+          <th>Время выполнения</th>
+          <th>Дата</th>
+          <th>Описание</th>
+          <th>Дата Выпуска</th>
+          <th>Утверждение</th>
+        </tr>
+        <tr>
+          <th style="width:3rem" ></th>
+          <th>
+            <p-columnFilter type="text" field="priority"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="number"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="time"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="date"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="description"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="releaseDate"></p-columnFilter>
+          </th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-req let-index="rowIndex">
+        <tr [pReorderableRow]="index" [draggable]="false">
+          <td >
+            <span class="pi pi-bars" pReorderableRowHandle></span>
+          </td>
+          <td style="pointer-events: none;">{{req.priority}}</td>
+          <td style="pointer-events: none;">{{req.number}}</td>
+          <td style="pointer-events: none;">{{req.time}} {{req.time ? ' ч.' : ''}}</td>
+          <td style="pointer-events: none;">{{formatDate(req.date)}}</td>
+          <td style="pointer-events: none;"> {{req.description}}</td>
+          <td style="pointer-events: none;">{{formatDate(req.releaseDate)}}</td>
+
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

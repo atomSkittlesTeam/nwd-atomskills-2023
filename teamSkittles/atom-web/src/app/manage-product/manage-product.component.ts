@@ -4,6 +4,7 @@ import {RequestService} from "../services/request.service";
 import {MessageService} from "primeng/api";
 import {StatusRequest} from "../dto/status-request";
 import {formatDate} from "@angular/common";
+import {Enums} from "../dto/enums";
 
 @Component({
   selector: 'app-manage-product',
@@ -35,6 +36,8 @@ export class ManageProductComponent implements OnInit, OnDestroy {
   }
 
   // [ngClass]="{'broken': message.type === 'machineBroke'}"
+  blocked: any = false;
+
   countPriority() {
     this.selectedRequests.forEach((e, idx) => e.priority = idx + 1)
   }
@@ -54,9 +57,13 @@ export class ManageProductComponent implements OnInit, OnDestroy {
   async countAutomaticsOrder() {
     this.isManual = false;
     await this.requestService.orderedPlan(this.selectedRequests
-      .filter(req => req.state.code === "BLANK" || req.state.code === "DRAFT" || req.state.code === null)
+      .filter(req => req.state?.code === "BLANK" || req.state?.code === "DRAFT" || req.state === null)
       .map(e => e.requestId)).then(data => {
       this.selectedRequests = data;
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Пересчет произошел',
+      })
     }).catch((data) => {
       this.messageService.add({
         severity: 'error',
@@ -67,40 +74,60 @@ export class ManageProductComponent implements OnInit, OnDestroy {
   }
 
   async savePlan() {
-    console.log(this.selectedRequests, 'save');
     await this.requestService.savePlan(this.selectedRequests
-      .filter(req => req.state.code === "BLANK" || req.state.code === "DRAFT" || req.state.code === null))
+      .filter(req => req.state?.code === "BLANK" || req.state?.code === "DRAFT" || req.state === null))
       .then(data => {
-      this.selectedRequests = data;
-    }).catch((data) => {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Ошибка регистрации',
-        detail: 'Произошла ошибка',
-      })
-    });
+        this.selectedRequests = data;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'План сохранился',
+        })
+      }).catch((data) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Ошибка сохранения плана',
+          detail: 'Произошла ошибка',
+        })
+      });
   }
 
   async approvePosition(id: number) {
-    console.log(this.selectedRequests, 'approvePosition');
-
+    this.blocked = true;
     await this.requestService.approvePosition(id, this.selectedRequests
-      .filter(req => req.state.code === "BLANK" || req.state.code === "DRAFT" || req.state.code === null))
+      .filter(req => req.state?.code === "BLANK" || req.state?.code === "DRAFT" || req.state === null))
       .then(data => {
-        console.log(data, 'data')
-      this.selectedRequests = data;
-    }).catch((data) => {
+        this.selectedRequests = data;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Утверждение прошло успешно',
+        })
+        this.blocked = false;
+
+      }).catch((data) => {
         this.selectedRequests = data;
         this.messageService.add({
           severity: 'error',
-          summary: 'Ошибка регистрации',
+          summary: 'Ошибка утверждения',
           detail: 'Произошла ошибка ',
-        })
+        });
+        this.blocked = false;
+
       });
 
   }
 
   formatDate(date: Date) {
     return formatDate(date, 'dd/MM/yyyy', 'en');
+  }
+
+  toProduction(request: Request) {
+    this.blocked = true;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Выполнено',
+      detail: 'Заказ-наряд сформирован',
+    });
+    request.state.code = StatusRequest.IN_PRODUCTION;
+    this.blocked = false;
   }
 }

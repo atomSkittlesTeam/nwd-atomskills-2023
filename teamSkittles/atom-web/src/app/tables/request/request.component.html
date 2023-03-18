@@ -59,7 +59,7 @@
   </p-toolbar>
   <div [class]="isProductionPlanMode ? 'master-single' : 'master'">
     <p-table [value]="request" [(selection)]="selectedRequests" [selectionMode]="isProductionPlanMode ? '' : 'multiple'"
-             [metaKeySelection]="!isProductionPlanMode" (onRowSelect)="test2()" dataKey="id"
+             [metaKeySelection]="!isProductionPlanMode" dataKey="id"
              [tableStyle]="{'width': '100%'}">
       <ng-template pTemplate="header">
         <tr>
@@ -100,7 +100,8 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-req>
-        <tr [pSelectableRow]="req" (click)="test(selectedRequests)" [class.formDisabled]="req.state.code != 'DRAFT'">
+        <tr [pSelectableRow]="req" (click)="checkRequest(selectedRequests)"
+            [class.formDisabled]="req.state.code != 'DRAFT'">
           <td *ngIf="isProductionPlanMode">
             <p-tableCheckbox [value]="req"></p-tableCheckbox>
           </td>

@@ -75,10 +75,18 @@
               [disabled]="!isEnabled(req)"
               icon="pi pi-check" styleClass="p-button-success"
               (onClick)="approvePosition(req.id)"></p-button>
+            <p-button
+              *ngIf="req.state?.code == 'APPROVED'"
+              [pTooltip]="'Сформировать заказ-наряд'"
+              [style]="{marginLeft: '5px'}"
+              icon="pi pi-cog" styleClass="p-button-warning"
+              (onClick)="toProduction(req)"></p-button>
           </td>
+
         </tr>
       </ng-template>
     </p-table>
   </div>
 </ng-container>
 <p-toast></p-toast>
+<p-blockUI [blocked]="blocked"></p-blockUI>
