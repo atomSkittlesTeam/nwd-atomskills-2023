@@ -48,7 +48,7 @@ public class ProductionTaskService {
         // добавить в очередь заказ наряд
         this.putTaskToProductionTaskQueue(productionTask);
 
-        // send CRM
+        // send to CRM
         this.requestService.changeRequestStatusInProductionCrm(request.getId());
 
         productionPlan.setProductionPlanStatus(ProductionPlanStatus.IN_PRODUCTION);
@@ -75,6 +75,4 @@ public class ProductionTaskService {
         }
         productionTaskBatchItemRepository.saveAll(queue);
     }
-
-
 }

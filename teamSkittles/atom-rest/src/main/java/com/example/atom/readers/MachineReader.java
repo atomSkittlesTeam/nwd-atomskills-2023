@@ -4,6 +4,7 @@ import com.example.atom.dto.DemoDto;
 import com.example.atom.dto.MachineDto;
 import com.example.atom.dto.RequestDto;
 import com.example.atom.dto.RequestPositionDto;
+import com.example.atom.entities.MachineType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -29,7 +30,7 @@ public class MachineReader {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public LinkedHashMap<String, LinkedHashMap<String, Integer>> getAllMachines() {
+    public LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> getAllMachines() {
         String url = UriComponentsBuilder.fromHttpUrl(this.url + "/mnf/machines")
                 .build(false)
                 .toUriString();
@@ -37,14 +38,14 @@ public class MachineReader {
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<?> entity = new HttpEntity<>(null, headers);
 
-            ResponseEntity<LinkedHashMap<String, LinkedHashMap<String, Integer>>> responseEntity = restTemplate.exchange(
+            ResponseEntity<LinkedHashMap<MachineType, LinkedHashMap<String, Integer>>> responseEntity = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     entity,
-                    new ParameterizedTypeReference<LinkedHashMap<String, LinkedHashMap<String, Integer>>>() {
+                    new ParameterizedTypeReference<LinkedHashMap<MachineType, LinkedHashMap<String, Integer>>>() {
                     });
 
-            LinkedHashMap<String, LinkedHashMap<String, Integer>> result = responseEntity.getBody();
+            LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> result = responseEntity.getBody();
             if (result == null)
                 System.out.println("Null");
             return result;

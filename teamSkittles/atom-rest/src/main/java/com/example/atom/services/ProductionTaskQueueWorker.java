@@ -1,6 +1,7 @@
 package com.example.atom.services;
 
 import com.example.atom.dto.MachineDto;
+import com.example.atom.dto.MachineTaskDto;
 import com.example.atom.entities.ProductionTaskBatchItem;
 import com.example.atom.repositories.ProductionTaskBatchItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,8 @@ public class ProductionTaskQueueWorker {
 
         // get all waiting machines
         List<MachineDto> waitingMachines = machineService.getAllWaitingMachines();
+//        Map<String, List<MachineDto>> machineDtoMap =
+//                waitingMachines.stream().collect(Collectors.groupingBy(e -> e.ge))
 
         if (waitingMachines.isEmpty()) {
             System.out.println("Нет свободных станков!");
@@ -33,8 +37,17 @@ public class ProductionTaskQueueWorker {
             List<ProductionTaskBatchItem> productionQueue = productionTaskBatchItemRepository.findAll();
             if (!productionQueue.isEmpty()) {
                 for (ProductionTaskBatchItem productionTask : productionQueue) {
-                    // try to send on machine
 
+                    // проверяем нужно точить или фрезеровать
+
+                    // проверяем не начали ли точить
+                    if (productionTask.getLatheStartTimestamp() == null) {
+                        // точим если есть доступные станки для точения
+//                        if ()
+                    }
+
+
+                    // фрезеруем, если есть доступные
                 }
             } else {
                 System.out.println("Отличная работа! В очереди нет заказ-нарядов!");
@@ -45,6 +58,4 @@ public class ProductionTaskQueueWorker {
     private void sendOnMachine(ProductionTaskBatchItem productionTask) {
 
     }
-
-
 }

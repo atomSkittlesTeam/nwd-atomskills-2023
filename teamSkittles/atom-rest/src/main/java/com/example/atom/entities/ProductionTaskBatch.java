@@ -25,7 +25,7 @@ public class ProductionTaskBatch {
 
     private Integer quantity;
 
-    private Integer quantityExec;
+    private Integer quantityExec = 0;
 
     /* точильная на 1 деталь по справочнику */
     private Integer latheTime;
