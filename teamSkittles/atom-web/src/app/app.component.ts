@@ -52,6 +52,8 @@ export class AppComponent implements OnInit {
 
   async showNewPositions() {
     this.display = true;
+    this.messages = await this.requestService.getNewMessages();
+
   }
 
   getMessagesByTime() {
@@ -91,7 +93,18 @@ export class AppComponent implements OnInit {
       this.router.navigate(['/login']);
     }
     this.messages = await this.requestService.getNewMessages();
-    localStorage.setItem("MACHINES_BROKEN", JSON.stringify(this.messages.map(e => e.type === Enums.machineBroke))) 
+    this.createBrokenArray();
+  }
+
+  createBrokenArray() {
+    let brokenMachine: Message[] = [];
+    this.messages.forEach(mes => {
+      if (mes.type === Enums.machineBroke) {
+        brokenMachine.push(mes);
+      }
+    })
+
+    localStorage.setItem("MACHINES_BROKEN", JSON.stringify(brokenMachine))
   }
 
   async closeOneInfo(id: number, idx: number) {
@@ -120,7 +133,7 @@ export class AppComponent implements OnInit {
       message: `Вы уверены что хотите отправить станок ${message.objectName} в ремонт?`,
       accept: async () => {
         await this.requestService.sendMachineToRepairing(message.objectName).then(data => {
-          // this.closeOneInfo(message.id, indexMesage);
+          this.closeOneInfo(message.id, indexMesage);
           this.messageService.add({
             severity: 'success',
             summary: 'Обновился',
