@@ -10,17 +10,31 @@ import com.example.atom.repositories.ProductionPlanRepository;
 import com.example.atom.repositories.RequestRepository;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class RequestService {
+
+    @Value("${api.url}")
+    private String url;
 
     @Autowired
     private RequestReader requestReader;
@@ -39,6 +53,11 @@ public class RequestService {
 
     @Autowired
     private ProductionPlanService productionPlanService;
+
+    @Autowired
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
@@ -124,6 +143,15 @@ public class RequestService {
     public List<RequestDto> getOrderedRequests(List<Long> requestIds) {
         List<RequestDto> result = new ArrayList<>();
         List<Request> requestExtensionList = requestRepository.findAllById(requestIds);
+
+        List<ProductionPlan> planApproved = productionPlanRepository
+                .findAllByProductionPlanStatusEqualsOrderByPriority(ProductionPlanStatus.APPROVED);
+
+        List<Request> requestsApproved = requestRepository.findAllById(
+                planApproved.stream().map(e -> e.getRequestId()).toList()
+        );
+
+
         Map<Long, Request> mapRequestExtensionById = requestExtensionList.stream()
                 .collect(Collectors.toMap(Request::getId, Function.identity()));
         Map<Long, List<RequestPositionDto>> mapItemsByRequestId = new HashMap<>();
@@ -159,17 +187,58 @@ public class RequestService {
         sortList(requestOverTwoDays);
         sortList(requestUnderTwoDays);
         List<Request> helpList = new ArrayList<>();
+        helpList.addAll(requestsApproved);
         helpList.addAll(requestOverTwoDays);
         helpList.addAll(requestUnderTwoDays);
-        long priority = productionPlanService.getCurrentMaxPriority();
+        long priority = 0;
+        Map<Long, ProductionPlanDto> partRequestMap = this.getPartIdsForRequestIds(helpList.stream()
+                .map(Request::getId).toList())
+                .stream()
+                .collect(Collectors.toMap(ProductionPlanDto::getRequestId, Function.identity()));
         for (Request res : helpList) {
             RequestDto dto = new RequestDto();
             priority++;
             dto.setPriority(priority);
-            result.add(dto.getRequestDtoFromEntity(res));
+            dto.setRequestDtoFromEntity(res);
+            if (!partRequestMap.isEmpty() && dto.getRequestId() != null) {
+                ProductionPlanDto plan = partRequestMap.get(dto.getRequestId());
+                if (plan != null) {
+                    dto.setId(plan.getId());
+                    StateDto stateDto = new StateDto();
+                    dto.setState(stateDto);
+                    switch (plan.getProductionPlanStatus()) {
+                        case BLANK -> {
+                            dto.getState().setCaption("Сохранено");
+                            dto.getState().setCode("BLANK");
+                        }
+                        case APPROVED -> {
+                            dto.getState().setCaption("Утверждено");
+                            dto.getState().setCode("APPROVED");
+                        }
+                        case IN_PRODUCTION -> {
+                            dto.getState().setCaption("В производствек");
+                            dto.getState().setCode("IN_PRODUCTION");
+                        }
+                    }
+                }
+            }
+            result.add(dto);
         }
 
         return result;
+    }
+
+    public List<ProductionPlanDto> getPartIdsForRequestIds(List<Long> requestIds) {
+
+        SqlParameterSource p = new MapSqlParameterSource()
+                .addValue("requestIds", requestIds);
+
+        String query = "select id, request_id, production_plan_status from production_plan where request_id in (:requestIds)";
+
+        List<ProductionPlanDto> productionPlanDtos = namedParameterJdbcTemplate.query(
+                query, p, new BeanPropertyRowMapper<>(ProductionPlanDto.class, false));
+
+        return productionPlanDtos;
     }
 
     private void sortList(List<Request> list) {
@@ -178,17 +247,24 @@ public class RequestService {
         list.sort(c);
     }
 
-    public void productionPlanSave(List<Long> requestIds) {
-        List<ProductionPlan> productionPlanList = new ArrayList<>();
-        requestIds.forEach(requestId -> {
-            ProductionPlan productionPlan = new ProductionPlan();
-            productionPlan.setRequestId(requestId);
-            productionPlan.setRequestStatus(RequestStatus.BLANK);
-            productionPlanList.add(productionPlan);
-        });
-        productionPlanRepository.saveAll(productionPlanList);
-        productionPlanRepository.flush();
+    public void changeRequestStatusInProductionCrm(Long requestId) {
+        String url = UriComponentsBuilder.fromHttpUrl(this.url + "/crm/requests/" + requestId
+                + "/set-state/in-production"
+                )
+                .build(false)
+                .toUriString();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<?> entity = new HttpEntity<>(null, headers);
+
+            ResponseEntity<?> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+        } catch (Exception e) {
+            System.out.println("impossible");
+        }
     }
-
-
 }

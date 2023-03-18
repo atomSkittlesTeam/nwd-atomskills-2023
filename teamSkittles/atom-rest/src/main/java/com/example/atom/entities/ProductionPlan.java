@@ -1,12 +1,9 @@
 package com.example.atom.entities;
 
-import com.example.atom.dto.RequestStatus;
-import com.example.atom.dto.Types;
+import com.example.atom.dto.ProductionPlanStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
 
 @Entity
 @Data
@@ -17,10 +14,9 @@ public class ProductionPlan {
     @Column(name = "id", nullable = false)
     private Long id;
     private Long priority;
-
-    //todo sequence counter to priority
     private Long requestId;
-    private RequestStatus requestStatus;
+    @Enumerated(EnumType.STRING)
+    private ProductionPlanStatus productionPlanStatus;
 
 //    public ProductionPlan(Types type, Boolean emailSign,
 //                          Boolean frontSign, Long objectId, String objectName, Instant machineDate) {
