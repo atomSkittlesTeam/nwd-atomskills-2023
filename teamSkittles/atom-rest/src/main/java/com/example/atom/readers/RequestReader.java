@@ -5,8 +5,6 @@ import com.example.atom.entities.ProductionPlan;
 import com.example.atom.entities.Request;
 import com.example.atom.repositories.ProductionPlanRepository;
 import com.example.atom.repositories.RequestRepository;
-import com.example.atom.services.ProductionPlanService;
-import com.example.atom.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -32,7 +30,6 @@ import java.util.stream.Collectors;
 public class RequestReader {
     @Value("${api.url}")
     private String url;
-
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;

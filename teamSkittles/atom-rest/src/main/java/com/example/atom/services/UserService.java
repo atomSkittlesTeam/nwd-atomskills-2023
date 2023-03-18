@@ -8,6 +8,7 @@ import com.example.atom.repositories.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -117,6 +118,14 @@ public class UserService {
 
 
     //////////////init admin////////////////////
+    @Value("${default-user.login}")
+    private String adminLogin;
+    @Value("${default-user.password}")
+    private String adminPassword;
+    @Value("${default-user.email}")
+    private String adminEmail;
+    @Value("${default-user.full-name}")
+    private String adminFullName;
     @PostConstruct
     public void initializeAdmin() {
         User adminRole = userRepository.findByLogin("admin");
