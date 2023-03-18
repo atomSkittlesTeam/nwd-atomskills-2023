@@ -2,6 +2,7 @@ package com.example.atom.services;
 
 import com.example.atom.dto.MachineDto;
 import com.example.atom.dto.Types;
+import com.example.atom.entities.MachineType;
 import com.example.atom.entities.Message;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.MessageRepository;
@@ -13,6 +14,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MachineService {
@@ -87,6 +89,16 @@ public class MachineService {
 
     public List<MachineDto> getAllWaitingMachines() {
         return this.getMachinesByStatus("WAITING");
+    }
+
+    public MachineDto getAllBrokenMachinesByStatusAndId(Long id) { //мне приходит ид сломанного, я его верну
+        MachineDto result = new MachineDto();
+        List<MachineDto> allBrokenMachines = this.getMachinesByStatus("BROKEN");
+        allBrokenMachines = allBrokenMachines.stream().filter(e -> e.getId().equals(id)).toList();
+        if(!allBrokenMachines.isEmpty()) {
+            result = allBrokenMachines.get(0);
+        }
+        return result;
     }
 
     private List<MachineDto> getMachinesByStatus(String status) {
