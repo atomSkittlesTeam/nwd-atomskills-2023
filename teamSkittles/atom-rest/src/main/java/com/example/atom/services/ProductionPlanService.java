@@ -32,9 +32,9 @@ public class ProductionPlanService {
         return getCurrentPriority(query);
     }
 
-    public Long getCurrentMaxApprovedPriority() {
+    public Long getCurrentMaxApprovedOrInProductionPriority() {
         //find max property from
-        String query = "select max(priority) as priority from production_plan where production_plan_status = 'APPROVED'";
+        String query = "select max(priority) as priority from production_plan where production_plan_status in ('APPROVED', 'IN_PRODUCTION')";
         return getCurrentPriority(query);
     }
 
@@ -88,13 +88,13 @@ public class ProductionPlanService {
         Long startPriorityOfApproved = dtoToApprove.getPriority();
         if (productionPlanToApprove != null) { //в списке blank'в уже была та позиция, которую апрувим
             productionPlanToApprove.setProductionPlanStatus(ProductionPlanStatus.APPROVED);
-            productionPlanToApprove.setPriority(getCurrentMaxApprovedPriority() + 1);
+            productionPlanToApprove.setPriority(getCurrentMaxApprovedOrInProductionPriority() + 1);
             productionPlanRepository.saveAndFlush(productionPlanToApprove); //сохранили, чтобы снизу это не попало в бланки
         } else { //в списке blank'ов её не было, вообще такую позицию видим впервые
             approveWasNew = true;
             newProductionPlanToApprove.setRequestId(dtoToApprove.getRequestId());
             newProductionPlanToApprove.setProductionPlanStatus(ProductionPlanStatus.APPROVED);
-            newProductionPlanToApprove.setPriority(getCurrentMaxApprovedPriority() + 1);
+            newProductionPlanToApprove.setPriority(getCurrentMaxApprovedOrInProductionPriority() + 1);
             productionPlanRepository.saveAndFlush(newProductionPlanToApprove); //сохранили, чтобы снизу это не попало в бланки
         }
         List<ProductionPlan> allProductionPlans = productionPlanRepository.findAll();

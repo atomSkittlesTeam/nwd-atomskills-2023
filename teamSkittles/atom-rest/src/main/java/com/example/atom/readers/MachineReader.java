@@ -78,4 +78,32 @@ public class MachineReader {
         }
         return null;
     }
+
+    public void setStatusToMachine(Integer port, String status) {
+        String url = UriComponentsBuilder
+                .fromHttpUrl(this.cutUrl + port + "/set/" + status)
+                .build(false)
+                .toUriString();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<?> entity = new HttpEntity<>(null, headers);
+            //HttpEntity<?> entity = new HttpEntity<>(id, headers); //как вариант, id здесь может быть
+
+            ResponseEntity<List<DemoDto>> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<List<DemoDto>>() {
+                    });
+
+            List<DemoDto> result = responseEntity.getBody();
+            if (result == null)
+                System.out.println("Null");
+//            return result;
+        } catch (Exception e) {
+            System.out.println("impossible");
+        }
+//        return null;
+    }
+
 }

@@ -28,7 +28,7 @@ public class MachineService {
     @Autowired
     private UserService userService;
 
-    @Scheduled(fixedDelay = 1000 * 60)
+    @Scheduled(fixedDelay = 1000 * 1)
     @Transactional
     public void getAllBrokenMachines() {
         LinkedHashMap<String, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
@@ -37,6 +37,9 @@ public class MachineService {
         listOfMaps.forEach(map -> allMachinesPorts.addAll(map.values().stream().toList()));
         for (Integer port : allMachinesPorts) {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals("unknown")) {
+                machineReader.setStatusToMachine(port, "waiting");
+            }
             if (machineDto.getState() != null && machineDto.getState().getCode().equals("BROKEN")){
                 saveMessageOfBrokenMachine(machineDto);
             }
