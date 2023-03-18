@@ -1,7 +1,8 @@
 package com.example.atom.controllers;
 
 import com.example.atom.entities.ProductionTask;
-import com.example.atom.entities.ProductionTaskQueue;
+import com.example.atom.entities.ProductionTaskBatchItem;
+import com.example.atom.entities.ProductionTaskBatch;
 import com.example.atom.readers.ProductionTaskReader;
 import com.example.atom.services.ProductionTaskService;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +33,16 @@ public class ProductionController {
         return productionTaskReader.getAllProductionTasks();
     }
 
-    @GetMapping("plan/tasks/{productionTaskId}")
+    @GetMapping("plan/tasks/{productionTaskId}/batches")
     @Transactional
-    public List<ProductionTaskQueue> getProductionTaskItems(@PathVariable Long productionTaskId) {
-        return productionTaskReader.getProductionTaskItems(productionTaskId);
+    public List<ProductionTaskBatch> getProductionTaskBatches(@PathVariable Long productionTaskId) {
+        return productionTaskReader.getProductionTaskBatches(productionTaskId);
+    }
+
+    @GetMapping("plan/tasks/{productionTaskId}/batches/{batchId}")
+    @Transactional
+    public List<ProductionTaskBatchItem> getProductionBatchItems(@PathVariable Long productionTaskId,
+                                                                 @PathVariable Long batchId) {
+        return productionTaskReader.getProductionBatchItems(batchId);
     }
 }

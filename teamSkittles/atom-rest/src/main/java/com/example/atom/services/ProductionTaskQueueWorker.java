@@ -1,8 +1,8 @@
 package com.example.atom.services;
 
 import com.example.atom.dto.MachineDto;
-import com.example.atom.entities.ProductionTaskQueue;
-import com.example.atom.repositories.ProductionTaskQueueRepository;
+import com.example.atom.entities.ProductionTaskBatchItem;
+import com.example.atom.repositories.ProductionTaskBatchItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductionTaskQueueWorker {
 
-    private final ProductionTaskQueueRepository productionTaskQueueRepository;
+    private final ProductionTaskBatchItemRepository productionTaskBatchItemRepository;
 
     private final MachineService machineService;
 
@@ -30,9 +30,9 @@ public class ProductionTaskQueueWorker {
             System.out.println("Нет свободных станков!");
         } else {
 
-            List<ProductionTaskQueue> productionQueue = productionTaskQueueRepository.findAll();
+            List<ProductionTaskBatchItem> productionQueue = productionTaskBatchItemRepository.findAll();
             if (!productionQueue.isEmpty()) {
-                for (ProductionTaskQueue productionTask : productionQueue) {
+                for (ProductionTaskBatchItem productionTask : productionQueue) {
                     // try to send on machine
 
                 }
@@ -42,7 +42,7 @@ public class ProductionTaskQueueWorker {
         }
     }
 
-    private void sendOnMachine(ProductionTaskQueue productionTask) {
+    private void sendOnMachine(ProductionTaskBatchItem productionTask) {
 
     }
 

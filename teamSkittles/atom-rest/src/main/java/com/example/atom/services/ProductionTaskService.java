@@ -2,15 +2,9 @@ package com.example.atom.services;
 
 import com.example.atom.dto.ProductionPlanStatus;
 import com.example.atom.dto.RequestPositionDto;
-import com.example.atom.entities.ProductionPlan;
-import com.example.atom.entities.ProductionTask;
-import com.example.atom.entities.ProductionTaskQueue;
-import com.example.atom.entities.Request;
+import com.example.atom.entities.*;
 import com.example.atom.readers.RequestReader;
-import com.example.atom.repositories.ProductionPlanRepository;
-import com.example.atom.repositories.ProductionTaskQueueRepository;
-import com.example.atom.repositories.ProductionTaskRepository;
-import com.example.atom.repositories.RequestRepository;
+import com.example.atom.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,11 +17,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductionTaskService {
 
-    private final ProductionTaskQueueRepository productionTaskQueueRepository;
+    private final ProductionTaskBatchItemRepository productionTaskBatchItemRepository;
 
     private final ProductionPlanRepository productionPlanRepository;
 
     private final ProductionTaskRepository productionTaskRepository;
+
+    private final ProductionTaskBatchRepository productionTaskBatchRepository;
 
     private final RequestRepository requestRepository;
 
@@ -63,12 +59,21 @@ public class ProductionTaskService {
         List<RequestPositionDto> positionDtos =
                 requestReader.getRequestPositionById(productionTask.getRequestId());
 
-        List<ProductionTaskQueue> queue = new ArrayList<>();
+        List<ProductionTaskBatchItem> queue = new ArrayList<>();
         for (RequestPositionDto positionDto : positionDtos) {
-            ProductionTaskQueue productionTaskQueue = new ProductionTaskQueue(productionTask, positionDto);
-            queue.add(productionTaskQueue);
+            // создаем партию
+            ProductionTaskBatch productionTaskBatch = new ProductionTaskBatch(
+                    productionTask.getId(),
+                    positionDto);
+            productionTaskBatch = productionTaskBatchRepository.save(productionTaskBatch);
+
+            // каждый элемент партии пихаем в очередь
+            for (int i = 0; i < productionTaskBatch.getQuantity(); i++) {
+                ProductionTaskBatchItem productionTaskBatchItem = new ProductionTaskBatchItem(productionTaskBatch.getId());
+                queue.add(productionTaskBatchItem);
+            }
         }
-        productionTaskQueueRepository.saveAll(queue);
+        productionTaskBatchItemRepository.saveAll(queue);
     }
 
 
