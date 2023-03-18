@@ -5,14 +5,11 @@ import com.example.atom.dto.MachineDto;
 import com.example.atom.dto.MachineHistoryDto;
 import com.example.atom.dto.MachineTaskDto;
 import com.example.atom.entities.*;
-import com.example.atom.dto.*;
-import com.example.atom.entities.*;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.ProductionTaskBatchItemRepository;
 import com.example.atom.repositories.ProductionTaskBatchRepository;
 import com.example.atom.repositories.ProductionTaskRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +31,10 @@ public class ProductionTaskQueueWorker {
     private final MachineService machineService;
 
     private final MachineReader machineReader;
+
     private final ProductionTaskRepository productionTaskRepository;
+
+    private final RequestService requestService;
 
     @Scheduled(fixedDelayString = "${scheduled.queue-view}")
     @Transactional
@@ -165,7 +165,9 @@ public class ProductionTaskQueueWorker {
         this.applyChanges(historyForBatchItemMilling, batchItem, MachineType.milling);
     }
 
-    private void applyChanges(List<MachineHistoryDto> story, ProductionTaskBatchItem batchItem, MachineType machineType) {
+    private void applyChanges(List<MachineHistoryDto> story,
+                              ProductionTaskBatchItem batchItem,
+                              MachineType machineType) {
 
         boolean lathe = machineType.equals(MachineType.lathe);
 
@@ -195,7 +197,7 @@ public class ProductionTaskQueueWorker {
                 batchItem.setMillingStartTimestamp(null);
                 batchItem.setMillingMachineCode(null);
             }
-
+            productionTaskBatchItemRepository.save(batchItem);
         } else {
             if (maxWorkingEndDate != null) {
             // готово
@@ -209,10 +211,25 @@ public class ProductionTaskQueueWorker {
                     Duration res = Duration.between(batchItem.getMillingStartTimestamp(),
                             batchItem.getMillingFinishedTimestamp());
                     batchItem.setMillingFactTime(res.getNano());
-                    this.checkProductionTaskComplete(batchItem);
+                    ProductionTaskBatch productionTaskBatch = productionTaskBatchRepository
+                            .findById(batchItem.getBatchId()).orElse(null);
+                    productionTaskBatchItemRepository.save(batchItem);
+                    this.checkProductionTaskComplete(batchItem, productionTaskBatch);
+                    this.putToCrm(batchItem, productionTaskBatch);
                 }
             }
         }
+    }
+
+    private void putToCrm(ProductionTaskBatchItem batchItem, ProductionTaskBatch productionTaskBatch) {
+        ProductionTask productionTask = productionTaskRepository.findById(
+                productionTaskBatch.getProductionTaskId())
+                .orElse(null);
+        this.requestService.sendToCrmCountForBatchItem(
+                productionTask.getRequestId(),
+                productionTaskBatch.getRequestPositionId(),
+                1L
+        );
     }
 
     private List<MachineHistoryDto> getAllStatusesMachinesHistory() {
@@ -234,11 +251,9 @@ public class ProductionTaskQueueWorker {
         return dtos;
     }
 
-    private void checkProductionTaskComplete(ProductionTaskBatchItem batchItem) {
+    private void checkProductionTaskComplete(ProductionTaskBatchItem batchItem,
+                                             ProductionTaskBatch productionTaskBatch) {
         // проверить выполнилась ли партия
-        ProductionTaskBatch productionTaskBatch = productionTaskBatchRepository
-                .findById(batchItem.getBatchId()).orElse(null);
-
         List<ProductionTaskBatch> allBatchesInTask = productionTaskBatchRepository
                 .findAllByProductionTaskId(productionTaskBatch.getProductionTaskId());
 
@@ -256,7 +271,8 @@ public class ProductionTaskQueueWorker {
     }
 
 
-    private boolean isProductionTaskComplete(ProductionTaskBatch productionTaskBatch, List<ProductionTaskBatch> allBatchesInTask) {
+    private boolean isProductionTaskComplete(ProductionTaskBatch productionTaskBatch,
+                                             List<ProductionTaskBatch> allBatchesInTask) {
         boolean allBatchesComplete = true;
         for (ProductionTaskBatch taskBatch : allBatchesInTask) {
             if (taskBatch.getEndBatchTime() == null) {
