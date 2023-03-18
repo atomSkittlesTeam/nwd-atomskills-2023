@@ -50,12 +50,22 @@
             </div>
           </div>
 
-          <div class="button">
+          <div class="button" *ngIf="isRegistrationForm">
             <button
               class="button"
               [label]="this.buttonLabel"
               pButton
               [disabled]="!user?.password || !user?.login || !user?.fullName || !user?.mail"
+              type="button"
+              [style]="{'height':'50px', 'width':'100%'}"
+              (click)="sendRequest()"></button>
+          </div>
+          <div class="button" *ngIf="!isRegistrationForm">
+            <button
+              class="button"
+              [label]="this.buttonLabel"
+              pButton
+              [disabled]="!user?.password || !user?.login"
               type="button"
               [style]="{'height':'50px', 'width':'100%'}"
               (click)="sendRequest()"></button>
