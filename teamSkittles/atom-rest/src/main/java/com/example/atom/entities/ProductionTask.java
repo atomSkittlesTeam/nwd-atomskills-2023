@@ -1,7 +1,6 @@
 package com.example.atom.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,7 +34,7 @@ public class ProductionTask {
     @CreationTimestamp
     private Instant creationDate;
 
-    private boolean closed;
+    private Instant closeDate;
 
     public ProductionTask(Long productionPlanId, Request request) {
         this.productionPlanId = productionPlanId;
