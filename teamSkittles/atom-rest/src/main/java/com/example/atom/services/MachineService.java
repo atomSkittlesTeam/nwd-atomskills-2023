@@ -2,6 +2,8 @@ package com.example.atom.services;
 
 import com.example.atom.dto.MachineDto;
 import com.example.atom.dto.Types;
+import com.example.atom.entities.MachineState;
+import com.example.atom.entities.MachineType;
 import com.example.atom.entities.Message;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.MessageRepository;
@@ -13,6 +15,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MachineService {
@@ -39,9 +42,9 @@ public class MachineService {
         for (Integer port : allMachinesPorts) {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
             if (machineDto.getState() != null && machineDto.getState().getCode().equals("unknown")) {
-                machineReader.setStatusToMachine(port, "waiting");
+                machineReader.setStatusToMachine(port, MachineState.WAITING, null);
             }
-            if (machineDto.getState() != null && machineDto.getState().getCode().equals("BROKEN")){
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals(MachineState.BROKEN.toString())) {
                 saveMessageOfBrokenMachine(machineDto);
             }
         }
@@ -86,10 +89,10 @@ public class MachineService {
     }
 
     public List<MachineDto> getAllWaitingMachines() {
-        return this.getMachinesByStatus("WAITING");
+        return this.getMachinesByStatus(MachineState.WAITING);
     }
 
-    private List<MachineDto> getMachinesByStatus(String status) {
+    private List<MachineDto> getMachinesByStatus(MachineState status) {
         System.out.println("Получение простаивающих станков...");
         LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
         List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();

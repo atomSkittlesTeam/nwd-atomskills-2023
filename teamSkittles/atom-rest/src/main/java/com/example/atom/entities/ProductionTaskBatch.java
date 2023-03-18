@@ -19,7 +19,10 @@ public class ProductionTaskBatch {
     // id заказ наряда
     private Long productionTaskId;
 
+    private Long productId;
+
     private String productName;
+
 
     private Long requestPositionId;
 
@@ -41,6 +44,7 @@ public class ProductionTaskBatch {
 
     public ProductionTaskBatch(Long productionTaskId, RequestPositionDto positionDto) {
         this.productionTaskId = productionTaskId;
+        this.productId = positionDto.getProduct().getId();
         this.productName = positionDto.getProduct().getCaption();
         this.requestPositionId = positionDto.getId();
         this.quantity = positionDto.getQuantity();
