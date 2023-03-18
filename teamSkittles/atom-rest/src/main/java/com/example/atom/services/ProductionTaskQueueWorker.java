@@ -2,6 +2,7 @@ package com.example.atom.services;
 
 import com.example.atom.dto.AdvInfoDto;
 import com.example.atom.dto.MachineDto;
+import com.example.atom.dto.MachineHistoryDto;
 import com.example.atom.dto.MachineTaskDto;
 import com.example.atom.entities.MachineState;
 import com.example.atom.entities.MachineType;
@@ -16,9 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,7 +33,7 @@ public class ProductionTaskQueueWorker {
 
     private final MachineReader machineReader;
 
-    @Scheduled(fixedDelay = 1000 * 60)
+    @Scheduled(fixedDelay = 1000 * 30)
     @Transactional
     private void monitorQueue() {
         System.out.println("Запущен мониторинг очереди на станки...");
@@ -117,6 +116,66 @@ public class ProductionTaskQueueWorker {
         MachineTaskDto machineTaskDto = new MachineTaskDto(new AdvInfoDto(productId, batchId, batchItemId, productionTaskId));
         machineReader.setStatusToMachine(machineDto.getPort(), MachineState.WORKING, machineTaskDto);
         System.out.println("!Отправлено! " + productId.toString() + " на станок " + machineDto.getCode() + "!");
+    }
+
+    @Scheduled(fixedDelay = 1000 * 60)
+    @Transactional
+    private void updateProductionPlanBatchState() {
+        List<MachineHistoryDto> history = this.getWaitingMachinesHistory();
+
+        Map<Long, List<MachineHistoryDto>> mapForBatchItems = history.stream()
+                .collect(Collectors.groupingBy(e -> e.getAdvInfo().getAdvInfo().getBatchItemId()));
+
+        // список изделий для всех
+        List<ProductionTaskBatchItem> productionTaskBatchItem =
+                productionTaskBatchItemRepository
+                .findAllById(mapForBatchItems.keySet());
+
+        for (Map.Entry<Long, List<MachineHistoryDto>> entryForBatchItem : mapForBatchItems.entrySet()) {
+            List<MachineHistoryDto> workingHistory = entryForBatchItem.getValue()
+                    .stream().filter(e -> e.getState()
+                            .getCode().equals(MachineState.WORKING.toString()))
+                    .toList();
+
+            Date maxBrokenDate = workingHistory.stream().filter(c ->
+                c.getState().getCode().equals(MachineState.BROKEN.toString()
+            ))
+                    .map(MachineHistoryDto::getBeginDateTime)
+                    .max(Date::compareTo)
+                    .orElse(null);
+
+            Date maxWorkingEndDate = workingHistory.stream().filter(c ->
+                            c.getState().getCode().equals(MachineState.WORKING.toString()
+                            ))
+                    .map(MachineHistoryDto::getEndDateTime)
+                    .max(Date::compareTo)
+                    .orElse(null);
+
+            if (maxWorkingEndDate != null) {
+                // возможно выполнена
+                if (maxBrokenDate != null && maxBrokenDate.after(maxWorkingEndDate)) {
+                    // сломалась, отправить обратно в пр-во
+
+                } else {
+                    // готово
+                }
+            }
+        }
+    }
+
+    private List<MachineHistoryDto> getWaitingMachinesHistory() {
+        // get all waiting machines
+        List<MachineDto> waitingMachines = machineService.getAllWaitingMachines();
+        Map<MachineType, List<MachineDto>> machineDtoMap =
+                waitingMachines
+                        .stream()
+                        .collect(Collectors.groupingBy(MachineDto::getMachineType));
+
+        List<MachineHistoryDto> dtos = new ArrayList<>();
+        for (MachineDto waitingMachine : waitingMachines) {
+            dtos.addAll(machineService.getHistoryForMachines(waitingMachine.getPort()));
+        }
+        return dtos;
     }
 
 }

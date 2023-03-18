@@ -1,6 +1,7 @@
 package com.example.atom.services;
 
 import com.example.atom.dto.MachineDto;
+import com.example.atom.dto.MachineHistoryDto;
 import com.example.atom.dto.Types;
 import com.example.atom.entities.MachineState;
 import com.example.atom.entities.MachineType;
@@ -8,8 +9,16 @@ import com.example.atom.entities.Message;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -19,6 +28,13 @@ import java.util.Map;
 
 @Service
 public class MachineService {
+
+    @Value("${api.url}")
+    private String url;
+
+    @Value("${api.cut-url}")
+    private String cutUrl;
+
     @Autowired
     private MessageRepository messageRepository;
 
@@ -30,6 +46,8 @@ public class MachineService {
 
     @Autowired
     private UserService userService;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
@@ -125,5 +143,30 @@ public class MachineService {
             throw new RuntimeException("Невозможно определить тип станка");
         }
         return type;
+    }
+
+    public List<MachineHistoryDto> getHistoryForMachines(int port) {
+        String url = UriComponentsBuilder.fromHttpUrl(this.cutUrl + port + "/status/all")
+                .build(false)
+                .toUriString();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<?> entity = new HttpEntity<>(null, headers);
+
+            ResponseEntity<List<MachineHistoryDto>> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<List<MachineHistoryDto>>() {
+                    });
+
+            List<MachineHistoryDto> result = responseEntity.getBody();
+            if (result == null)
+                System.out.println("Null");
+            return result;
+        } catch (Exception e) {
+            System.out.println("impossible");
+        }
+        return null;
     }
 }
