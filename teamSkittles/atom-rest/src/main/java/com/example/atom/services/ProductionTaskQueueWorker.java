@@ -1,9 +1,6 @@
 package com.example.atom.services;
 
-import com.example.atom.dto.AdvInfoDto;
-import com.example.atom.dto.MachineDto;
-import com.example.atom.dto.MachineHistoryDto;
-import com.example.atom.dto.MachineTaskDto;
+import com.example.atom.dto.*;
 import com.example.atom.entities.*;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.ProductionTaskBatchItemRepository;
@@ -290,5 +287,28 @@ public class ProductionTaskQueueWorker {
                 .findById(taskId).orElse(null);
         productionTask.setCloseDate(closeDate);
         productionTaskRepository.save(productionTask);
+    }
+
+    @Scheduled(fixedDelayString = "${scheduled.repairing-machines}")
+    public void getAllRepairingMachines() {
+        //смотрю всю историю всех станков, вычисляю, не пришел ли ко мне починенный станок
+        List<MachineHistoryDto> listHistory = this.getAllStatusesMachinesHistory();
+//        Map<String, MachineHistoryDto> mapHistoryByCode =
+//                listHistory.stream().collect(Collectors.toMap(MachineHistoryDto::getCode, e -> e));
+        Map<String, List<MachineHistoryDto>> mapHistoryListByCode =
+                listHistory.stream().collect(Collectors.groupingBy(MachineHistoryDto::getCode, Collectors.toList()));
+        mapHistoryListByCode.forEach((k, list) -> {
+            list.sort(Comparator.comparing(MachineHistoryDto::getBeginDateTime).reversed()); //сначала должны идти новые
+            MachineHistoryDto lastRepaired = list.stream().filter(e -> {
+                return (e.getState().getCode().equals(MachineState.REPAIRING.toString()) &&
+                        e.getBeginDateTime() != null && e.getEndDateTime() != null);
+            }).findFirst().orElse(null);
+            if (lastRepaired != null) {
+                machineService.saveMessageOfMachine(lastRepaired.getId(), lastRepaired.getCode(),
+                        lastRepaired.getBeginDateTime(), Types.machineRepair);
+            }
+        });
+        machineService.sendEmailOfRepairedMachines();
+        System.out.println("Дернул все станки на починку");
     }
 }
