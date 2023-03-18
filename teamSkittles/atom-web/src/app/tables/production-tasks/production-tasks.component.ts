@@ -14,6 +14,7 @@ export class ProductionTasksComponent implements OnInit {
 
   requests: Request[] = [];
   selectedRequests: Request[] = [];
+  display: any;
 
   constructor(public requestService: RequestService) {
   }
@@ -21,6 +22,10 @@ export class ProductionTasksComponent implements OnInit {
     this.requests = await this.requestService.getRequests();
   }
 
+  test() {
+    this.display = true;
+    console.log(this.selectedRequests)
+  }
   formatDate(date: Date) {
     return formatDate(date, 'dd/MM/yyyy', 'en');
   }

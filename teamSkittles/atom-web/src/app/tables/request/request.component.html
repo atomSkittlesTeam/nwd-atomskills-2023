@@ -100,8 +100,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-req>
-        <tr [pSelectableRow]="req" (click)="checkRequest(selectedRequests)"
-            [class.formDisabled]="req.state.code != 'DRAFT'">
+        <tr [pSelectableRow]="req" (click)="checkRequest(selectedRequests)" [class.formDisabled]="req.state.code != 'DRAFT'">
           <td *ngIf="isProductionPlanMode">
             <p-tableCheckbox [value]="req"></p-tableCheckbox>
           </td>
