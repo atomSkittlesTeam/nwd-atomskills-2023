@@ -41,8 +41,8 @@ public class ProductionTaskQueueWorker {
         List<MachineDto> waitingMachines = machineService.getAllWaitingMachines();
         Map<MachineType, List<MachineDto>> machineDtoMap =
                 waitingMachines
-                .stream()
-                .collect(Collectors.groupingBy(MachineDto::getMachineType));
+                        .stream()
+                        .collect(Collectors.groupingBy(MachineDto::getMachineType));
 
         if (waitingMachines.isEmpty()) {
             System.out.println("Нет свободных станков!");
@@ -69,27 +69,36 @@ public class ProductionTaskQueueWorker {
                     if (productionTask.getLatheStartTimestamp() == null) {
                         // точим если есть доступные станки для точения
                         List<MachineDto> latheMachineDtoList = machineDtoMap.get(MachineType.lathe);
-                        MachineDto firstFoundedLatheMachine = latheMachineDtoList.get(0);
-                        // отправляем на станок
-                        this.sendOnMachine(firstFoundedLatheMachine,
-                                productionTaskBatch.getProductId(),
-                                productionTask.getBatchId(),
-                                productionTask.getId(),
-                                productionTaskBatch.getProductionTaskId()
-                                );
-                        latheMachineDtoList.remove(firstFoundedLatheMachine);
+                        if (latheMachineDtoList != null) {
+                            MachineDto firstFoundedLatheMachine = latheMachineDtoList.get(0);
+                            // отправляем на станок
+                            this.sendOnMachine(firstFoundedLatheMachine,
+                                    productionTaskBatch.getProductId(),
+                                    productionTask.getBatchId(),
+                                    productionTask.getId(),
+                                    productionTaskBatch.getProductionTaskId()
+                            );
+                            latheMachineDtoList = latheMachineDtoList.stream().filter(e -> e.getId() != firstFoundedLatheMachine.getId()).toList();
+                        } else {
+//                            System.out.println("Токарные станки недоступны");
+                        }
                         // проверяем не начали ли фрезеровать
                     } else if (productionTask.getMillingStartTimestamp() == null) {
                         // фрезеруем, если есть доступные
                         List<MachineDto> millingMachineDtoList = machineDtoMap.get(MachineType.milling);
-                        MachineDto firstFoundedMillingMachine = millingMachineDtoList.get(0);
-                        this.sendOnMachine(firstFoundedMillingMachine,
-                                productionTaskBatch.getProductId(),
-                                productionTask.getBatchId(),
-                                productionTask.getId(),
-                                productionTaskBatch.getProductionTaskId()
-                        );
-                        millingMachineDtoList.remove(firstFoundedMillingMachine);
+                        if (millingMachineDtoList != null) {
+                            MachineDto firstFoundedMillingMachine = millingMachineDtoList.get(0);
+                            this.sendOnMachine(firstFoundedMillingMachine,
+                                    productionTaskBatch.getProductId(),
+                                    productionTask.getBatchId(),
+                                    productionTask.getId(),
+                                    productionTaskBatch.getProductionTaskId()
+                            );
+                            millingMachineDtoList = millingMachineDtoList.stream().filter(e -> e.getId() != firstFoundedMillingMachine.getId()).toList();
+                        } else {
+//                            System.out.println("Фрезерные станки недоступны");
+                        }
+
                     }
                 }
             } else {
