@@ -7,14 +7,18 @@
   <p-table [value]="user" [(contextMenuSelection)]="selectedUser" [contextMenu]="cm" dataKey="code" [tableStyle]="{'min-width': '50rem'}">
     <ng-template pTemplate="header">
       <tr>
-        <th>Username</th>
-        <th>Role</th>
+        <th>Логин</th>
+        <th>Роль</th>
+        <th>Электронная почта</th>
+        <th>ФИО</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-user>
       <tr [pContextMenuRow]="user">
         <td>{{user.login}}</td>
         <td>{{user.role}}</td>
+        <td>{{user.email}}</td>
+        <td>{{user.fullName}}</td>
       </tr>
     </ng-template>
   </p-table>
