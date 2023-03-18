@@ -4,13 +4,11 @@ import com.example.atom.dto.AdvInfoDto;
 import com.example.atom.dto.MachineDto;
 import com.example.atom.dto.MachineHistoryDto;
 import com.example.atom.dto.MachineTaskDto;
-import com.example.atom.entities.MachineState;
-import com.example.atom.entities.MachineType;
-import com.example.atom.entities.ProductionTaskBatch;
-import com.example.atom.entities.ProductionTaskBatchItem;
+import com.example.atom.entities.*;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.ProductionTaskBatchItemRepository;
 import com.example.atom.repositories.ProductionTaskBatchRepository;
+import com.example.atom.repositories.ProductionTaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -33,6 +31,7 @@ public class ProductionTaskQueueWorker {
     private final MachineService machineService;
 
     private final MachineReader machineReader;
+    private final ProductionTaskRepository productionTaskRepository;
 
     @Scheduled(fixedDelay = 1000 * 30)
     @Transactional
@@ -129,7 +128,8 @@ public class ProductionTaskQueueWorker {
         List<MachineHistoryDto> history = this.getAllStatusesMachinesHistory();
 
         Map<Long, List<MachineHistoryDto>> mapForBatchItems = history.stream()
-                .filter(e -> e.getAdvInfo() != null && e.getAdvInfo().getAdvInfo() != null)
+                .filter(e -> e.getAdvInfo() != null && e.getAdvInfo().getAdvInfo() != null
+                        && e.getAdvInfo().getAdvInfo().getBatchItemId() != null)
                 .collect(Collectors.groupingBy(e -> e.getAdvInfo().getAdvInfo().getBatchItemId()));
 
         // список изделий для всех
@@ -203,12 +203,7 @@ public class ProductionTaskQueueWorker {
                     Duration res = Duration.between(batchItem.getMillingStartTimestamp(),
                             batchItem.getMillingFinishedTimestamp());
                     batchItem.setMillingFactTime(res.getNano());
-                    // проверить выполнилась ли партия
-
-                    ProductionTaskBatch productionTaskBatch = productionTaskBatchRepository
-                            .findById(batchItem.getBatchId()).orElse(null);
-                    productionTaskBatch.completeBatchItem(batchItem.getMillingFinishedTimestamp());
-
+                    this.checkProductionTaskComplete(batchItem);
                 }
             }
         }
@@ -231,5 +226,45 @@ public class ProductionTaskQueueWorker {
             dtos.addAll(list);
         }
         return dtos;
+    }
+
+    private void checkProductionTaskComplete(ProductionTaskBatchItem batchItem) {
+        // проверить выполнилась ли партия
+        ProductionTaskBatch productionTaskBatch = productionTaskBatchRepository
+                .findById(batchItem.getBatchId()).orElse(null);
+
+        List<ProductionTaskBatch> allBatchesInTask = productionTaskBatchRepository
+                .findAllByProductionTaskId(productionTaskBatch.getProductionTaskId());
+
+        boolean isProductionTaskComplete = this.isProductionTaskComplete(productionTaskBatch,
+                allBatchesInTask);
+        if (isProductionTaskComplete) {
+            Instant maxEndBatchTime = allBatchesInTask.stream()
+                    .map(ProductionTaskBatch::getEndBatchTime)
+                    .max(Instant::compareTo)
+                    .orElse(null);
+            this.completeProductionTask(productionTaskBatch.getProductionTaskId(), maxEndBatchTime);
+        }
+
+        productionTaskBatch.completeBatchItem(batchItem.getMillingFinishedTimestamp());
+    }
+
+
+    private boolean isProductionTaskComplete(ProductionTaskBatch productionTaskBatch, List<ProductionTaskBatch> allBatchesInTask) {
+        boolean allBatchesComplete = true;
+        for (ProductionTaskBatch taskBatch : allBatchesInTask) {
+            if (taskBatch.getEndBatchTime() == null) {
+                allBatchesComplete = false;
+                break;
+            }
+        }
+        return allBatchesComplete;
+    }
+
+    private void completeProductionTask(Long taskId, Instant closeDate) {
+        ProductionTask productionTask = productionTaskRepository
+                .findById(taskId).orElse(null);
+        productionTask.setCloseDate(closeDate);
+        productionTaskRepository.save(productionTask);
     }
 }
