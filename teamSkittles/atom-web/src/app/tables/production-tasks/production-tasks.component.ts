@@ -22,7 +22,7 @@ export class ProductionTasksComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.productionTask = await this.requestService.getProductionTask();
+    this.productionTask = await this.requestService.getAllTasks();
   }
 
   showDialog() {

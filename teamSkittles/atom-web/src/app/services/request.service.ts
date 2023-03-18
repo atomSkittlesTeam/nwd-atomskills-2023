@@ -82,4 +82,9 @@ export class RequestService extends BaseService {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.get<Request[]>(url + `/machine/get-broken-machine-by-id/${machineCode}`, {}));
   }
+
+  async getAllTasks() {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<ProductionTask[]>(url + `/production/all-tasks`, {}));
+  }
 }
