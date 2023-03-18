@@ -28,10 +28,11 @@ public class MachineService {
     @Autowired
     private UserService userService;
 
-    @Scheduled(fixedDelay = 1000 * 1)
+    @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void getAllBrokenMachines() {
-        LinkedHashMap<String, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
+        //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые
+        LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
         List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();
         List<Integer> allMachinesPorts = new ArrayList<>();
         listOfMaps.forEach(map -> allMachinesPorts.addAll(map.values().stream().toList()));
@@ -90,17 +91,35 @@ public class MachineService {
 
     private List<MachineDto> getMachinesByStatus(String status) {
         System.out.println("Получение простаивающих станков...");
-        LinkedHashMap<String, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
+        LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
         List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();
         List<Integer> allMachinesPorts = new ArrayList<>();
         listOfMaps.forEach(map -> allMachinesPorts.addAll(map.values().stream().toList()));
         List<MachineDto> machineDtos = new ArrayList<>();
         for (Integer port : allMachinesPorts) {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
+            machineDto.setMachineType(this.getType(allMachines, machineDto.getCode()));
             if (machineDto.getState() != null && machineDto.getState().getCode().equals(status)) {
                 machineDtos.add(machineDto);
             }
         }
         return machineDtos;
+    }
+
+    private MachineType getType(LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> allMachines, String machineName) {
+        MachineType type = null;
+        for (Map.Entry<MachineType, LinkedHashMap<String, Integer>> stringLinkedHashMapEntry : allMachines.entrySet()) {
+            type = stringLinkedHashMapEntry.getKey(); // type
+            LinkedHashMap<String, Integer> machinesMap = stringLinkedHashMapEntry.getValue();
+            if (machinesMap.containsKey(machineName)) {
+                return type;
+            } else {
+                continue;
+            }
+        }
+        if (type == null) {
+            throw new RuntimeException("Невозможно определить тип станка");
+        }
+        return type;
     }
 }

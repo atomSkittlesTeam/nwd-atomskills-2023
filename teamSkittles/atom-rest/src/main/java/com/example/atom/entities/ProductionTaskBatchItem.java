@@ -30,6 +30,7 @@ public class ProductionTaskBatchItem {
     private Instant latheFinishedTimestamp;
 
     // время работы на станке
+    // точение
     private Integer latheFactTime;
 
     private Instant millingStartTimestamp;
