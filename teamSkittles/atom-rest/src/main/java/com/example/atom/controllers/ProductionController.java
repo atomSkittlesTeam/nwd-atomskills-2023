@@ -20,7 +20,7 @@ public class ProductionController {
 
     private final ProductionTaskService productionTaskService;
 
-    @PostMapping("productionPlan/{id}")
+    @PostMapping("plan/{id}/task")
     @Transactional
     public void createProductionTask(@PathVariable Long productionId) {
         productionTaskService.createProductionTask(productionId);
