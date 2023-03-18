@@ -28,18 +28,17 @@ public class MachineService {
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void getAllBrokenMachines() {
-        //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые
         LinkedHashMap<String, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
         List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();
         List<Integer> allMachinesPorts = new ArrayList<>();
         listOfMaps.forEach(map -> allMachinesPorts.addAll(map.values().stream().toList()));
         for (Integer port : allMachinesPorts) {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
-            if (machineDto.getState() != null && machineDto.getState().getCode().equals("WAITING")){
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals("BROKEN")){
                 saveMessageOfBrokenMachine(machineDto);
             }
         }
-        sendMessageOfBrokenMachines();
+        sendEmailOfBrokenMachines();
         System.out.println("Дернул все станки на поломку");
     }
 
@@ -60,7 +59,7 @@ public class MachineService {
     }
 
     @Transactional
-    public void sendMessageOfBrokenMachines() {
+    public void sendEmailOfBrokenMachines() {
         List<Message> messages = messageRepository.findAll();
         List<Message> newMessages = messages.stream().filter(e -> e.getEmailSign().equals(false)
                 && e.getType().equals(Types.machineBroke)).toList();
