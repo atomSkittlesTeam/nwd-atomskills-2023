@@ -32,7 +32,8 @@ public class AuthController {
                 .fullName(newUser.getFullName())
                 .role("user")
                 .build();
-        if(!userService.isValidatedOfChiefCreate(user)) {
+        if(!userService.isValidatedOfChiefCreate(user) || !userService.isValidatedOfDublicateCreate(user)) {
+            //никогда не попадем сюда
             throw new RuntimeException("Нельзя создавать второго шефа!");
         }
         userRepository.save(user);

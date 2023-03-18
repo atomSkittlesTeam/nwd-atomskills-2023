@@ -32,9 +32,9 @@ public class ProductionPlanService {
         return getCurrentPriority(query);
     }
 
-    public Long getCurrentMaxApprovedPriority() {
+    public Long getCurrentMaxApprovedOrInProductionPriority() {
         //find max property from
-        String query = "select max(priority) as priority from production_plan where production_plan_status = 'APPROVED'";
+        String query = "select max(priority) as priority from production_plan where production_plan_status in ('APPROVED', 'IN_PRODUCTION')";
         return getCurrentPriority(query);
     }
 
@@ -81,12 +81,21 @@ public class ProductionPlanService {
         List<ProductionPlan> productionPlanList = new ArrayList<>();
         //approve - переводим из blank в approve какую-нибудь существующую позицию плана
         ProductionPlan productionPlanToApprove = productionPlanRepository.findById(planId).orElse(null);
-        Long startPriorityOfApproved = dtos.stream().filter(e ->
-                Optional.ofNullable(e.getId()).orElse(-111L).equals(planId)).toList().get(0).getPriority();
-        if (productionPlanToApprove != null) {
+        ProductionPlan newProductionPlanToApprove = new ProductionPlan();
+        Boolean approveWasNew = false;
+        ProductionPlanDto dtoToApprove = dtos.stream().filter(e ->
+                Optional.ofNullable(e.getId()).orElse(-111L).equals(planId)).toList().get(0);
+        Long startPriorityOfApproved = dtoToApprove.getPriority();
+        if (productionPlanToApprove != null) { //в списке blank'в уже была та позиция, которую апрувим
             productionPlanToApprove.setProductionPlanStatus(ProductionPlanStatus.APPROVED);
-            productionPlanToApprove.setPriority(getCurrentMaxApprovedPriority() + 1);
+            productionPlanToApprove.setPriority(getCurrentMaxApprovedOrInProductionPriority() + 1);
             productionPlanRepository.saveAndFlush(productionPlanToApprove); //сохранили, чтобы снизу это не попало в бланки
+        } else { //в списке blank'ов её не было, вообще такую позицию видим впервые
+            approveWasNew = true;
+            newProductionPlanToApprove.setRequestId(dtoToApprove.getRequestId());
+            newProductionPlanToApprove.setProductionPlanStatus(ProductionPlanStatus.APPROVED);
+            newProductionPlanToApprove.setPriority(getCurrentMaxApprovedOrInProductionPriority() + 1);
+            productionPlanRepository.saveAndFlush(newProductionPlanToApprove); //сохранили, чтобы снизу это не попало в бланки
         }
         List<ProductionPlan> allProductionPlans = productionPlanRepository.findAll();
         List<ProductionPlan> blankPlans = allProductionPlans.stream().filter(e ->
@@ -95,7 +104,7 @@ public class ProductionPlanService {
 //        productionPlanRepository.flush();
         Map<Long, ProductionPlan> mapBlankByRequestId = blankPlans.stream()
                 .collect(Collectors.toMap(ProductionPlan::getRequestId, Function.identity()));
-        dtos.forEach(dto -> {
+        for(ProductionPlanDto dto : dtos) {
 //            if(productionPlanToApprove != null && productionPlanToApprove.getRequestId() != null
 //                    && !dto.getRequestId().equals(productionPlanToApprove.getRequestId())) {
 //                ProductionPlan productionPlan = new ProductionPlan();
@@ -106,8 +115,10 @@ public class ProductionPlanService {
 //            }
             //если к нам с фронта пришли 5 новых blank и 10 старых blank, то у десяти штук я пересетил priority - так как они
             //могли быть перебиты руками и плюс сверху мы апрувнули одну позицию, новым проставим весь entity
-            if (productionPlanToApprove != null &&
-                    !dto.getRequestId().equals(productionPlanToApprove.getRequestId())) {
+            if (approveWasNew && !dto.getRequestId().equals(newProductionPlanToApprove.getRequestId())
+            ||
+                    (!approveWasNew && productionPlanToApprove != null &&
+                    !dto.getRequestId().equals(productionPlanToApprove.getRequestId()))) {
                 ProductionPlan productionPlanBlank = mapBlankByRequestId.get(dto.getRequestId());
                 if (productionPlanBlank != null) { //к нам с фронта пришел старый бланк
                     productionPlanBlank.setPriority(dto.getPriority()
@@ -122,7 +133,7 @@ public class ProductionPlanService {
                 }
             }
 
-        });
+        };
         productionPlanRepository.saveAllAndFlush(productionPlanList);
     }
 

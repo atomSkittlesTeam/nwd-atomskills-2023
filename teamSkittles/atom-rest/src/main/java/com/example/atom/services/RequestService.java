@@ -52,6 +52,9 @@ public class RequestService {
     private EmailServiceImpl emailService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private ProductionPlanService productionPlanService;
 
     @Autowired
@@ -85,6 +88,7 @@ public class RequestService {
             //если они есть - отсылаю емейл
             sendMessageOfNewRequests();
         }
+        List<String> emails = userService.getEmailsByRole("chief");
         System.out.println("Дернул все реквесты");
     }
 
@@ -105,10 +109,13 @@ public class RequestService {
         List<Message> newMessages = messages.stream().filter(e -> e.getEmailSign().equals(false)
                 && e.getType().equals(Types.newRequests)).toList();
         String numbers = String.join(",", newMessages.stream().map(Message::getObjectName).toList());
-        emailService.sendSimpleMessage("sergej.davidyuk@yandex.ru",
-                "Новые реквесты пришли",
-                ("Пришли новые заказы, количество: " + newMessages.size() + "\n"
-                        + "вот такие номера у новых заказов: " + numbers));
+        List<String> emails = userService.getEmailsByRole("chief");
+        emails.forEach(email -> {
+            emailService.sendSimpleMessage(email,
+                    "Новые реквесты пришли",
+                    ("Пришли новые заказы, количество: " + newMessages.size() + "\n"
+                            + "вот такие номера у новых заказов: " + numbers));
+        });
         newMessages.forEach(e -> e.setEmailSign(true));
         messageRepository.saveAll(newMessages);
         System.out.println("Отправил сообщение о новых реквестах");
@@ -144,9 +151,14 @@ public class RequestService {
         List<RequestDto> result = new ArrayList<>();
         List<Request> requestExtensionList = requestRepository.findAllById(requestIds);
 
+        List<ProductionPlan> planInProduction = productionPlanRepository
+                .findAllByProductionPlanStatusEqualsOrderByPriority(ProductionPlanStatus.IN_PRODUCTION);
         List<ProductionPlan> planApproved = productionPlanRepository
                 .findAllByProductionPlanStatusEqualsOrderByPriority(ProductionPlanStatus.APPROVED);
 
+        List<Request> requestsInProduction = requestRepository.findAllById(
+                planInProduction.stream().map(e -> e.getRequestId()).toList()
+        );
         List<Request> requestsApproved = requestRepository.findAllById(
                 planApproved.stream().map(e -> e.getRequestId()).toList()
         );
@@ -187,6 +199,7 @@ public class RequestService {
         sortList(requestOverTwoDays);
         sortList(requestUnderTwoDays);
         List<Request> helpList = new ArrayList<>();
+        helpList.addAll(requestsInProduction);
         helpList.addAll(requestsApproved);
         helpList.addAll(requestOverTwoDays);
         helpList.addAll(requestUnderTwoDays);

@@ -27,7 +27,7 @@ export class AdminComponent implements OnInit {
       return {name: role.name}}));
     this.items = [
       {label: 'Update', icon: 'pi pi-fw pi-pencil', command: () => this.showDialog()},
-      {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => console.log(localStorage.getItem("ROLES"))}
+      // {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => console.log(localStorage.getItem("ROLES"))}
     ];
     this.user = await this.userService.getUsers();
 
@@ -48,11 +48,13 @@ export class AdminComponent implements OnInit {
         summary: 'Обновился',
         detail: 'Юзер обновлился',
       })
-    }).catch(() => this.messageService.add({
+    }).catch((e) => {
+      console.log(e,'error')
+      this.messageService.add({
       severity: 'error',
       summary: 'Обновления',
-      detail: 'Юзер не обновлен, возможно вы не админ',
-    }));
+      detail: e,
+    })});
     this.displayDialog = false;
   }
 

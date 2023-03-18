@@ -1,0 +1,71 @@
+<div class="container">
+
+  <p-splitter>
+    <ng-template pTemplate>
+
+      <div class="master">
+        <p-table [value]="requests" [(selection)]="selectedRequests"
+                 [tableStyle]="{'min-width': '50rem'}">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">
+                <p-button
+                  [pTooltip]="'Показать диалоговое окно'"
+                  class="show-dialog"
+                  icon="pi pi-check"  styleClass="p-button-success"
+                  (onClick)="test()"></p-button>
+              </th>
+              <th>Приоритет</th>
+              <th>Номер</th>
+              <th>Время выполнения</th>
+              <th>Дата</th>
+              <th>Описание</th>
+              <th>Дата Выпуска</th>
+            </tr>
+            <tr>
+              <th style="width:4rem"></th>
+              <th>
+                <p-columnFilter type="text" field="priority"></p-columnFilter>
+              </th>
+              <th>
+                <p-columnFilter type="text" field="number"></p-columnFilter>
+              </th>
+              <th>
+                <p-columnFilter type="text" field="time"></p-columnFilter>
+              </th>
+              <th>
+                <p-columnFilter type="text" field="date"></p-columnFilter>
+              </th>
+              <th>
+                <p-columnFilter type="text" field="description"></p-columnFilter>
+              </th>
+              <th>
+                <p-columnFilter type="text" field="releaseDate"></p-columnFilter>
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-req>
+            <tr [pSelectableRow]="req">
+              <td>
+                <p-tableCheckbox [value]="req"></p-tableCheckbox>
+              </td>
+              <td style="pointer-events: none;">{{req.priority}}</td>
+              <td style="pointer-events: none;">{{req.number}}</td>
+              <td style="pointer-events: none;">{{req.time}} {{req.time ? ' ч.' : ''}}</td>
+              <td style="pointer-events: none;">{{formatDate(req.date)}}</td>
+              <td style="pointer-events: none;"> {{req.description}}</td>
+              <td style="pointer-events: none;">{{formatDate(req.releaseDate)}}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </ng-template>
+    <ng-template pTemplate>
+      Panel 2
+    </ng-template>
+  </p-splitter>
+</div>
+
+<p-dialog header="Title" [(visible)]="display">
+  Content
+</p-dialog>

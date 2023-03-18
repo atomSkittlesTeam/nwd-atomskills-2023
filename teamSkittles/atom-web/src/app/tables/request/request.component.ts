@@ -5,6 +5,8 @@ import {RequestPosition} from "../../dto/RequestPosition";
 import {MessageService} from "primeng/api";
 import {Router} from "@angular/router";
 import {formatDate} from "@angular/common";
+import {UserService} from "../../services/user.service";
+import {AuthService} from "../../services/auth.service";
 
 @Component({
   selector: 'app-request',
@@ -17,12 +19,14 @@ export class RequestComponent implements OnInit {
   request: Request[] = [];
   selectedRequests: Request[] = [];
 
+  userRole: string = '';
+
   requestPositions: RequestPosition[] = [];
 
   isProductionPlanMode = false;
 
-  constructor(public requestService: RequestService, public router: Router) {
-
+  constructor(public requestService: RequestService, public router: Router, public authService: AuthService) {
+    this.userRole = authService.userRole;
   }
 
   async ngOnInit() {
@@ -30,7 +34,7 @@ export class RequestComponent implements OnInit {
     console.log(this.request)
   }
 
-  async test(selected: any) {
+  async checkRequest(selected: any) {
     if (selected.length == 1) {
       console.log(await this.requestService.getRequestPositionById(selected[0].id));
       this.requestPositions = await this.requestService.getRequestPositionById(selected[0].id);
@@ -46,16 +50,15 @@ export class RequestComponent implements OnInit {
     }
   }
 
-  test2() {
-    console.log('heyy')
-  }
 
   sendRequestsPositions() {
+    this.selectedRequests.forEach(req => req.requestId = req.id);
     localStorage.setItem('SendArray', JSON.stringify(this.selectedRequests));
     this.router.navigate(['/manage']);
   }
 
-  getReleaseDate(date: Date) {
+
+  formatDate(date: Date) {
     return formatDate(date, 'dd/MM/yyyy', 'en');
   }
 }

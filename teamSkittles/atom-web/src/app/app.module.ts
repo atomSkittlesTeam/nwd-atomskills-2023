@@ -27,6 +27,8 @@ import {SidebarModule} from 'primeng/sidebar'
 import {ToolbarModule} from "primeng/toolbar";
 import { ManageProductComponent } from './manage-product/manage-product.component';
 import {InputSwitchModule} from "primeng/inputswitch";
+import {BlockUIModule} from "primeng/blockui";
+import { ProductionTasksComponent } from './tables/production-tasks/production-tasks.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,29 +36,31 @@ import {InputSwitchModule} from "primeng/inputswitch";
     NavigationComponent,
     AdminComponent,
     RequestComponent,
-    ManageProductComponent
+    ManageProductComponent,
+    ProductionTasksComponent
   ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    AppRoutingModule,
-    MessageModule,
-    MessagesModule,
-    FormsModule,
-    ButtonModule,
-    TableModule,
-    ToastModule,
-    DialogModule,
-    SelectButtonModule,
-    ContextMenuModule,
-    BrowserAnimationsModule,
-    MultiSelectModule,
-    SpeedDialModule,
-    SplitterModule,
-    SidebarModule,
-    ToolbarModule,
-    InputSwitchModule
-  ],
+    imports: [
+        BrowserModule,
+        HttpClientModule,
+        AppRoutingModule,
+        MessageModule,
+        MessagesModule,
+        FormsModule,
+        ButtonModule,
+        TableModule,
+        ToastModule,
+        DialogModule,
+        SelectButtonModule,
+        ContextMenuModule,
+        BrowserAnimationsModule,
+        MultiSelectModule,
+        SpeedDialModule,
+        SplitterModule,
+        SidebarModule,
+        ToolbarModule,
+        InputSwitchModule,
+        BlockUIModule
+    ],
   providers: [ConfigService, {
     provide: HTTP_INTERCEPTORS,
     useClass: AuthHelperInterceptor,

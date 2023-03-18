@@ -2,7 +2,6 @@ package com.example.atom.services;
 
 import com.example.atom.dto.MachineDto;
 import com.example.atom.dto.Types;
-import com.example.atom.entities.MachineType;
 import com.example.atom.entities.Message;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.MessageRepository;
@@ -14,7 +13,6 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class MachineService {
@@ -27,6 +25,9 @@ public class MachineService {
     @Autowired
     private EmailServiceImpl emailService;
 
+    @Autowired
+    private UserService userService;
+
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void getAllBrokenMachines() {
@@ -37,11 +38,14 @@ public class MachineService {
         listOfMaps.forEach(map -> allMachinesPorts.addAll(map.values().stream().toList()));
         for (Integer port : allMachinesPorts) {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
-            if (machineDto.getState() != null && machineDto.getState().getCode().equals("WAITING")){
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals("unknown")) {
+                machineReader.setStatusToMachine(port, "waiting");
+            }
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals("BROKEN")){
                 saveMessageOfBrokenMachine(machineDto);
             }
         }
-        sendMessageOfBrokenMachines();
+        sendEmailOfBrokenMachines();
         System.out.println("Дернул все станки на поломку");
     }
 
@@ -62,15 +66,18 @@ public class MachineService {
     }
 
     @Transactional
-    public void sendMessageOfBrokenMachines() {
+    public void sendEmailOfBrokenMachines() {
         List<Message> messages = messageRepository.findAll();
         List<Message> newMessages = messages.stream().filter(e -> e.getEmailSign().equals(false)
                 && e.getType().equals(Types.machineBroke)).toList();
         if (newMessages.size() > 0) {
             String numbers = String.join(",", newMessages.stream().map(Message::getObjectName).toList());
-            emailService.sendSimpleMessage("sergej.davidyuk@yandex.ru",
-                    "Произошла поломка станка!",
-                    ("Станки с кодами: " + numbers + " сломаны"));
+            List<String> emails = userService.getEmailsByRole("chief");
+            emails.forEach(email -> {
+                emailService.sendSimpleMessage(email,
+                        "Произошла поломка станка!",
+                        ("Станки с кодами: " + numbers + " сломаны"));
+            });
             newMessages.forEach(e -> e.setEmailSign(true));
             messageRepository.saveAll(newMessages);
             messageRepository.flush();
