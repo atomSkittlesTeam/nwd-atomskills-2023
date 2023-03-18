@@ -10,7 +10,6 @@ import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -121,7 +120,7 @@ public class MachineService {
         return result;
     }
 
-    private List<MachineDto> getMachinesByStatus(MachineState status) {
+    public List<MachineDto> getMachinesByStatus(MachineState status) {
         System.out.println("Получение простаивающих станков...");
         LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
         List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();
@@ -132,7 +131,8 @@ public class MachineService {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
             machineDto.setMachineType(this.getType(allMachines, machineDto.getCode()));
             machineDto.setPort(port);
-            if (machineDto.getState() != null && machineDto.getState().getCode().equals(status.toString())) {
+            if ((machineDto.getState() != null && machineDto.getState().getCode().equals(status.toString()))
+                    || status == null) {
                 machineDtos.add(machineDto);
             }
         }
