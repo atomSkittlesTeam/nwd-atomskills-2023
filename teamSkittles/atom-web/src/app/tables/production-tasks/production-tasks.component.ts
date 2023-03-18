@@ -3,6 +3,7 @@ import {formatDate} from "@angular/common";
 import {Request} from "../../dto/Request";
 import {RequestService} from "../../services/request.service";
 import {MessageService} from "primeng/api";
+import {ProductionTask} from "../../dto/ProductionTask";
 
 @Component({
   selector: 'app-production-tasks',
@@ -12,20 +13,23 @@ import {MessageService} from "primeng/api";
 })
 export class ProductionTasksComponent implements OnInit {
 
-  requests: Request[] = [];
-  selectedRequests: Request[] = [];
+  productionTask: ProductionTask[] = [];
+  selectedProductionTask: ProductionTask[] = [];
   display: any;
+  checked: boolean = false;
 
   constructor(public requestService: RequestService) {
   }
+
   async ngOnInit() {
-    this.requests = await this.requestService.getRequests();
+    this.productionTask = await this.requestService.getProductionTask();
   }
 
-  test() {
+  showDialog() {
     this.display = true;
-    console.log(this.selectedRequests)
+    console.log(this.selectedProductionTask)
   }
+
   formatDate(date: Date) {
     return formatDate(date, 'dd/MM/yyyy', 'en');
   }

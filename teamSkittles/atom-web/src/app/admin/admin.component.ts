@@ -53,7 +53,7 @@ export class AdminComponent implements OnInit {
       this.messageService.add({
       severity: 'error',
       summary: 'Обновления',
-      detail: e,
+      detail: e.error.message
     })});
     this.displayDialog = false;
   }

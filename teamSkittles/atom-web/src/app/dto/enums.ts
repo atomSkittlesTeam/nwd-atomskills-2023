@@ -1,4 +1,4 @@
 export enum Enums {
-  machineRepaier, machinebBroken, newRequests
+  machineRepaier = 'machineRepaier', machinebBroken = 'machinebBroken', newRequests = 'newRequests'
 
 }

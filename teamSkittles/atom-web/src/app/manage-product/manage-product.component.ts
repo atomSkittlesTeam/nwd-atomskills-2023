@@ -35,7 +35,7 @@ export class ManageProductComponent implements OnInit, OnDestroy {
 
   }
 
-  // [ngClass]="{'broken': message.type === 'machineBroke'}"
+
   blocked: any = false;
 
   countPriority() {
