@@ -1,9 +1,7 @@
 package com.example.atom.readers;
 
-import com.example.atom.dto.DemoDto;
-import com.example.atom.dto.MachineDto;
-import com.example.atom.dto.RequestDto;
-import com.example.atom.dto.RequestPositionDto;
+import com.example.atom.dto.*;
+import com.example.atom.entities.MachineState;
 import com.example.atom.entities.MachineType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -77,7 +75,7 @@ public class MachineReader {
         return null;
     }
 
-    public void setStatusToMachine(Integer port, String status) {
+    public void setStatusToMachine(Integer port, MachineState status, MachineTaskDto machineTaskDto) {
         String url = UriComponentsBuilder
                 .fromHttpUrl(this.cutUrl + port + "/set/" + status)
                 .build(false)
@@ -86,7 +84,7 @@ public class MachineReader {
             Map<String, String> map = new HashMap<>();
             map.put("default", "default");
             HttpHeaders headers = new HttpHeaders();
-            HttpEntity<?> entity = new HttpEntity<>(map, headers);
+            HttpEntity<?> entity = new HttpEntity<>(machineTaskDto == null ? map : machineTaskDto, headers);
             //HttpEntity<?> entity = new HttpEntity<>(id, headers); //как вариант, id здесь может быть
 
             restTemplate.exchange(
