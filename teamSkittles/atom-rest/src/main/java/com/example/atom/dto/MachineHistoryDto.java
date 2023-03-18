@@ -10,13 +10,13 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MachineDto {
+public class MachineHistoryDto {
     private Long id;
     private String code;
     private StateDto state;
-    private AdvInfoDto advInfo;
     private Date beginDateTime;
     private Date endDateTime;
     private MachineType machineType;
     private int port;
+    private AdvInfoAdditionalDto advInfo;
 }
