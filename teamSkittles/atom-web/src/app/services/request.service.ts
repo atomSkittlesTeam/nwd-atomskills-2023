@@ -9,6 +9,8 @@ import {Request} from "../dto/Request";
 import {RequestPosition} from "../dto/RequestPosition";
 import {Message} from "../dto/Message";
 import {ProductionTask} from "../dto/ProductionTask";
+import {ProductionTaskBatch} from "../dto/ProductionTaskBatch";
+import {ProductionTaskBatchItem} from "../dto/ProductionTaskBatchItem";
 
 @Injectable({
   providedIn: 'root'
@@ -86,5 +88,15 @@ export class RequestService extends BaseService {
   async getAllTasks() {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.get<ProductionTask[]>(url + `/production/all-tasks`, {}));
+  }
+
+  async getAllBatchesByTask(id: number) {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<ProductionTaskBatch[]>(url + `/production/all-batches/${id}`, {}));
+  }
+
+  async getAllBatchItemsByBatch(id: number) {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<ProductionTaskBatchItem[]>(url + `/production/all-batch-items/${id}`, {}));
   }
 }

@@ -7,6 +7,7 @@ export class ProductionTask {
 
   requestNumber: string;
   creationDate: Date;
+  closeDate: Date;
   closed: boolean;
 
   constructor() {
