@@ -4,11 +4,19 @@
       <h3 class="logo" routerLink="/"><img pTooltip="Перейти домой" src="assets/logo.png" alt="MESkittles"
                                            height="60px"></h3>
     </div>
-    <div class="p-toolbar-group-start">
+    <div class="p-toolbar-group-end">
+
       <span *ngIf="userLogin" class="login-label">Текущий пользователь: <b
         [pTooltip]="'Роль пользователя: ' + userRole" [tooltipPosition]="'left'">{{userLogin}}</b></span>
-      <p-button type="text" class="sidebar" (click)="showNewPositions()" icon="pi pi-bell" label="{{messages.length}}"
-                *ngIf="userAuth && userRole == 'chief'"></p-button>
+
+      <div style="height: 40px; width: 15px; border-left: 1px lightgrey solid"></div>
+
+      <div *ngIf="userAuth && userRole == 'chief'" (click)="showNewPositions()" pTooltip="Посмотреть уведомления"
+           style="cursor: pointer; border: 1px lightgrey solid; border-radius: 10px; padding: 10px;
+           display: flex; align-items: center">
+        <i style="font-size: 26px" [class.bell-anim]="messages.length > 0" class="pi pi-bell"></i>
+        <span style="font-size: 22px; margin-left: 10px">({{messages.length}})</span>
+      </div>
     </div>
   </p-toolbar>
 
