@@ -117,7 +117,7 @@
           <td>{{batch.id}}</td>
           <td>{{batch.quantity}}</td>
           <td>{{batch.quantityExec}}</td>
-          <td>{{batch.endBatchTime == null ? 'Завершена' : 'Изготавливается'}}</td>
+          <td>{{batch.endBatchTime != null ? 'Завершена' : 'Изготавливается'}}</td>
           <td>
             <p-button
               [pTooltip]="'Показать диалоговое окно'"
