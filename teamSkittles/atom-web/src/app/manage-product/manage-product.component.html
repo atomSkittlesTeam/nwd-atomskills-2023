@@ -28,7 +28,7 @@
           <th style="width:3rem" *ngIf="isManual"></th>
           <th>Приоритет</th>
           <th>Номер</th>
-          <th>Время выполнения</th>
+          <th>Автоматически расчитанное время</th>
           <th>Дата</th>
           <th>Описание</th>
           <th>Дата Выпуска</th>
@@ -71,13 +71,14 @@
           <td style="pointer-events: none;">{{formatDate(req.releaseDate)}}</td>
           <td>
             <p-button
-              [pTooltip]="isEnabled(req) ? 'Утвердить позицию' : 'Позицию нельзя утвердить' "
+              [pTooltip]="isEnabled(req) ? 'Утвердить позицию' : 'Позиция уже утверждена' "
               [disabled]="!isEnabled(req)"
               icon="pi pi-check" styleClass="p-button-success"
               (onClick)="approvePosition(req.id)"></p-button>
             <p-button
-              *ngIf="req.state?.code == 'APPROVED'"
-              [pTooltip]="'Сформировать заказ-наряд'"
+
+              [pTooltip]="req.state?.code == 'APPROVED' ? 'Сформировать заказ-наряд' : 'Заказ уже сформирован'"
+              [disabled]="req.state?.code == 'IN_PRODUCTION' || req.state?.code !== 'APPROVED' || req.state?.code === 'BLANK'"
               [style]="{marginLeft: '5px'}"
               icon="pi pi-cog" styleClass="p-button-warning"
               (onClick)="toProduction(req)"></p-button>
