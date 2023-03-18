@@ -50,4 +50,15 @@ public class ProductionController {
     public List<ProductionTask> getProductionTasks() {
         return productionTaskService.getAllProductionTasks();
     }
+
+    @GetMapping("all-batches/{id}")
+    public List<ProductionTaskBatch> getProductionTaskBatchesByTaskId(@PathVariable("id") Long id) {
+        return productionTaskReader.getProductionTaskBatches(id);
+//        return productionTaskService.getAllProductionTaskBatchesByTaskId(id);
+    }
+
+    @GetMapping("all-batch-items/{id}")
+    public List<ProductionTaskBatchItem> getBatchItemsByBatchId(@PathVariable("id") Long id) {
+        return productionTaskReader.getProductionBatchItems(id);
+    }
 }
