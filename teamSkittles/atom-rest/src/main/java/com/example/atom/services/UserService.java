@@ -136,13 +136,15 @@ public class UserService {
 
     private void generateAdminUser() {
         User admin = new User();
-        admin.setLogin("admin");
-        admin.setPassword("admin");
-        admin.setEmail("admin@email");
-        admin.setFullName("Админ Админыч Админов");
+        admin.setLogin(adminLogin);
+        admin.setPassword(adminPassword);
+        admin.setEmail(adminEmail);
+        admin.setFullName(adminFullName);
         User user = User.builder()
                 .login(admin.getLogin())
                 .password(passwordEncoder.encode(admin.getPassword()))
+                .fullName(admin.getFullName())
+                .email(admin.getEmail())
                 .role("admin")
                 .build();
         userRepository.save(user);
