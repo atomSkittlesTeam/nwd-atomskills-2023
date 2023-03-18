@@ -121,7 +121,7 @@ public class ProductionTaskQueueWorker {
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     private void updateProductionPlanBatchState() {
-        List<MachineHistoryDto> history = this.getWaitingMachinesHistory();
+        List<MachineHistoryDto> history = this.getAllStatusesMachinesHistory();
 
         Map<Long, List<MachineHistoryDto>> mapForBatchItems = history.stream()
                 .collect(Collectors.groupingBy(e -> e.getAdvInfo().getAdvInfo().getBatchItemId()));
@@ -163,17 +163,17 @@ public class ProductionTaskQueueWorker {
         }
     }
 
-    private List<MachineHistoryDto> getWaitingMachinesHistory() {
-        // get all waiting machines
-        List<MachineDto> waitingMachines = machineService.getAllWaitingMachines();
+    private List<MachineHistoryDto> getAllStatusesMachinesHistory() {
+        // get all statuses machines
+        List<MachineDto> machineDtos = machineService.getMachinesByStatus(null);
         Map<MachineType, List<MachineDto>> machineDtoMap =
-                waitingMachines
+                machineDtos
                         .stream()
                         .collect(Collectors.groupingBy(MachineDto::getMachineType));
 
         List<MachineHistoryDto> dtos = new ArrayList<>();
-        for (MachineDto waitingMachine : waitingMachines) {
-            dtos.addAll(machineService.getHistoryForMachines(waitingMachine.getPort()));
+        for (MachineDto machineDto : machineDtos) {
+            dtos.addAll(machineService.getHistoryForMachines(machineDto.getPort()));
         }
         return dtos;
     }
