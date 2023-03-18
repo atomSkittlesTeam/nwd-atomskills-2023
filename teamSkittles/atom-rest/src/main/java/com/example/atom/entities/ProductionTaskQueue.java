@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 /*
 
     ОЧЕРЕДЬ ЗАКАЗ НАРЯДОВ НА ЗАПУСК НА СТАНОК
@@ -34,11 +36,28 @@ public class ProductionTaskQueue {
 
     private Integer quantityExec;
 
-    private Integer millingTime;
-
+    /* точильная по справочнику*/
     private Integer latheTime;
 
+    private boolean latheFlag;
+
+    private Instant latheStartTimestamp;
+
+    private Instant latheFactTimestamp;
+
+    /* фрезерная по справочнику*/
+    private Integer millingTime;
+
+    private boolean millingFlag;
+
+    private Instant millingStartTimestamp;
+
+    // время работы на станке
+    private Instant millingFactTimestamp;
+
     private Long machineId;
+
+    private Instant summaryWorkingTime;
 
     public ProductionTaskQueue(ProductionTask productionTask,
                                RequestPositionDto positionDto) {
@@ -50,6 +69,4 @@ public class ProductionTaskQueue {
         this.millingTime = positionDto.getProduct().getMillingTime();
         this.latheTime = positionDto.getProduct().getLatheTime();
     }
-
-
 }
