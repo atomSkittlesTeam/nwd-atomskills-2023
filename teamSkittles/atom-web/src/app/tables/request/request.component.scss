@@ -5,3 +5,29 @@
     }
   }
 }
+
+.master {
+  height: calc(50vh - 185px);
+  overflow: auto;
+}
+
+.master-single {
+  height: calc(100vh - 185px);
+  overflow: auto;
+
+}
+
+.detail {
+  height: calc(50vh - 1em - 1px );
+  overflow: auto;
+}
+
+:host {
+  ::ng-deep {
+    .p-toolbar {
+      .p-button {
+        margin-left: 5px;
+      }
+    }
+  }
+}

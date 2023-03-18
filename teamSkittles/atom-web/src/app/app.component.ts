@@ -4,8 +4,10 @@ import {UserService} from "./services/user.service";
 import {Router} from "@angular/router";
 import {MenuItem} from "primeng/api";
 import {Message} from "./dto/Message";
-import {Enums} from "./dto/enums";
 import {RequestService} from "./services/request.service";
+import {interval} from "rxjs";
+import {Enums} from "./dto/enums";
+
 
 @Component({
   selector: 'app-root',
@@ -14,24 +16,41 @@ import {RequestService} from "./services/request.service";
 })
 export class AppComponent implements OnInit {
   title = 'atomskittles-webapp';
-  admin: boolean = false;
+  userAuth: boolean = false;
+  userRole: string = '';
   items: MenuItem[] = [];
+
+  enums = Enums;
+
 
   messages: Message[] = [];
   display: boolean = false;
 
   constructor(public authService: AuthService, public router: Router, private userService: UserService, public requestService: RequestService) {
-    this.admin = !!this.authService.get();
+    authService.auth.subscribe(() => this.initUser());
+    this.authService.checkAuth();
+    this.getMessagesByTime();
   }
 
   deleteAuthMark() {
     localStorage.removeItem("AUTH");
   }
 
+  public initUser() {
+    this.userAuth = this.authService.userAuth;
+    this.userRole = this.authService.userRole;
+  }
+
   async showNewPositions() {
-    this.messages = await this.requestService.getNewMessages();
-    console.log(this.messages)
     this.display = true;
+  }
+
+  getMessagesByTime() {
+
+    interval(60000).subscribe(async () => {
+      this.messages = await this.requestService.getNewMessages();
+
+    });
   }
 
   async ngOnInit(): Promise<void> {
@@ -45,7 +64,7 @@ export class AppComponent implements OnInit {
       {
         icon: 'pi pi-sign-in',
         command: () => {
-          localStorage.removeItem("AUTH");
+          this.authService.logOut();
           this.router.navigate(['/login']);
           // this.messageService.add({ severity: 'success', summary: 'Update', detail: 'Data Updated' });
         }
@@ -53,21 +72,16 @@ export class AppComponent implements OnInit {
       {
         icon: 'pi pi-sign-out',
         command: () => {
-          localStorage.removeItem("AUTH");
+          this.authService.logOut();
           this.router.navigate(['/registration']);
           // this.messageService.add({ severity: 'error', summary: 'Delete', detail: 'Data Deleted' });
         }
       }
     ];
-    if (!this.authService.get()) {
+    if (!this.authService.userAuth) {
       this.router.navigate(['/login']);
     }
-
-    if (this.authService.get()) {
-      await this.userService.getUserRoles();
-    }
-
-
+    this.messages = await this.requestService.getNewMessages();
   }
 
   async closeOneInfo(id: number, idx: number) {

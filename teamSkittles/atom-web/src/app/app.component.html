@@ -5,8 +5,8 @@
       <h3 style="cursor: pointer" routerLink="/">Пацаны ваще ребята</h3>
     </div>
     <div class="p-toolbar-group-start">
-      <p-button type="text" class="sidebar" (click)="showNewPositions()" icon="pi pi-bell" label="Уведомления ({{messages.length}})"></p-button>
-
+      <p-button type="text" class="sidebar" (click)="showNewPositions()" icon="pi pi-bell" label="{{messages.length}}"
+                *ngIf="userAuth && userRole == 'chief'"></p-button>
 
     </div>
   </p-toolbar>
@@ -14,15 +14,17 @@
   <router-outlet></router-outlet>
 </ng-container>
 <p-speedDial [model]="items" class="module-nav" direction="up-left" type="quarter-circle"
-             buttonClassName="p-button-success" *ngIf="admin"></p-speedDial>
-<p-sidebar [(visible)]="display" position="right" >
-  <div class="container-message" >
+             buttonClassName="p-button-success" *ngIf="userAuth"></p-speedDial>
+<p-sidebar [(visible)]="display" position="right">
+  <div class="container-message">
     <h3 *ngIf="messages.length == 0">Нет новых сообщений</h3>
-    <div class="message" *ngFor="let message of messages; let idx = index;" >
+    <div class="message" *ngFor="let message of messages; let idx = index;">
       <div class="message__icon" (click)="closeOneInfo(message.id, idx)"><i class="pi pi-times"></i></div>
-      <div class="message__text">{{message.id}}</div>
+      <div class="message__text">{{message.customText}}</div>
     </div>
   </div>
-  <button pButton type="button" class="p-button-success" label="Прочитать все" (click)="closeAllInfo()"></button>
+  <div style="width: 100%; text-align: center; padding-top: 10px">
+    <button pButton type="button" class="p-button-success" label="Прочитать все" (click)="closeAllInfo()"></button>
+  </div>
 </p-sidebar>
 
