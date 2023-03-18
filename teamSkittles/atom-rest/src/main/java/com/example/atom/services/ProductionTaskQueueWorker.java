@@ -206,6 +206,7 @@ public class ProductionTaskQueueWorker {
                     Duration res = Duration.between(batchItem.getLatheStartTimestamp(),
                             batchItem.getLatheFinishedTimestamp());
                     batchItem.setLatheFactTime(res.getNano());
+                    productionTaskBatchItemRepository.save(batchItem);
                 } else {
                     batchItem.setMillingFinishedTimestamp(maxWorkingEndDate.toInstant());
                     Duration res = Duration.between(batchItem.getMillingStartTimestamp(),
