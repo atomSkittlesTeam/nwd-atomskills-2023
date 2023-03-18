@@ -91,7 +91,8 @@ public class ProductionTaskQueueWorker {
                                     .equals(firstFoundedLatheMachine.getId())).toList();
                         }
                         // проверяем не начали ли фрезеровать
-                    } else if (batchItem.getMillingStartTimestamp() == null) {
+                    } else if (batchItem.getLatheFinishedTimestamp() != null
+                            && batchItem.getMillingStartTimestamp() == null) {
                         // фрезеруем, если есть доступные
                         if (millingMachineDtoList != null && !millingMachineDtoList.isEmpty()) {
                             MachineDto firstFoundedMillingMachine = millingMachineDtoList.get(0);
