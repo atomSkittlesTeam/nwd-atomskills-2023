@@ -63,13 +63,13 @@ public class ProductionTaskQueueWorker {
                 for (ProductionTaskBatchItem productionTask : productionQueue) {
                     // проверяем нужно точить или фрезеровать
 
+                    ProductionTaskBatch productionTaskBatch = productionTaskBatchMap.get(productionTask.getBatchId());
                     // проверяем не начали ли точить
                     if (productionTask.getLatheStartTimestamp() == null) {
                         // точим если есть доступные станки для точения
                         List<MachineDto> latheMachineDtoList = machineDtoMap.get(MachineType.lathe);
                         MachineDto firstFoundedLatheMachine = latheMachineDtoList.get(0);
                         // отправляем на станок
-                        ProductionTaskBatch productionTaskBatch = productionTaskBatchMap.get(productionTask.getBatchId());
                         this.sendOnMachine(firstFoundedLatheMachine,
                                 productionTaskBatch.getProductId(),
                                 productionTask.getBatchId(),
@@ -81,7 +81,12 @@ public class ProductionTaskQueueWorker {
                         // фрезеруем, если есть доступные
                         List<MachineDto> millingMachineDtoList = machineDtoMap.get(MachineType.milling);
                         MachineDto firstFoundedMillingMachine = millingMachineDtoList.get(0);
-                        // @ TODO отправляем на станок
+                        this.sendOnMachine(firstFoundedMillingMachine,
+                                productionTaskBatch.getProductId(),
+                                productionTask.getBatchId(),
+                                productionTask.getId(),
+                                productionTaskBatch.getProductionTaskId()
+                        );
                     }
                 }
             } else {
