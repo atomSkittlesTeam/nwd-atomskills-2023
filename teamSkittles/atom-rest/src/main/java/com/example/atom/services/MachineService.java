@@ -92,6 +92,7 @@ public class MachineService {
         for (Integer port : allMachinesPorts) {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
             machineDto.setMachineType(this.getType(allMachines, machineDto.getCode()));
+            machineDto.setPort(port);
             if (machineDto.getState() != null && machineDto.getState().getCode().equals(status)) {
                 machineDtos.add(machineDto);
             }

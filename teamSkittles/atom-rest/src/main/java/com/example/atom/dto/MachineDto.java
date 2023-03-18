@@ -19,4 +19,6 @@ public class MachineDto {
     private Date endDateTime;
     private MachineType machineType;
 
+    private int port;
+
 }

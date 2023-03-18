@@ -1,7 +1,7 @@
 package com.example.atom.services;
 
 import com.example.atom.dto.MachineDto;
-import com.example.atom.dto.MachineTaskDto;
+import com.example.atom.entities.MachineType;
 import com.example.atom.entities.ProductionTaskBatchItem;
 import com.example.atom.repositories.ProductionTaskBatchItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,27 +28,34 @@ public class ProductionTaskQueueWorker {
 
         // get all waiting machines
         List<MachineDto> waitingMachines = machineService.getAllWaitingMachines();
-//        Map<String, List<MachineDto>> machineDtoMap =
-//                waitingMachines.stream().collect(Collectors.groupingBy(e -> e.ge))
+        Map<MachineType, List<MachineDto>> machineDtoMap =
+                waitingMachines
+                .stream()
+                .collect(Collectors.groupingBy(MachineDto::getMachineType));
 
         if (waitingMachines.isEmpty()) {
             System.out.println("Нет свободных станков!");
         } else {
 
-            List<ProductionTaskBatchItem> productionQueue = productionTaskBatchItemRepository.findAll();
+            List<ProductionTaskBatchItem> productionQueue = productionTaskBatchItemRepository
+                    .findAllBySummaryWorkingTimeProductIsNullOrderByIdAsc();
             if (!productionQueue.isEmpty()) {
                 for (ProductionTaskBatchItem productionTask : productionQueue) {
-
                     // проверяем нужно точить или фрезеровать
 
                     // проверяем не начали ли точить
                     if (productionTask.getLatheStartTimestamp() == null) {
                         // точим если есть доступные станки для точения
-//                        if ()
+                        List<MachineDto> latheMachineDtoList = machineDtoMap.get(MachineType.lathe);
+                        MachineDto firstFoundedLatheMachine = latheMachineDtoList.get(0);
+                        // @ TODO отправляем на станок
+                        // проверяем не начали ли фрезеровать
+                    } else if (productionTask.getMillingStartTimestamp() == null) {
+                        // фрезеруем, если есть доступные
+                        List<MachineDto> millingMachineDtoList = machineDtoMap.get(MachineType.milling);
+                        MachineDto firstFoundedMillingMachine = millingMachineDtoList.get(0);
+                        // @ TODO отправляем на станок
                     }
-
-
-                    // фрезеруем, если есть доступные
                 }
             } else {
                 System.out.println("Отличная работа! В очереди нет заказ-нарядов!");

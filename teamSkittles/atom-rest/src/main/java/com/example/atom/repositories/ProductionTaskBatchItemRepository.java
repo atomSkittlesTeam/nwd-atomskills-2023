@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ProductionTaskBatchItemRepository extends JpaRepository<ProductionTaskBatchItem, Long> {
     List<ProductionTaskBatchItem> findAllByBatchId(Long batchId);
+    List<ProductionTaskBatchItem> findAllBySummaryWorkingTimeProductIsNullOrderByIdAsc();
 }

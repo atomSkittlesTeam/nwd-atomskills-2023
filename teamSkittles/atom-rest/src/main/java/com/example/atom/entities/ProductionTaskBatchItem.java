@@ -42,7 +42,7 @@ public class ProductionTaskBatchItem {
 
     private Long machineId;
 
-    private Instant summaryWorkingTimeProduct;
+    private Integer summaryWorkingTimeProduct;
 
     public ProductionTaskBatchItem(Long batchId) {
         this.batchId = batchId;
