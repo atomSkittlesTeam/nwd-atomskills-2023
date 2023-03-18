@@ -2,9 +2,16 @@
   <div class="card">
     <ng-container *ngTemplateOutlet="masterTable"></ng-container>
   </div>
-  <hr/>
+
   <div class="detail">
-    <p-table [value]="requestPositions" selectionMode="single" dataKey="code" [tableStyle]="{'width': '100%'}">
+    <p-toolbar >
+      <div class="p-toolbar-group-start">
+        <h3>Позиции заказа</h3>
+        <div class="splitter"></div>
+        <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info" [disabled]="selectedRequests.length !== 1" (click)="refreshDitail()"></button>
+      </div>
+    </p-toolbar>
+    <p-table [value]="requestPositions"  dataKey="code" [tableStyle]="{'width': '100%'}">
       <ng-template pTemplate="header">
         <tr>
           <th>Id позиции</th>
@@ -47,8 +54,12 @@
 
 <ng-template #masterTable>
   <p-toolbar *ngIf="userRole == 'chief'">
+
     <div class="p-toolbar-group-start">
       <h3>Список заказов</h3>
+      <div class="splitter"></div>
+      <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info" (click)="refreshMain()"></button>
+      <div class="splitter"></div>
       <p-button [label]="isProductionPlanMode ? 'Закрыть режим подбора' : 'Подбор заказов'"
                 icon="pi pi-list" styleClass="p-button-success"
                 (onClick)="onProductionPlanModeChange()"></p-button>
@@ -102,7 +113,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-req>
-        <tr [pSelectableRow]="req" (click)="checkRequest(selectedRequests)" [class.formDisabled]="req.state.code != 'DRAFT'">
+        <tr [pSelectableRow]="req" (click)="checkRequest(selectedRequests)"  [class.formDisabled]="req.state.code != 'DRAFT'">
           <td *ngIf="isProductionPlanMode">
             <p-tableCheckbox [value]="req"></p-tableCheckbox>
           </td>

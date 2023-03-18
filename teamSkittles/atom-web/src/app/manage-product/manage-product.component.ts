@@ -142,4 +142,8 @@ export class ManageProductComponent implements OnInit, OnDestroy {
       this.blocked = false;
     });
   }
+
+  refreshMain() {
+
+  }
 }

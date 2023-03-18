@@ -84,6 +84,7 @@ textarea,
 select {
   font: inherit;
 }
+
 /* Удаляем все анимации и переходы для людей, которые предпочитай их не использовать */
 @media (prefers-reduced-motion: reduce) {
   * {
@@ -105,6 +106,13 @@ select {
 
 .saveType {
   color: green;
+}
+
+.splitter {
+  border-right: 1px solid grey;
+  height: 40px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 

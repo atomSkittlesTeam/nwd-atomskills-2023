@@ -31,7 +31,6 @@ export class RequestComponent implements OnInit {
 
   async ngOnInit() {
     this.request = await this.requestService.getRequests();
-    console.log(this.request)
   }
 
   async checkRequest(selected: any) {
@@ -60,5 +59,14 @@ export class RequestComponent implements OnInit {
 
   formatDate(date: Date) {
     return formatDate(date, 'dd/MM/yyyy', 'en');
+  }
+
+  async refreshDitail() {
+
+    this.requestPositions = await this.requestService.getRequestPositionById(this.selectedRequests[0].id);
+  }
+
+  async refreshMain() {
+    this.request = await this.requestService.getRequests();
   }
 }

@@ -1,6 +1,7 @@
 <p-dialog [header]="'Детализация партии ' + this.dialogHeader" [(visible)]="display"
           [style]="{width: '90%', height: '90vh'}">
   <ng-container>
+
     <div>
       <p-table [value]="productionTaskBatchItem" dataKey="code"
                [tableStyle]="{'width': '100%'}" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
@@ -96,11 +97,18 @@
   <div class="card">
     <ng-container *ngTemplateOutlet="masterTable"></ng-container>
   </div>
-  <hr/>
   <div class="detail">
-    <p-table *ngIf="productionTaskBatch.length > 0"
-             [value]="productionTaskBatch" [(selection)]="selectedProductionTaskBatch"
-             [tableStyle]="{'min-width': '50rem'}">
+    <p-toolbar>
+      <div class="p-toolbar-group-start">
+        <h3>Партии заказ-наряда</h3>
+        <div class="splitter"></div>
+        <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info"
+                [disabled]="!selectedProductionTask" (click)="refreshDitail()"></button>
+      </div>
+    </p-toolbar>
+    <p-table
+      [value]="productionTaskBatch" [(selection)]="selectedProductionTaskBatch"
+      [tableStyle]="{'min-width': '50rem'}">
       <ng-template pTemplate="header">
         <tr>
 
@@ -155,8 +163,13 @@
 <ng-template #masterTable>
   <p-toolbar>
     <div class="p-toolbar-group-start">
+      <h3>Список заказ-нарядов</h3>
+      <div class="splitter"></div>
+      <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info"
+              (click)="refreshMain()"></button>
     </div>
   </p-toolbar>
+
   <div [class]="'master'">
     <p-table [value]="productionTask" [(selection)]="selectedProductionTask"
              [tableStyle]="{'min-width': '50rem'}">
