@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Data
@@ -51,4 +53,15 @@ public class ProductionTaskBatch {
         this.latheTime = positionDto.getProduct().getLatheTime();
         this.millingTime = positionDto.getProduct().getMillingTime();
     }
+
+    public void completeBatchItem(Instant endBatchTime) {
+        this.quantityExec++;
+        if (Objects.equals(quantity, quantityExec)) {
+            this.endBatchTime = endBatchTime;
+            Duration res = Duration.between(this.startBatchTime,
+                   this.endBatchTime);
+            this.summaryWorkingTimeBatch = res.getNano();
+        }
+    }
+
 }

@@ -26,7 +26,6 @@ import java.time.Instant;
 import java.util.*;
 
 @Service
-@NoArgsConstructor
 public class MachineService {
 
     @Value("${api.url}")

@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
@@ -59,39 +60,43 @@ public class ProductionTaskQueueWorker {
             if (!productionQueue.isEmpty()) {
                 List<MachineDto> latheMachineDtoList = machineDtoMap.get(MachineType.lathe);
                 List<MachineDto> millingMachineDtoList = machineDtoMap.get(MachineType.milling);
-                for (ProductionTaskBatchItem productionTask : productionQueue) {
+                for (ProductionTaskBatchItem batchItem : productionQueue) {
                     // проверяем нужно точить или фрезеровать
-
-                    ProductionTaskBatch productionTaskBatch = productionTaskBatchMap.get(productionTask.getBatchId());
+                    ProductionTaskBatch productionTaskBatch = productionTaskBatchMap.get(batchItem.getBatchId());
                     // проверяем не начали ли точить
-                    if (productionTask.getLatheStartTimestamp() == null) {
+                    if (batchItem.getLatheStartTimestamp() == null) {
                         // точим если есть доступные станки для точения
                         if (latheMachineDtoList != null && !latheMachineDtoList.isEmpty()) {
                             MachineDto firstFoundedLatheMachine = latheMachineDtoList.get(0);
                             // отправляем на станок
                             this.sendOnMachine(firstFoundedLatheMachine,
                                     productionTaskBatch.getProductId(),
-                                    productionTask.getBatchId(),
-                                    productionTask.getId(),
+                                    batchItem.getBatchId(),
+                                    batchItem.getId(),
                                     productionTaskBatch.getProductionTaskId()
                             );
-                            productionTask.setLatheStartTimestamp(Instant.now());
-                            productionTaskBatchItemRepository.save(productionTask);
-                            latheMachineDtoList = latheMachineDtoList.stream().filter(e -> !e.getId().equals(firstFoundedLatheMachine.getId())).toList();
+                            batchItem.setLatheStartTimestamp(Instant.now());
+                            batchItem.setLatheMachineCode(firstFoundedLatheMachine.getCode());
+                            productionTaskBatch.setStartBatchTime(Instant.now());
+                            productionTaskBatchItemRepository.save(batchItem);
+                            productionTaskBatchRepository.save(productionTaskBatch);
+                            latheMachineDtoList = latheMachineDtoList.stream().filter(e -> !e.getId()
+                                    .equals(firstFoundedLatheMachine.getId())).toList();
                         }
                         // проверяем не начали ли фрезеровать
-                    } else if (productionTask.getMillingStartTimestamp() == null) {
+                    } else if (batchItem.getMillingStartTimestamp() == null) {
                         // фрезеруем, если есть доступные
                         if (millingMachineDtoList != null && !millingMachineDtoList.isEmpty()) {
                             MachineDto firstFoundedMillingMachine = millingMachineDtoList.get(0);
                             this.sendOnMachine(firstFoundedMillingMachine,
                                     productionTaskBatch.getProductId(),
-                                    productionTask.getBatchId(),
-                                    productionTask.getId(),
+                                    batchItem.getBatchId(),
+                                    batchItem.getId(),
                                     productionTaskBatch.getProductionTaskId()
                             );
-                            productionTask.setMillingStartTimestamp(Instant.now());
-                            productionTaskBatchItemRepository.save(productionTask);
+                            batchItem.setMillingStartTimestamp(Instant.now());
+                            batchItem.setMillingMachineCode(firstFoundedMillingMachine.getCode());
+                            productionTaskBatchItemRepository.save(batchItem);
                             millingMachineDtoList = millingMachineDtoList.stream().filter(e -> !Objects.equals(e.getId(), firstFoundedMillingMachine.getId())).toList();
                         }
                     }
@@ -119,6 +124,7 @@ public class ProductionTaskQueueWorker {
         List<MachineHistoryDto> history = this.getAllStatusesMachinesHistory();
 
         Map<Long, List<MachineHistoryDto>> mapForBatchItems = history.stream()
+                .filter(e -> e.getAdvInfo() != null && e.getAdvInfo().getAdvInfo() != null)
                 .collect(Collectors.groupingBy(e -> e.getAdvInfo().getAdvInfo().getBatchItemId()));
 
         // список изделий для всех
@@ -126,33 +132,78 @@ public class ProductionTaskQueueWorker {
                 productionTaskBatchItemRepository
                 .findAllById(mapForBatchItems.keySet());
 
+        Map<Long, ProductionTaskBatchItem> productionTaskBatchItemMap = productionTaskBatchItem
+                .stream()
+                .collect(Collectors.toMap(ProductionTaskBatchItem::getId, Function.identity()));
+
         for (Map.Entry<Long, List<MachineHistoryDto>> entryForBatchItem : mapForBatchItems.entrySet()) {
-            List<MachineHistoryDto> workingHistory = entryForBatchItem.getValue()
-                    .stream().filter(e -> e.getState()
-                            .getCode().equals(MachineState.WORKING.toString()))
-                    .toList();
+            List<MachineHistoryDto> historyForBatchItem = entryForBatchItem.getValue();
+            this.executeByStates(productionTaskBatchItemMap.get(entryForBatchItem.getKey()), historyForBatchItem);
+        }
+    }
 
-            Date maxBrokenDate = workingHistory.stream().filter(c ->
-                c.getState().getCode().equals(MachineState.BROKEN.toString()
-            ))
-                    .map(MachineHistoryDto::getBeginDateTime)
-                    .max(Date::compareTo)
-                    .orElse(null);
+    private void executeByStates(ProductionTaskBatchItem batchItem, List<MachineHistoryDto> historyForBatchItem) {
+        // изменения по изделию
+        List<MachineHistoryDto> historyForBatchItemLathe = historyForBatchItem.stream()
+                .filter(e -> e.getMachineType().equals(MachineType.lathe)).toList();
 
-            Date maxWorkingEndDate = workingHistory.stream().filter(c ->
-                            c.getState().getCode().equals(MachineState.WORKING.toString()
-                            ))
-                    .map(MachineHistoryDto::getEndDateTime)
-                    .max(Date::compareTo)
-                    .orElse(null);
+        List<MachineHistoryDto> historyForBatchItemMilling = historyForBatchItem.stream()
+                .filter(e -> e.getMachineType().equals(MachineType.milling)).toList();
 
+        this.applyChanges(historyForBatchItemLathe, batchItem, MachineType.lathe);
+        this.applyChanges(historyForBatchItemMilling, batchItem, MachineType.milling);
+    }
+
+    private void applyChanges(List<MachineHistoryDto> story, ProductionTaskBatchItem batchItem, MachineType machineType) {
+
+        boolean lathe = machineType.equals(MachineType.lathe);
+
+        Date maxBrokenDate = story.stream().filter(c ->
+                        c.getState().getCode().equals(MachineState.BROKEN.toString()
+                        ))
+                .map(MachineHistoryDto::getBeginDateTime)
+                .filter(Objects::nonNull)
+                .max(Date::compareTo)
+                .orElse(null);
+
+        Date maxWorkingEndDate = story.stream().filter(c ->
+                        c.getState().getCode().equals(MachineState.WORKING.toString()
+                        ))
+                .map(MachineHistoryDto::getEndDateTime)
+                .filter(Objects::nonNull)
+                .max(Date::compareTo)
+                .orElse(null);
+
+
+        if (maxBrokenDate != null && maxBrokenDate.after(maxWorkingEndDate)) {
+            // сломалась, отправить обратно в пр-во
+            if (lathe) {
+                batchItem.setLatheStartTimestamp(null);
+                batchItem.setLatheMachineCode(null);
+            } else {
+                batchItem.setMillingStartTimestamp(null);
+                batchItem.setMillingMachineCode(null);
+            }
+
+        } else {
             if (maxWorkingEndDate != null) {
-                // возможно выполнена
-                if (maxBrokenDate != null && maxBrokenDate.after(maxWorkingEndDate)) {
-                    // сломалась, отправить обратно в пр-во
-
+            // готово
+                if (lathe) {
+                    batchItem.setLatheFinishedTimestamp(maxWorkingEndDate.toInstant());
+                    Duration res = Duration.between(batchItem.getLatheStartTimestamp(),
+                            batchItem.getLatheFinishedTimestamp());
+                    batchItem.setLatheFactTime(res.getNano());
                 } else {
-                    // готово
+                    batchItem.setMillingFinishedTimestamp(maxWorkingEndDate.toInstant());
+                    Duration res = Duration.between(batchItem.getMillingStartTimestamp(),
+                            batchItem.getMillingFinishedTimestamp());
+                    batchItem.setMillingFactTime(res.getNano());
+                    // проверить выполнилась ли партия
+
+                    ProductionTaskBatch productionTaskBatch = productionTaskBatchRepository
+                            .findById(batchItem.getBatchId()).orElse(null);
+                    productionTaskBatch.completeBatchItem(batchItem.getMillingFinishedTimestamp());
+
                 }
             }
         }
@@ -168,7 +219,11 @@ public class ProductionTaskQueueWorker {
 
         List<MachineHistoryDto> dtos = new ArrayList<>();
         for (MachineDto machineDto : machineDtos) {
-            dtos.addAll(machineService.getHistoryForMachines(machineDto.getPort()));
+            List<MachineHistoryDto> list = machineService.getHistoryForMachines(machineDto.getPort());
+            list.forEach(e -> {
+                e.setMachineType(machineDto.getMachineType());
+            });
+            dtos.addAll(list);
         }
         return dtos;
     }
