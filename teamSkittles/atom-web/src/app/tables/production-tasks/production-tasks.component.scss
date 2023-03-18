@@ -1,0 +1,19 @@
+.container {
+}
+:host {
+  ::ng-deep {
+    .p-splitter-panel {
+      display: block;
+    }
+  }
+}
+
+.master {
+  height: calc(100vh - 182px);
+  overflow: auto;
+  position: relative;
+}
+
+.show-dialog {
+
+}

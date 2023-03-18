@@ -5,6 +5,7 @@ import {NavigationComponent} from "./navigation/navigation.component";
 import {AdminComponent} from "./admin/admin.component";
 import {RequestComponent} from "./tables/request/request.component";
 import {ManageProductComponent} from "./manage-product/manage-product.component";
+import {ProductionTasksComponent} from "./tables/production-tasks/production-tasks.component";
 
 const routes: Routes = [
   {path: '', component: NavigationComponent},
@@ -13,6 +14,7 @@ const routes: Routes = [
   {path: 'admin', component: AdminComponent},
   {path: 'request', component: RequestComponent},
   {path: 'manage', component: ManageProductComponent},
+  {path: 'production-tasks', component: ProductionTasksComponent},
   // {path: 'stat', component: StatComponent},
 ];
 

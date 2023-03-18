@@ -8,10 +8,12 @@ import {AuthService} from "../services/auth.service";
 })
 export class NavigationComponent {
   login: any = ""
-  admin: boolean = false;
+  userAuth: boolean = false;
+  userRole: string = '';
 
   constructor(public authService: AuthService,) {
-    this.admin = !!this.authService.get();
+    this.userAuth = this.authService.userAuth;
+    this.userRole = this.authService.userRole;
 
   }
 

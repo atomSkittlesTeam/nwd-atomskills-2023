@@ -1,13 +1,12 @@
-<div class="nav" *ngIf="admin">
+<div class="nav" *ngIf="userAuth">
   <span class="nav__user-name">Привет {{login}}</span>
   <ng-container>
     <div class="nav__buttons">
-      <button pButton type="button" class="p-button-success" (click)="deleteAuthMark()" label="Логин"
-              routerLink="/login"></button>
-      <button pButton type="button" class="p-button-success" (click)="deleteAuthMark()" label="Регистрация"
-              routerLink="/registration"></button>
-      <button pButton type="button" class="p-button-success" label="Админка" routerLink="/admin"></button>
-      <button pButton type="button" class="p-button-success" label="Задачи" routerLink="/request"></button>
+      <button pButton type="button" class="p-button-success" label="Админка" routerLink="/admin"
+              *ngIf="userRole == 'chief' ||  userRole == 'admin'"></button>
+      <button pButton type="button" class="p-button-success" label="Список заказов" routerLink="/request"></button>
+      <button pButton type="button" class="p-button-success" label="Формирование плана" routerLink="/manage"
+              *ngIf="userRole == 'chief'"></button>
     </div>
   </ng-container>
 </div>
