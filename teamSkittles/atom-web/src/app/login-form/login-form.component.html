@@ -1,93 +1,87 @@
-<!--<div class="container">-->
-<!--  <div class="left-side">-->
-<!--    <div class="form-block">-->
-<!--      <div class="form-block__container">-->
-<!--        <div class="text block">Авторизация</div>-->
-<!--        <div class="block">-->
-<!--          <div class="p-inputgroup">-->
-<!--            <span class="p-inputgroup-addon"><i class="pi pi-user"></i></span>-->
-<!--            <input-->
-<!--              type="text"-->
-<!--              pInputText-->
-<!--              required-->
-<!--              placeholder="Username"-->
-<!--              [(ngModel)]="user.login"/>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--  <div class="right-side"></div>-->
-<!--</div>-->
-
-
-
 <div class="container">
-  <div class="grid p-fluid">
-    <span>{{title}}</span>
-    <div class="col-12 md:col-4">
-      <div class="p-inputgroup">
-        <span class="p-inputgroup-addon"><i class="pi pi-user"></i></span>
-        <input
-          type="text"
-          pInputText
-          required
-          placeholder="Username"
-          [(ngModel)]="user.login"/>
+  <div class="left-side">
+    <div class="form-block">
+      <div class="form-block__container">
+        <div class="text block">Авторизация</div>
+        <div class="block">
+          <div class="col-12 md:col-4">
+            <div class="p-inputgroup">
+              <!--              <span class="p-inputgroup-addon"><i class="pi pi-user"></i></span>-->
+              <input
+                type="text"
+                pInputText
+                required
+                placeholder="Username"
+                [(ngModel)]="user.login"/>
+            </div>
+          </div>
+          <div class="col-12 md:col-4" *ngIf="isRegistrationForm">
+            <div class="p-inputgroup">
+              <!--              <span class="p-inputgroup-addon"><i class="pi pi-user"></i></span>-->
+              <input
+                type="text"
+                pInputText
+                required
+                placeholder="Mail"
+                [(ngModel)]="user.mail"/>
+            </div>
+          </div>
+          <div class="col-12 md:col-4" *ngIf="isRegistrationForm">
+            <div class="p-inputgroup" >
+              <!--              <span class="p-inputgroup-addon"><i class="pi pi-user"></i></span>-->
+              <input
+                type="text"
+                pInputText
+                required
+                placeholder="ФИО"
+                [(ngModel)]="user.fullName"/>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-4">
+            <div class="p-inputgroup">
+              <!--              <span class="p-inputgroup-addon"><i class="pi pi-key"></i></span>-->
+              <input
+                type="password"
+                pInputText
+                required
+                placeholder="Password"
+                [(ngModel)]="user.password"/>
+            </div>
+          </div>
+
+          <div class="button" *ngIf="isRegistrationForm">
+            <button
+              class="button"
+              [label]="this.buttonLabel"
+              pButton
+              [disabled]="!user?.password || !user?.login || !user?.fullName || !user?.mail"
+              type="button"
+              [style]="{'height':'50px', 'width':'100%'}"
+              (click)="sendRequest()"></button>
+          </div>
+          <div class="button" *ngIf="!isRegistrationForm">
+            <button
+              class="button"
+              [label]="this.buttonLabel"
+              pButton
+              [disabled]="!user?.password || !user?.login"
+              type="button"
+              [style]="{'height':'50px', 'width':'100%'}"
+              (click)="sendRequest()"></button>
+          </div>
+          <div class="button">
+            <button *ngIf="!isRegistrationForm" pButton pRipple [style]="{'height':'50px', 'width':'100%'}"
+                    type="button" routerLink="/registration"
+                    label="Зарегистрироваться"
+                    class="p-button-raised p-button-success"></button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col-12 md:col-4" *ngIf="isRegistrationForm">
-      <div class="p-inputgroup">
-        <span class="p-inputgroup-addon"><i class="pi pi-user"></i></span>
-        <input
-          type="text"
-          pInputText
-          required
-          placeholder="Mail"
-          [(ngModel)]="user.mail"/>
-      </div>
-    </div>
-    <div class="col-12 md:col-4" *ngIf="isRegistrationForm">
-      <div class="p-inputgroup">
-        <span class="p-inputgroup-addon"><i class="pi pi-user"></i></span>
-        <input
-          type="text"
-          pInputText
-          required
-          placeholder="ФИО"
-          [(ngModel)]="user.fullName"/>
-      </div>
-    </div>
-
-    <div class="col-12 md:col-4">
-      <div class="p-inputgroup">
-        <span class="p-inputgroup-addon"><i class="pi pi-key"></i></span>
-        <input
-          type="password"
-          pInputText
-          required
-
-          placeholder="Password"
-          [(ngModel)]="user.password"/>
-      </div>
-    </div>
-
-    <p-button
-      class="button"
-      [label]="this.buttonLabel"
-      icon="pi pi-check"
-      [disabled]="!user.password || !user.login"
-      iconPos="left"
-      [style]="{'margin-top':'10px'}"
-      (click)="sendRequest()"></p-button>
-
-    <p-button
-      *ngIf="!isRegistrationForm"
-      class="button"
-      label="Зарегистрироваться"
-      icon="pi pi-user"
-      [style]="{'margin-top':'10px'}"
-      iconPos="left" routerLink="/registration"></p-button>
+  </div>
+  <div class="right-side">
+    <img src="../../assets/2.PNG" class="img1" alt="">
   </div>
 </div>
 

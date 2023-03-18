@@ -128,6 +128,10 @@ public class ProductionTaskQueueWorker {
     private void updateProductionPlanBatchState() {
         List<MachineHistoryDto> history = this.getAllStatusesMachinesHistory();
 
+        Map<String, List<MachineHistoryDto>> machineHistoryMap = history.stream()
+                .collect(Collectors.groupingBy(MachineHistoryDto::getCode));
+
+
         Map<Long, List<MachineHistoryDto>> mapForBatchItems = history.stream()
                 .filter(e -> e.getAdvInfo() != null && e.getAdvInfo().getAdvInfo() != null
                         && e.getAdvInfo().getAdvInfo().getBatchItemId() != null)
@@ -146,12 +150,14 @@ public class ProductionTaskQueueWorker {
             List<MachineHistoryDto> historyForBatchItem = entryForBatchItem.getValue();
             ProductionTaskBatchItem batchItem = productionTaskBatchItemMap.get(entryForBatchItem.getKey());
             if (batchItem != null) {
-                this.executeByStates(batchItem, historyForBatchItem);
+                this.executeByStates(batchItem, historyForBatchItem, machineHistoryMap);
             }
         }
     }
 
-    private void executeByStates(ProductionTaskBatchItem batchItem, List<MachineHistoryDto> historyForBatchItem) {
+    private void executeByStates(ProductionTaskBatchItem batchItem,
+                                 List<MachineHistoryDto> historyForBatchItem,
+                                 Map<String, List<MachineHistoryDto>> machineHistoryMap) {
         // изменения по изделию
         List<MachineHistoryDto> historyForBatchItemLathe = historyForBatchItem.stream()
                 .filter(e -> e.getMachineType().equals(MachineType.lathe)).toList();
@@ -159,34 +165,37 @@ public class ProductionTaskQueueWorker {
         List<MachineHistoryDto> historyForBatchItemMilling = historyForBatchItem.stream()
                 .filter(e -> e.getMachineType().equals(MachineType.milling)).toList();
 
-        this.applyChanges(historyForBatchItemLathe, batchItem, MachineType.lathe);
-        this.applyChanges(historyForBatchItemMilling, batchItem, MachineType.milling);
+        this.applyChanges(historyForBatchItemLathe, batchItem, MachineType.lathe, machineHistoryMap);
+        this.applyChanges(historyForBatchItemMilling, batchItem, MachineType.milling, machineHistoryMap);
     }
 
     private void applyChanges(List<MachineHistoryDto> story,
                               ProductionTaskBatchItem batchItem,
-                              MachineType machineType) {
+                              MachineType machineType,
+                              Map<String, List<MachineHistoryDto>> machineHistoryMap) {
 
         boolean lathe = machineType.equals(MachineType.lathe);
 
-        Date maxBrokenDate = story.stream().filter(c ->
-                        c.getState().getCode().equals(MachineState.BROKEN.toString()
-                        ))
-                .map(MachineHistoryDto::getBeginDateTime)
-                .filter(Objects::nonNull)
-                .max(Date::compareTo)
-                .orElse(null);
+//        Date maxBrokenDate = story.stream().filter(c ->
+//                        c.getState().getCode().equals(MachineState.BROKEN.toString()
+//                        ))
+//                .map(MachineHistoryDto::getBeginDateTime)
+//                .filter(Objects::nonNull)
+//                .max(Date::compareTo)
+//                .orElse(null);
 
-        Date maxWorkingEndDate = story.stream().filter(c ->
-                        c.getState().getCode().equals(MachineState.WORKING.toString()
-                        ))
-                .map(MachineHistoryDto::getEndDateTime)
-                .filter(Objects::nonNull)
-                .max(Date::compareTo)
-                .orElse(null);
+        MachineHistoryDto machineHistoryWithMaxWorkingEndDate =
+                story.stream()
+                        .filter(e -> e.getEndDateTime() != null)
+                        .max(Comparator.comparing(MachineHistoryDto::getEndDateTime))
+                        .orElse(null);
 
+        List<MachineHistoryDto> machineHistory = machineHistoryMap
+                .get(machineHistoryWithMaxWorkingEndDate.getCode());
 
-        if (maxBrokenDate != null && maxBrokenDate.after(maxWorkingEndDate)) {
+        boolean broken = this.wasBroken(machineHistory, machineHistoryWithMaxWorkingEndDate);
+
+        if (broken) {
             // сломалась, отправить обратно в пр-во
             if (lathe) {
                 batchItem.setLatheStartTimestamp(null);
@@ -195,29 +204,34 @@ public class ProductionTaskQueueWorker {
                 batchItem.setMillingStartTimestamp(null);
                 batchItem.setMillingMachineCode(null);
             }
-            productionTaskBatchItemRepository.save(batchItem);
-        } else {
-            if (maxWorkingEndDate != null) {
-            // готово
-                if (lathe) {
-                    batchItem.setLatheFinishedTimestamp(maxWorkingEndDate.toInstant());
-                    Duration res = Duration.between(batchItem.getLatheStartTimestamp(),
-                            batchItem.getLatheFinishedTimestamp());
-                    batchItem.setLatheFactTime(res.getNano());
-                    productionTaskBatchItemRepository.save(batchItem);
-                } else {
-                    batchItem.setMillingFinishedTimestamp(maxWorkingEndDate.toInstant());
-                    Duration res = Duration.between(batchItem.getMillingStartTimestamp(),
-                            batchItem.getMillingFinishedTimestamp());
-                    batchItem.setMillingFactTime(res.getNano());
-                    ProductionTaskBatch productionTaskBatch = productionTaskBatchRepository
-                            .findById(batchItem.getBatchId()).orElse(null);
-                    productionTaskBatchItemRepository.save(batchItem);
-                    this.checkProductionTaskComplete(batchItem, productionTaskBatch);
-                    this.putToCrm(batchItem, productionTaskBatch);
-                }
+        } else if (machineHistoryWithMaxWorkingEndDate != null) {
+        // готово
+            if (lathe) {
+                batchItem.setLatheFinishedTimestamp(machineHistoryWithMaxWorkingEndDate.getEndDateTime().toInstant());
+                Duration res = Duration.between(batchItem.getLatheStartTimestamp(),
+                        batchItem.getLatheFinishedTimestamp());
+                batchItem.setLatheFactTime(res.getNano());
+                productionTaskBatchItemRepository.save(batchItem);
+            } else {
+                batchItem.setMillingFinishedTimestamp(machineHistoryWithMaxWorkingEndDate.getEndDateTime().toInstant());
+                Duration res = Duration.between(batchItem.getMillingStartTimestamp(),
+                        batchItem.getMillingFinishedTimestamp());
+                batchItem.setMillingFactTime(res.getNano());
+                ProductionTaskBatch productionTaskBatch = productionTaskBatchRepository
+                        .findById(batchItem.getBatchId()).orElse(null);
+                productionTaskBatchItemRepository.save(batchItem);
+                this.checkProductionTaskComplete(batchItem, productionTaskBatch);
+                this.putToCrm(batchItem, productionTaskBatch);
             }
         }
+    }
+
+    private boolean wasBroken(List<MachineHistoryDto> list,
+                              MachineHistoryDto currentHistoryElement) {
+        list.sort(Comparator.comparing(MachineHistoryDto::getBeginDateTime));
+        int i = list.indexOf(currentHistoryElement);
+        MachineHistoryDto machineHistoryDto = list.get(i + 1);
+        return machineHistoryDto.getState().getCode().equals(MachineState.BROKEN.toString());
     }
 
     private void putToCrm(ProductionTaskBatchItem batchItem, ProductionTaskBatch productionTaskBatch) {
@@ -234,11 +248,6 @@ public class ProductionTaskQueueWorker {
     private List<MachineHistoryDto> getAllStatusesMachinesHistory() {
         // get all statuses machines
         List<MachineDto> machineDtos = machineService.getMachinesByStatus(null);
-        Map<MachineType, List<MachineDto>> machineDtoMap =
-                machineDtos
-                        .stream()
-                        .collect(Collectors.groupingBy(MachineDto::getMachineType));
-
         List<MachineHistoryDto> dtos = new ArrayList<>();
         for (MachineDto machineDto : machineDtos) {
             List<MachineHistoryDto> list = machineService.getHistoryForMachines(machineDto.getPort());

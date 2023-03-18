@@ -42,4 +42,7 @@ export class TaskForRepairsComponent implements OnInit {
     return this.messages;
   }
 
+  refreshTable() {
+
+  }
 }
