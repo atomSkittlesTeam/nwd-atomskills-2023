@@ -1,6 +1,7 @@
 package com.example.atom.controllers;
 
 import com.example.atom.dto.*;
+import com.example.atom.entities.MachineState;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.readers.RequestReader;
 import com.example.atom.services.MachineService;
@@ -28,7 +29,7 @@ public class MachineController {
     @GetMapping("get-broken-machine-by-id/{id}")
     public void getPlan(@PathVariable Long id) {
         MachineDto machineDto = machineService.getAllBrokenMachinesByStatusAndId(id);
-        machineReader.setStatusToMachine(machineDto.getPort(), "");
+        machineReader.setStatusToMachine(machineDto.getPort(), MachineState.REPAIRING, null);
     }
 
 }

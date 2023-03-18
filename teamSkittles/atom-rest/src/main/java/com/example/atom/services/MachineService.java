@@ -94,7 +94,7 @@ public class MachineService {
 
     public MachineDto getAllBrokenMachinesByStatusAndId(Long id) { //мне приходит ид сломанного, я его верну
         MachineDto result = new MachineDto();
-        List<MachineDto> allBrokenMachines = this.getMachinesByStatus("BROKEN");
+        List<MachineDto> allBrokenMachines = this.getMachinesByStatus(MachineState.BROKEN);
         allBrokenMachines = allBrokenMachines.stream().filter(e -> e.getId().equals(id)).toList();
         if(!allBrokenMachines.isEmpty()) {
             result = allBrokenMachines.get(0);
