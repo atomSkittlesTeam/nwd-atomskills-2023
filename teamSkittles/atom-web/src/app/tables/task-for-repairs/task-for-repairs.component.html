@@ -1,0 +1,64 @@
+<div class="container">
+
+  <div class="flex align-items-center justify-content-between">
+    <h3>Products</h3>
+  </div>
+  <p-table [value]="messages" [(selection)]="selectedMessage"
+           [tableStyle]="{'min-width': '50rem'}">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Статус</th>
+        <th>Текст</th>
+        <th>Статус Почты</th>
+        <th>Статус Прочтения</th>
+        <th>Id станка</th>
+        <th>Номер</th>
+        <th></th>
+      </tr>
+      <tr>
+        <th>
+          <p-columnFilter type="text" field="type"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="customText"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="emailSign"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="frontSign"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="objectId"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="objectName"></p-columnFilter>
+        </th>
+        <th>
+
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-mes>
+      <tr [pSelectableRow]="mes">
+        <td style="pointer-events: none;">{{mes.type}}</td>
+        <td style="pointer-events: none;">{{mes.customText}}</td>
+        <td style="pointer-events: none;">{{mes.emailSign}}</td>
+        <td style="pointer-events: none;">{{mes.frontSign}}</td>
+        <td style="pointer-events: none;"> {{mes.objectId}}</td>
+        <td style="pointer-events: none;"> {{mes.objectName}}</td>
+        <td>
+          <p-button
+            [pTooltip]="'Отправить на ремонт'"
+            class="show-dialog"
+            tooltipPosition="left"
+            icon="pi pi-check" styleClass="p-button-info"
+            (onClick)="sendToRepair(mes)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+</div>
+

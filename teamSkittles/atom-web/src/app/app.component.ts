@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from "./services/auth.service";
 import {UserService} from "./services/user.service";
 import {Router} from "@angular/router";
-import {ConfirmationService, MenuItem} from "primeng/api";
+import {ConfirmationService, MenuItem, MessageService} from "primeng/api";
 import {Message} from "./dto/Message";
 import {RequestService} from "./services/request.service";
 import {interval} from "rxjs";
@@ -13,7 +13,7 @@ import {Enums} from "./dto/enums";
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  providers: [ConfirmationService]
+  providers: [ConfirmationService, MessageService]
 })
 export class AppComponent implements OnInit {
   title = 'atomskittles-webapp';
@@ -29,7 +29,13 @@ export class AppComponent implements OnInit {
   Enums = Enums;
   isDialogShown: boolean = false;
 
-  constructor(public authService: AuthService, public router: Router, private userService: UserService, public requestService: RequestService, private confirmationService: ConfirmationService) {
+  constructor(public authService: AuthService,
+              public router: Router,
+              private userService:
+                UserService, public requestService:
+                RequestService,
+              private confirmationService: ConfirmationService,
+              public messageService: MessageService) {
     authService.auth.subscribe(() => this.initUser());
     this.authService.checkAuth();
     this.getMessagesByTime();
@@ -46,6 +52,8 @@ export class AppComponent implements OnInit {
 
   async showNewPositions() {
     this.display = true;
+    this.messages = await this.requestService.getNewMessages();
+
   }
 
   getMessagesByTime() {
@@ -85,6 +93,18 @@ export class AppComponent implements OnInit {
       this.router.navigate(['/login']);
     }
     this.messages = await this.requestService.getNewMessages();
+    this.createBrokenArray();
+  }
+
+  createBrokenArray() {
+    let brokenMachine: Message[] = [];
+    this.messages.forEach(mes => {
+      if (mes.type === Enums.machineBroke) {
+        brokenMachine.push(mes);
+      }
+    })
+
+    localStorage.setItem("MACHINES_BROKEN", JSON.stringify(brokenMachine))
   }
 
   async closeOneInfo(id: number, idx: number) {
@@ -108,11 +128,25 @@ export class AppComponent implements OnInit {
     return this.messages;
   }
 
-  confirm() {
+  confirm(message: Message, indexMesage: number) {
     this.confirmationService.confirm({
-      message: 'Are you sure that you want to perform this action?',
-      accept: () => {
-        //Actual logic to perform a confirmation
+      message: `Вы уверены что хотите отправить станок ${message.objectName} в ремонт?`,
+      accept: async () => {
+        await this.requestService.sendMachineToRepairing(message.objectName).then(data => {
+          this.closeOneInfo(message.id, indexMesage);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Обновился',
+            detail: 'Отправка прошла успешна',
+          })
+        }).catch((e) => {
+          console.log(e, 'error')
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Ошибка при отправке',
+            detail: e.error?.message
+          })
+        });
       }
     });
   }

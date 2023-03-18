@@ -1,72 +1,74 @@
 <div class="container">
 
-  <p-splitter>
-    <ng-template pTemplate>
 
-      <div class="master">
-        <p-table [value]="productionTask" [(selection)]="selectedProductionTask"
-                 [tableStyle]="{'min-width': '50rem'}">
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 4rem">
-                <p-button
-                  [pTooltip]="'Показать диалоговое окно'"
-                  class="show-dialog"
-                  icon="pi pi-check" styleClass="p-button-success"
-                  (onClick)="showDialog()"></p-button>
-
-                <div class="field-checkbox">
-                  <p-checkbox [(ngModel)]="checked" [binary]="true"></p-checkbox>
-                  <label>Активные</label>
-                </div>
-              </th>
-
-
-
-              <th>Id плана</th>
-              <th>Id заявки</th>
-              <th>Номер заявки</th>
-              <th>Дата создания таски</th>
-              <th>Закрытие</th>
-            </tr>
-            <tr>
-              <th style="width:4rem"></th>
-              <th>
-                <p-columnFilter type="text" field="productionPlanId"></p-columnFilter>
-              </th>
-              <th>
-                <p-columnFilter type="text" field="requestId"></p-columnFilter>
-              </th>
-              <th>
-                <p-columnFilter type="text" field="requestNumber"></p-columnFilter>
-              </th>
-              <th>
-                <p-columnFilter type="text" field="creationDate"></p-columnFilter>
-              </th>
-              <th>
-                <p-columnFilter type="text" field="closed"></p-columnFilter>
-              </th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-req>
-            <tr [pSelectableRow]="req">
-              <td>
-                <p-tableCheckbox [value]="req"></p-tableCheckbox>
-              </td>
-              <td style="pointer-events: none;">{{req.productionPlanId}}</td>
-              <td style="pointer-events: none;">{{req.requestId}}</td>
-              <td style="pointer-events: none;">{{req.requestNumber}}</td>
-              <td style="pointer-events: none;">{{formatDate(req.creationDate)}}</td>
-              <td style="pointer-events: none;"> {{req.closed}}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
+  <p-table [value]="productionTask" [(selection)]="selectedProductionTask"
+           [tableStyle]="{'min-width': '50rem'}">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">
+        </th>
+        <th>Номер заказ-наряда</th>
+        <th>Id плана</th>
+        <th>Id заявки</th>
+        <th>Номер заявки</th>
+        <th>Дата создания таски</th>
+        <th>Закрытие</th>
+        <th>
+          <div class="field-checkbox">
+            <p-checkbox [(ngModel)]="checked" [binary]="true"></p-checkbox>
+            <label>Активные</label>
+          </div>
+        </th>
+      </tr>
+      <tr>
+        <th style="width:4rem"></th>
+        <th>
+          <p-columnFilter type="text" field="id"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="productionPlanId"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="requestId"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="requestNumber"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="creationDate"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="closed"></p-columnFilter>
+        </th>
+        <th>
+          <p-button
+            [pTooltip]="'Показать диалоговое окно'"
+            class="show-dialog"
+            tooltipPosition="left"
+            icon="pi pi-check" styleClass="p-button-success"
+            [disabled]="selectedProductionTask.length != 1"
+            (onClick)="showDialog()"></p-button>
+        </th>
+      </tr>
     </ng-template>
-    <ng-template pTemplate>
-      Panel 2
+    <ng-template pTemplate="body" let-req>
+      <tr [pSelectableRow]="req">
+        <td>
+          <p-tableCheckbox [value]="req"></p-tableCheckbox>
+        </td>
+        <td style="pointer-events: none;">{{req.id}}</td>
+        <td style="pointer-events: none;">{{req.productionPlanId}}</td>
+        <td style="pointer-events: none;">{{req.requestId}}</td>
+        <td style="pointer-events: none;">{{req.requestNumber}}</td>
+        <td style="pointer-events: none;">{{formatDate(req.creationDate)}}</td>
+        <td style="pointer-events: none;"> {{req.closed}}</td>
+        <td style="pointer-events: none;">
+
+        </td>
+      </tr>
     </ng-template>
-  </p-splitter>
+  </p-table>
+
 </div>
 
 <p-dialog header="Title" [(visible)]="display">

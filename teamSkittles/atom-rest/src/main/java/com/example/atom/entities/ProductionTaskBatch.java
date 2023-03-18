@@ -20,13 +20,11 @@ public class ProductionTaskBatch {
 
     // id заказ наряда
     private Long productionTaskId;
+    private Long requestPositionId;
 
     private Long productId;
 
     private String productName;
-
-
-    private Long requestPositionId;
 
     private Integer quantity;
 

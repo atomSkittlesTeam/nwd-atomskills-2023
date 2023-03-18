@@ -1,5 +1,5 @@
 <ng-container>
-  <p-toolbar style="position: absolute; top: 0; width: 100%">
+  <p-toolbar style="position: absolute; top: 0; width: 100%;">
     <div class="p-toolbar-group-start">
 
       <h3 style="cursor: pointer" routerLink="/">Пацаны ваще ребята</h3>
@@ -21,11 +21,13 @@
     <div class="message" class="{{message.type}}" *ngFor="let message of messages; let idx = index;">
       <div class="message__icon" (click)="closeOneInfo(message.id, idx)"><i class="pi pi-times"></i></div>
       <div class="message__text">{{message.customText}}</div>
-      <p-button
-        [pTooltip]="'Отправить на починку'"
-        class="approve"
-        icon="pi pi-check" styleClass="p-button-success"
-        ></p-button>
+      <p-button *ngIf="message.type === enums.machineBroke"
+                [pTooltip]="'Создать заявку на ремонт'"
+                tooltipPosition="left"
+                class="approve"
+                icon="pi pi-check" styleClass="p-button-success"
+                (click)="confirm(message, idx)"
+      ></p-button>
     </div>
   </div>
   <div style="width: 100%; text-align: center; padding-top: 10px">
@@ -33,5 +35,7 @@
   </div>
 </p-sidebar>
 
-<p-confirmDialog [style]="{width: '50vw'}" [acceptLabel]="'Да, отправить заявку'" [rejectIcon]="'Нет'" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+<p-confirmDialog [style]="{width: '50vw'}" [acceptLabel]="'Да, отправить заявку'" [rejectIcon]="'Нет'"
+                 [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
 
+<p-toast></p-toast>

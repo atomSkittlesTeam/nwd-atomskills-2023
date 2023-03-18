@@ -31,6 +31,7 @@ import {BlockUIModule} from "primeng/blockui";
 import { ProductionTasksComponent } from './tables/production-tasks/production-tasks.component';
 import {CheckboxModule} from "primeng/checkbox";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
+import { TaskForRepairsComponent } from './tables/task-for-repairs/task-for-repairs.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -39,7 +40,8 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
     AdminComponent,
     RequestComponent,
     ManageProductComponent,
-    ProductionTasksComponent
+    ProductionTasksComponent,
+    TaskForRepairsComponent
   ],
   imports: [
     BrowserModule,
