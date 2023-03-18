@@ -115,7 +115,7 @@ public class MachineService {
             emails.forEach(email -> {
                 emailService.sendSimpleMessage(email,
                         "Станок снова в строю!",
-                        ("Станки с кодами: " + numbers + " восстановлены"));
+                        ("Станки с кодами: " + numbers + " отремонтированы"));
             });
             newMessagesOfRepaired.forEach(e -> e.setEmailSign(true));
             messageRepository.saveAll(newMessagesOfRepaired);

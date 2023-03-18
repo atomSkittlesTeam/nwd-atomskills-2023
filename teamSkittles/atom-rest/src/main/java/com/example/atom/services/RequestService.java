@@ -112,9 +112,9 @@ public class RequestService {
         List<String> emails = userService.getEmailsByRole("chief");
         emails.forEach(email -> {
             emailService.sendSimpleMessage(email,
-                    "Новые реквесты пришли",
-                    ("Пришли новые заказы, количество: " + newMessages.size() + "\n"
-                            + "вот такие номера у новых заказов: " + numbers));
+                    "Поступили новые заказы",
+                    ("Количество заказов: " + newMessages.size() + "\n"
+                            + "Номера заказов: " + numbers));
         });
         newMessages.forEach(e -> e.setEmailSign(true));
         messageRepository.saveAll(newMessages);
