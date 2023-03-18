@@ -13,7 +13,7 @@ import {RolesService} from "../services/roles.service";
 export class AdminComponent implements OnInit {
   selectedUser: User = new User();
   paymentOptions: any[] = [];
-  items: MenuItem[] = [];
+  // items: MenuItem[] = [];
   userDto: User = new User();
   user: User[] = [];
   displayDialog: boolean = false;
@@ -25,10 +25,10 @@ export class AdminComponent implements OnInit {
   async ngOnInit() {
     this.roles = await this.rolesService.getRoles().then(data => data.map(role => {
       return {name: role.name}}));
-    this.items = [
-      {label: 'Update', icon: 'pi pi-fw pi-pencil', command: () => this.showDialog()},
-      // {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => console.log(localStorage.getItem("ROLES"))}
-    ];
+    // this.items = [
+    //   {label: 'Update', icon: 'pi pi-fw pi-pencil', command: () => this.showDialog()},
+    //   // {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => console.log(localStorage.getItem("ROLES"))}
+    // ];
     this.user = await this.userService.getUsers();
 
   }

@@ -30,9 +30,9 @@ public class MessageDto {
             case newRequests ->
                     this.customText = "Новая заявка! Номер заявки: " + message.getObjectName();
             case machineBroke ->
-                    this.customText = "Станок сломан! Номер станка: " + message.getObjectName();
+                    this.customText = "Станок сломан! Код станка: " + message.getObjectName();
             case machineRepair ->
-                    this.customText = "Станок отремонтирован! Номер станка: " + message.getObjectName();
+                    this.customText = "Станок отремонтирован! Код станка: " + message.getObjectName();
         }
     }
 }
