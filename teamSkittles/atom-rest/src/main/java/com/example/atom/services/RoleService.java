@@ -84,9 +84,6 @@ public class RoleService {
         Role role4 = new Role("contragent", "Роль заказчика");
         roles.add(role4);
 
-        Role role5 = new Role("operator", "Роль работника");
-        roles.add(role5);
-
         roleRepository.saveAll(roles);
     }
 }
