@@ -24,7 +24,8 @@ export class AdminComponent implements OnInit {
 
   async ngOnInit() {
     this.roles = await this.rolesService.getRoles().then(data => data.map(role => {
-      return {name: role.name}}));
+      return {name: role.name}
+    }));
     // this.items = [
     //   {label: 'Update', icon: 'pi pi-fw pi-pencil', command: () => this.showDialog()},
     //   // {label: 'Delete', icon: 'pi pi-fw pi-times', command: () => console.log(localStorage.getItem("ROLES"))}
@@ -49,13 +50,17 @@ export class AdminComponent implements OnInit {
         detail: 'Юзер обновлился',
       })
     }).catch((e) => {
-      console.log(e,'error')
+      console.log(e, 'error')
       this.messageService.add({
-      severity: 'error',
-      summary: 'Обновления',
-      detail: e.error.message
-    })});
+        severity: 'error',
+        summary: 'Обновления',
+        detail: e.error.message
+      })
+    });
     this.displayDialog = false;
   }
 
+  selectUser(user: User) {
+    this.selectedUser = user;
+  }
 }
