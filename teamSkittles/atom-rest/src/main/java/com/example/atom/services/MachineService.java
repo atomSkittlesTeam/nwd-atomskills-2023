@@ -76,4 +76,23 @@ public class MachineService {
         }
     }
 
+    public List<MachineDto> getAllWaitingMachines() {
+        return this.getMachinesByStatus("WAITING");
+    }
+
+    private List<MachineDto> getMachinesByStatus(String status) {
+        System.out.println("Получение простаивающих станков...");
+        LinkedHashMap<String, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
+        List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();
+        List<Integer> allMachinesPorts = new ArrayList<>();
+        listOfMaps.forEach(map -> allMachinesPorts.addAll(map.values().stream().toList()));
+        List<MachineDto> machineDtos = new ArrayList<>();
+        for (Integer port : allMachinesPorts) {
+            MachineDto machineDto = machineReader.getMachineStatusByPort(port);
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals(status)) {
+                machineDtos.add(machineDto);
+            }
+        }
+        return machineDtos;
+    }
 }
