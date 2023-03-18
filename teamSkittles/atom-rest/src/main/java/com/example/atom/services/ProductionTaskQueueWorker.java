@@ -124,7 +124,8 @@ public class ProductionTaskQueueWorker {
         List<MachineHistoryDto> history = this.getAllStatusesMachinesHistory();
 
         Map<Long, List<MachineHistoryDto>> mapForBatchItems = history.stream()
-                .filter(e -> e.getAdvInfo() != null && e.getAdvInfo().getAdvInfo() != null)
+                .filter(e -> e.getAdvInfo() != null && e.getAdvInfo().getAdvInfo() != null
+                && e.getAdvInfo().getAdvInfo().getBatchItemId() != null)
                 .collect(Collectors.groupingBy(e -> e.getAdvInfo().getAdvInfo().getBatchItemId()));
 
         // список изделий для всех

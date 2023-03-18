@@ -99,4 +99,14 @@ export class RequestService extends BaseService {
     const url = await this.getBackendUrl();
     return await firstValueFrom(this.http.get<ProductionTaskBatchItem[]>(url + `/production/all-batch-items/${id}`, {}));
   }
+
+  async getAllMachines() {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<string[]>(url + `/production/all-machines`, {}));
+  }
+
+  async getAllItemsByMachineCode(machineCode: string) {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<ProductionTaskBatchItem[]>(url + `all-batch-items-by-machine/${machineCode}`, {}));
+  }
 }
