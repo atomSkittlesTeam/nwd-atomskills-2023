@@ -76,7 +76,7 @@
       class="button"
       [label]="this.buttonLabel"
       icon="pi pi-check"
-      [disabled]="!user?.password || !user?.login"
+      [disabled]="!user.password || !user.login"
       iconPos="left"
       [style]="{'margin-top':'10px'}"
       (click)="sendRequest()"></p-button>
