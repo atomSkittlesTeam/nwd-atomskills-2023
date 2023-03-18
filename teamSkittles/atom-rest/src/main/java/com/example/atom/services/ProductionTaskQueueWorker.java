@@ -146,7 +146,10 @@ public class ProductionTaskQueueWorker {
 
         for (Map.Entry<Long, List<MachineHistoryDto>> entryForBatchItem : mapForBatchItems.entrySet()) {
             List<MachineHistoryDto> historyForBatchItem = entryForBatchItem.getValue();
-            this.executeByStates(productionTaskBatchItemMap.get(entryForBatchItem.getKey()), historyForBatchItem);
+            ProductionTaskBatchItem batchItem = productionTaskBatchItemMap.get(entryForBatchItem.getKey());
+            if (batchItem != null) {
+                this.executeByStates(batchItem, historyForBatchItem);
+            }
         }
     }
 
@@ -270,28 +273,4 @@ public class ProductionTaskQueueWorker {
         productionTask.setCloseDate(closeDate);
         productionTaskRepository.save(productionTask);
     }
-
-    @Scheduled(fixedDelayString = "${scheduled.repairing-machines}")
-    public void getAllRepairingMachines() {
-        //смотрю всю историю всех станков, вычисляю, не пришел ли ко мне починенный станок
-        List<MachineHistoryDto> listHistory = this.getAllStatusesMachinesHistory();
-//        Map<String, MachineHistoryDto> mapHistoryByCode =
-//                listHistory.stream().collect(Collectors.toMap(MachineHistoryDto::getCode, e -> e));
-        Map<String, List<MachineHistoryDto>> mapHistoryListByCode =
-                listHistory.stream().collect(Collectors.groupingBy(MachineHistoryDto::getCode, Collectors.toList()));
-        mapHistoryListByCode.forEach((k, list) -> {
-            list.sort(Comparator.comparing(MachineHistoryDto::getBeginDateTime).reversed()); //сначала должны идти новые
-            MachineHistoryDto lastRepaired = list.stream().filter(e -> {
-                return (e.getState().getCode().equals(MachineState.REPAIRING.toString()) &&
-                        e.getBeginDateTime() != null && e.getEndDateTime() != null);
-            }).findFirst().orElse(null);
-            if (lastRepaired != null) {
-                machineService.saveMessageOfMachine(lastRepaired.getId(), lastRepaired.getCode(),
-                        lastRepaired.getBeginDateTime(), Types.machineRepair);
-            }
-        });
-        machineService.sendEmailOfRepairedMachines();
-        System.out.println("Дернул все станки на починку");
-    }
-
 }
