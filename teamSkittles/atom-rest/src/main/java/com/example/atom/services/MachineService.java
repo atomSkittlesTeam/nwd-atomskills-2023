@@ -2,6 +2,8 @@ package com.example.atom.services;
 
 import com.example.atom.dto.MachineDto;
 import com.example.atom.dto.Types;
+import com.example.atom.entities.MachineState;
+import com.example.atom.entities.MachineType;
 import com.example.atom.entities.Message;
 import com.example.atom.readers.MachineReader;
 import com.example.atom.repositories.MessageRepository;
@@ -13,6 +15,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MachineService {
@@ -31,13 +34,17 @@ public class MachineService {
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
     public void getAllBrokenMachines() {
-        LinkedHashMap<String, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
+        //вычитаю из всех реквестов, которые пришли из сервиса те, которые уже были в бд, получил новые
+        LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
         List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();
         List<Integer> allMachinesPorts = new ArrayList<>();
         listOfMaps.forEach(map -> allMachinesPorts.addAll(map.values().stream().toList()));
         for (Integer port : allMachinesPorts) {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
-            if (machineDto.getState() != null && machineDto.getState().getCode().equals("BROKEN")){
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals("unknown")) {
+                machineReader.setStatusToMachine(port, MachineState.WAITING, null);
+            }
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals(MachineState.BROKEN.toString())) {
                 saveMessageOfBrokenMachine(machineDto);
             }
         }
@@ -82,22 +89,41 @@ public class MachineService {
     }
 
     public List<MachineDto> getAllWaitingMachines() {
-        return this.getMachinesByStatus("WAITING");
+        return this.getMachinesByStatus(MachineState.WAITING);
     }
 
-    private List<MachineDto> getMachinesByStatus(String status) {
+    private List<MachineDto> getMachinesByStatus(MachineState status) {
         System.out.println("Получение простаивающих станков...");
-        LinkedHashMap<String, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
+        LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> allMachines = machineReader.getAllMachines();
         List<LinkedHashMap<String, Integer>> listOfMaps = allMachines.values().stream().toList();
         List<Integer> allMachinesPorts = new ArrayList<>();
         listOfMaps.forEach(map -> allMachinesPorts.addAll(map.values().stream().toList()));
         List<MachineDto> machineDtos = new ArrayList<>();
         for (Integer port : allMachinesPorts) {
             MachineDto machineDto = machineReader.getMachineStatusByPort(port);
-            if (machineDto.getState() != null && machineDto.getState().getCode().equals(status)) {
+            machineDto.setMachineType(this.getType(allMachines, machineDto.getCode()));
+            machineDto.setPort(port);
+            if (machineDto.getState() != null && machineDto.getState().getCode().equals(status.toString())) {
                 machineDtos.add(machineDto);
             }
         }
         return machineDtos;
+    }
+
+    private MachineType getType(LinkedHashMap<MachineType, LinkedHashMap<String, Integer>> allMachines, String machineName) {
+        MachineType type = null;
+        for (Map.Entry<MachineType, LinkedHashMap<String, Integer>> stringLinkedHashMapEntry : allMachines.entrySet()) {
+            type = stringLinkedHashMapEntry.getKey(); // type
+            LinkedHashMap<String, Integer> machinesMap = stringLinkedHashMapEntry.getValue();
+            if (machinesMap.containsKey(machineName)) {
+                return type;
+            } else {
+                continue;
+            }
+        }
+        if (type == null) {
+            throw new RuntimeException("Невозможно определить тип станка");
+        }
+        return type;
     }
 }

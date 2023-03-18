@@ -151,9 +151,14 @@ public class RequestService {
         List<RequestDto> result = new ArrayList<>();
         List<Request> requestExtensionList = requestRepository.findAllById(requestIds);
 
+        List<ProductionPlan> planInProduction = productionPlanRepository
+                .findAllByProductionPlanStatusEqualsOrderByPriority(ProductionPlanStatus.IN_PRODUCTION);
         List<ProductionPlan> planApproved = productionPlanRepository
                 .findAllByProductionPlanStatusEqualsOrderByPriority(ProductionPlanStatus.APPROVED);
 
+        List<Request> requestsInProduction = requestRepository.findAllById(
+                planInProduction.stream().map(e -> e.getRequestId()).toList()
+        );
         List<Request> requestsApproved = requestRepository.findAllById(
                 planApproved.stream().map(e -> e.getRequestId()).toList()
         );
@@ -194,6 +199,7 @@ public class RequestService {
         sortList(requestOverTwoDays);
         sortList(requestUnderTwoDays);
         List<Request> helpList = new ArrayList<>();
+        helpList.addAll(requestsInProduction);
         helpList.addAll(requestsApproved);
         helpList.addAll(requestOverTwoDays);
         helpList.addAll(requestUnderTwoDays);

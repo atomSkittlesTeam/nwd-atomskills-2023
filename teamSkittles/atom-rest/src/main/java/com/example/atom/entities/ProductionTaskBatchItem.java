@@ -30,6 +30,7 @@ public class ProductionTaskBatchItem {
     private Instant latheFinishedTimestamp;
 
     // время работы на станке
+    // точение
     private Integer latheFactTime;
 
     private Instant millingStartTimestamp;
@@ -41,7 +42,7 @@ public class ProductionTaskBatchItem {
 
     private Long machineId;
 
-    private Instant summaryWorkingTimeProduct;
+    private Integer summaryWorkingTimeProduct;
 
     public ProductionTaskBatchItem(Long batchId) {
         this.batchId = batchId;

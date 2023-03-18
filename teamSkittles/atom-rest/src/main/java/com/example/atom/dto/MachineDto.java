@@ -1,5 +1,6 @@
 package com.example.atom.dto;
 
+import com.example.atom.entities.MachineType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,5 +17,8 @@ public class MachineDto {
     private Object advInfo;
     private Date beginDateTime;
     private Date endDateTime;
+    private MachineType machineType;
+
+    private int port;
 
 }
