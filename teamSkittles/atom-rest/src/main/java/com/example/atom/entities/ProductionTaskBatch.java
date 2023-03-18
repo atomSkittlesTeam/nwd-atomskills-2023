@@ -59,6 +59,9 @@ public class ProductionTaskBatch {
             Duration res = Duration.between(this.startBatchTime,
                    this.endBatchTime);
             this.summaryWorkingTimeBatch = res.getNano();
+
+            // find all batches for current ProductionTask
+            // if all batches are rdy, then close task
         }
     }
 
