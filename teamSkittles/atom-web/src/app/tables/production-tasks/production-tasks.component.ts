@@ -28,6 +28,7 @@ export class ProductionTasksComponent implements OnInit {
   selectedProductionTaskBatchItem: ProductionTaskBatchItem;
   display: any;
   checked: boolean = false;
+  dialogHeader: string;
 
   constructor(public requestService: RequestService) {
   }
@@ -39,6 +40,7 @@ export class ProductionTasksComponent implements OnInit {
 
   async showDialog(batch: ProductionTaskBatch) {
     this.display = true;
+    this.dialogHeader = batch?.id.toString();
     this.productionTaskBatchItem = await this.requestService.getAllBatchItemsByBatch(batch.id);
   }
 
