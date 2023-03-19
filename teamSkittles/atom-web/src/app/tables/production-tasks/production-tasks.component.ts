@@ -6,6 +6,7 @@ import {MessageService} from "primeng/api";
 import {ProductionTask} from "../../dto/ProductionTask";
 import {ProductionTaskBatch} from "../../dto/ProductionTaskBatch";
 import {ProductionTaskBatchItem} from "../../dto/ProductionTaskBatchItem";
+import {Data} from "@angular/router";
 
 @Component({
   selector: 'app-production-tasks',
@@ -29,8 +30,10 @@ export class ProductionTasksComponent implements OnInit {
   display: any;
   checked: boolean = false;
   dialogHeader: string;
+  displayModal: boolean;
+  request: Request;
 
-  constructor(public requestService: RequestService) {
+  constructor(public requestService: RequestService, public messageService: MessageService) {
   }
 
   async ngOnInit() {
@@ -44,7 +47,8 @@ export class ProductionTasksComponent implements OnInit {
     this.productionTaskBatchItem = await this.requestService.getAllBatchItemsByBatch(batch.id);
   }
 
-  formatDate(date: Date) {
+  formatDate(date: Data | string) {
+    // @ts-ignore
     return formatDate(date, 'dd/MM/yyyy', 'en');
   }
 
@@ -65,6 +69,13 @@ export class ProductionTasksComponent implements OnInit {
   async refreshDitail() {
     this.productionTaskBatch = await this.requestService.getAllBatchesByTask(this.selectedProductionTask.id);
 
+  }
+
+  async recountPosition(req: any) {
+    this.displayModal = true;
+    let arrayRequests = await this.requestService.getRequests();
+    // @ts-ignore
+    this.request = arrayRequests.find(e => e.number === req.requestNumber);
   }
 }
 

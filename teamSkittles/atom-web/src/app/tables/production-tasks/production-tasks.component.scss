@@ -42,3 +42,27 @@
   height: calc(50vh - 1em - 1px);
   overflow: auto;
 }
+
+.dialog-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+
+  .line {
+    display: grid;
+    grid-template-columns: 100px 200px;
+    gap: 10px;
+    border: 1px solid rgba(96, 82, 82, 0.79);
+    padding: 5px;
+  }
+
+  .key, .value {
+    font-size: 20px;
+  }
+
+  .key {
+    border-right: 1px solid rgba(96, 82, 82, 0.79);
+
+  }
+}
