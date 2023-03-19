@@ -32,6 +32,8 @@ import { ProductionTasksComponent } from './tables/production-tasks/production-t
 import {CheckboxModule} from "primeng/checkbox";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import { TaskForRepairsComponent } from './tables/task-for-repairs/task-for-repairs.component';
+import { AnalyticsComponent } from './tables/analytics/analytics.component';
+import {ChartModule} from "primeng/chart";
 @NgModule({
   declarations: [
     AppComponent,
@@ -41,7 +43,8 @@ import { TaskForRepairsComponent } from './tables/task-for-repairs/task-for-repa
     RequestComponent,
     ManageProductComponent,
     ProductionTasksComponent,
-    TaskForRepairsComponent
+    TaskForRepairsComponent,
+    AnalyticsComponent
   ],
   imports: [
     BrowserModule,
@@ -65,7 +68,8 @@ import { TaskForRepairsComponent } from './tables/task-for-repairs/task-for-repa
     InputSwitchModule,
     BlockUIModule,
     CheckboxModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    ChartModule
   ],
   providers: [ConfigService, {
     provide: HTTP_INTERCEPTORS,

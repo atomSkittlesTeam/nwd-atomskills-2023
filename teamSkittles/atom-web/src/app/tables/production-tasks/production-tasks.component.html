@@ -145,7 +145,7 @@
         <h3>Партии заказ-наряда</h3>
         <div class="splitter"></div>
         <button pButton pRipple type="button" icon="pi pi-refresh" pTooltip="Обновить таблицу" class="p-button-rounded p-button-info"
-                [disabled]="!selectedProductionTask" (click)="refreshDitail()"></button>
+                [disabled]="!selectedProductionTask" (click)="refreshDetail()"></button>
       </div>
     </p-toolbar>
     <p-table
@@ -262,7 +262,7 @@
                     (click)="recountPosition(req)"
                     class="p-button-rounded p-button-success"></button>
           </td>
-          <td>{{formatDate(req.creationDate)}}</td>
+          <td>{{formatInstance(req.creationDate)}}</td>
           <td> {{req.closed}}</td>
           <td>
           </td>

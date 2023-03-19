@@ -60,7 +60,7 @@ export class RequestComponent implements OnInit {
     return formatDate(date, 'dd/MM/yyyy', 'en');
   }
 
-  async refreshDitail() {
+  async refreshDetail() {
 
     this.requestPositions = await this.requestService.getRequestPositionById(this.selectedRequests[0].id);
   }

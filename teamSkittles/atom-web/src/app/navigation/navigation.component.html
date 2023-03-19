@@ -11,8 +11,8 @@
               icon="pi pi-list" *ngIf="userRole != 'admin' && userRole == 'chief'"></button>
       <button pButton type="button" class="p-button-success" label="Журнал поломок" routerLink="/broken-machine"
               icon="pi pi-sitemap" *ngIf="userRole != 'admin' && userRole == 'chief'"></button>
-      <button pButton type="button" class="p-button-success" label="Аналитика" routerLink="/"
-              icon="pi pi-chart-bar" *ngIf="userRole == 'chief'"></button>
+      <button pButton type="button" class="p-button-success" label="Аналитика" routerLink="/analytics"
+              icon="pi pi-chart-bar" *ngIf="userRole != 'admin' && userRole == 'chief'"></button>
     </div>
   </ng-container>
 </div>

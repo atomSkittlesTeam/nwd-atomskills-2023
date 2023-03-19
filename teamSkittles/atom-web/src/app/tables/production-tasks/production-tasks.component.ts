@@ -52,6 +52,10 @@ export class ProductionTasksComponent implements OnInit {
     return formatDate(date, 'dd/MM/yyyy', 'en');
   }
 
+  formatInstance(date: Date) {
+    return formatDate(Number.parseFloat(date.toString())*1000, 'dd/MM/yyyy', 'en');
+  }
+
   isEnabled(request: Request) {
     return (request.state?.code === 'DRAFT' || request.state?.code === 'BLANK' || request.state == null)
   }
@@ -66,7 +70,7 @@ export class ProductionTasksComponent implements OnInit {
     this.productionTask = await this.requestService.getAllTasks();
   }
 
-  async refreshDitail() {
+  async refreshDetail() {
     this.productionTaskBatch = await this.requestService.getAllBatchesByTask(this.selectedProductionTask.id);
 
   }

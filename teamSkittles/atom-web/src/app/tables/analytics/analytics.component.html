@@ -1,0 +1,158 @@
+<p-dialog *ngIf="false" [header]="'Детализация станка ' + this.dialogHeader" [(visible)]="display"
+          [style]="{width: '90%', height: '90vh'}">
+  <ng-container>
+
+    <div>
+      <p-table [value]="productionTaskBatchItems" dataKey="code"
+               [tableStyle]="{'width': '100%'}" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+               [rows]="10" [paginator]="true"
+               currentPageReportTemplate="Показаны {first} - {last} из {totalRecords} элементов">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="batchId">Заказ-наряд
+              <p-sortIcon field="batchId"></p-sortIcon>
+            </th>
+            <th pSortableColumn="latheFactTime">Время токарной операции
+              <p-sortIcon field="latheFactTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="latherFinishedTimestamp">Время завершения токарной операции
+              <p-sortIcon field="latherFinishedTimestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="latherMachineCode">Код токарного станка
+              <p-sortIcon field="latherMachineCode"></p-sortIcon>
+            </th>
+            <th pSortableColumn="latherStartTimestamp">Дата начала токарной операции
+              <p-sortIcon field="latherStartTimestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="millingFactTime">Время фрезерной операции
+              <p-sortIcon field="millingFactTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="millingFinishedTimestamp">Время завершения фрезерной операции
+              <p-sortIcon field="millingFinishedTimestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="millingMachineCode">Код фрезерного станка
+              <p-sortIcon field="millingMachineCode"></p-sortIcon>
+            </th>
+            <th pSortableColumn="millingStartTimestamp">Дата начала фрезерной операции
+              <p-sortIcon field="millingStartTimestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="summaryWorkingTimeProduct">Сумарное время изготовления
+              <p-sortIcon field="summaryWorkingTimeProduct"></p-sortIcon>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <p-columnFilter type="text" field="batchId"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="latheFactTime"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="latherFinishedTimestamp"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="latherMachineCode"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="latherStartTimestamp"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="millingFactTime"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="millingFinishedTimestamp"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="millingMachineCode"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="millingStartTimestamp"></p-columnFilter>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="summaryWorkingTimeProduct"></p-columnFilter>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-bathItem>
+          <tr [pSelectableRow]="bathItem">
+            <td>{{bathItem.batchId}}</td>
+            <td>{{bathItem.latheFactTime}}</td>
+            <td>{{bathItem.latherFinishedTimestamp}}</td>
+            <td>{{bathItem.latherMachineCode}}</td>
+            <td>{{bathItem.latherStartTimestamp}}</td>
+            <td>{{bathItem.millingFactTime}}</td>
+            <td>{{bathItem.millingFinishedTimestamp}}</td>
+            <td>{{bathItem.millingMachineCode}}</td>
+            <td>{{bathItem.millingStartTimestamp}}</td>
+            <td>{{bathItem.summaryWorkingTimeProduct}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </ng-container>
+</p-dialog>
+
+<p-dialog [(visible)]="displayStat" [header]="'Эффективность станка' + this.dialogHeader" [style]="{'display':'block','width': '600px', 'height': '600px'}">
+  <p-chart type="pie" [data]="data" [style]="{'display':'block','width': '500px', 'height': '500px'}"></p-chart>
+</p-dialog>
+
+<p-dialog [(visible)]="displayStats" [header]="'Выработка станков'" [style]="{'display':'block','width': '600px', 'height': '600px'}">
+  <p-chart type="bar" [data]="dataAll" [style]="{'display':'block','width': '500px', 'height': '500px'}"></p-chart>
+</p-dialog>
+
+<ng-container>
+  <div>
+    <p-toolbar>
+      <div class="p-toolbar-group-start">
+        <h3>Список станков</h3>
+        <div class="splitter"></div>
+        <button pButton type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info"
+                (click)="refreshMachines()"></button>
+        <button pButton type="button" class="p-button-rounded p-button-info"
+                label="Показать выработку по всем станкам" style="margin-left: 10px"
+                (click)="showDialogStats()"></button>
+      </div>
+    </p-toolbar>
+    <p-table
+      [value]="machineList" [(selection)]="selectedMachine"
+      [tableStyle]="{'min-width': '50rem'}">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Код станка</th>
+          <th></th>
+          <th></th>
+        </tr>
+        <tr>
+          <th>
+            <p-columnFilter type="text" field="code"></p-columnFilter>
+          </th>
+          <th></th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-machine>
+        <tr [pSelectableRow]="machine">
+          <td>{{machine.code}}</td>
+          <td>
+            <p-button *ngIf="false"
+              [pTooltip]="'Посмотреть детали, относящиеся к этому станку'"
+              class="show-dialog"
+              tooltipPosition="left"
+              icon="pi pi-eye" styleClass="p-button-info"
+              (onClick)="showDialog(machine.code)"></p-button>
+          </td>
+          <td>
+            <p-button
+              [pTooltip]="'Посмотреть детали статистику простоев по станку'"
+              class="show-dialog"
+              tooltipPosition="left"
+              icon="pi pi-eye" styleClass="p-button-warning"
+              (onClick)="showDialogStat(machine.code, machine.port)"></p-button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</ng-container>
+
+
