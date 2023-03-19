@@ -8,7 +8,8 @@ api:
   cut-url: "http://192.168.1.44:"
 scheduled:
   broken-machines: "25000"
-  repairing-machines: "60000"
+  update-batch: "20000"
+  repairing-machines: "27000"
   new-requests: "30000"
   queue-view: "35000"
 default-user:

@@ -123,7 +123,7 @@ public class ProductionTaskQueueWorker {
         System.out.println("!Отправлено! " + productId.toString() + " на станок " + machineDto.getCode() + "!");
     }
 
-    @Scheduled(fixedDelay = 1000 * 60)
+    @Scheduled(fixedDelayString = "${scheduled.update-batch}")
     @Transactional
     public void updateProductionPlanBatchState() {
         List<MachineHistoryDto> history = this.getAllStatusesMachinesHistory();
