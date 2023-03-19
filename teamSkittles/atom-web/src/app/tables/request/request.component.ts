@@ -35,7 +35,6 @@ export class RequestComponent implements OnInit {
 
   async checkRequest(selected: any) {
     if (selected.length == 1) {
-      console.log(await this.requestService.getRequestPositionById(selected[0].id));
       this.requestPositions = await this.requestService.getRequestPositionById(selected[0].id);
     } else {
       this.requestPositions = [];

@@ -8,7 +8,7 @@
       <div class="p-toolbar-group-start">
         <h3>Позиции заказа</h3>
         <div class="splitter"></div>
-        <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info" [disabled]="selectedRequests.length !== 1" (click)="refreshDetail()"></button>
+        <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info" pTooltip="Обновить таблицу" [disabled]="selectedRequests.length !== 1" (click)="refreshDetail()"></button>
       </div>
     </p-toolbar>
     <p-table [value]="requestPositions"  dataKey="code" [tableStyle]="{'width': '100%'}">
@@ -58,7 +58,7 @@
     <div class="p-toolbar-group-start">
       <h3>Список заказов</h3>
       <div class="splitter"></div>
-      <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info" (click)="refreshMain()"></button>
+      <button pButton pRipple type="button" icon="pi pi-refresh" pTooltip="Обновить таблицу" pTooltip="Обновить таблицу" class="p-button-rounded p-button-info" (click)="refreshMain()"></button>
       <div class="splitter"></div>
       <p-button [label]="isProductionPlanMode ? 'Закрыть режим подбора' : 'Подбор заказов'"
                 icon="pi pi-list" styleClass="p-button-success"

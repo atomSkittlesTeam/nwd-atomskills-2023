@@ -16,7 +16,7 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-user>
-      <tr [pContextMenuRow]="user">
+      <tr [pContextMenuRow]="user" (click)="selectUser(user)">
         <td>{{user.login}}</td>
         <td>{{user.role}}</td>
         <td>{{user.email}}</td>

@@ -50,14 +50,17 @@
             </div>
           </div>
 
-          <div class="button" *ngIf="isRegistrationForm">
+          <div class="button" *ngIf="isRegistrationForm" style="display: inline-flex">
+            <p-button *ngIf="isRegistrationForm" [pTooltip]="'К форме логина'"
+                      icon="pi pi-arrow-left" styleClass="p-button-secondary"
+                      routerLink="/login"></p-button>
             <button
               class="button"
               [label]="this.buttonLabel"
               pButton
               [disabled]="!user?.password || !user?.login || !user?.fullName || !user?.mail"
               type="button"
-              [style]="{'height':'50px', 'width':'100%'}"
+              [style]="{'height':'50px', 'width':'100%', marginLeft: '5px'}"
               (click)="sendRequest()"></button>
           </div>
           <div class="button" *ngIf="!isRegistrationForm">
