@@ -93,10 +93,12 @@
 </p-dialog>
 
 <p-dialog *ngIf="displayStat" [(visible)]="displayStat" [header]="'Эффективность станка ' + this.dialogHeader" [style]="{'width': '50vw'}">
+  <h3>График показывает распределение рабочего времени и простоек станка в секундах</h3>
   <p-chart type="pie" [data]="data"></p-chart>
 </p-dialog>
 
 <p-dialog *ngIf="displayStats" [(visible)]="displayStats" [header]="'Выработка станков'" [style]="{'width': '70vw'}">
+  <h3>График показывает распределение количества произведенных деталей по каждому станку</h3>
   <p-chart type="bar" [data]="dataAll"></p-chart>
 </p-dialog>
 
