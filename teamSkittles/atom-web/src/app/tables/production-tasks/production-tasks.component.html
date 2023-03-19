@@ -92,6 +92,48 @@
   </ng-container>
 </p-dialog>
 
+<p-dialog header="Информация о заявке" [(visible)]="displayModal" *ngIf="request" [modal]="true"
+          [style]="{width: '50vw'}"
+          [draggable]="false" [resizable]="false">
+  <div class="dialog-container">
+    <div class="line">
+      <div class="key">Id</div>
+      <div class="value">{{request.id }}</div>
+    </div>
+    <div class="line">
+      <div class="key">Номер</div>
+      <div class="value">{{request.requestId}}</div>
+    </div>
+    <div class="line">
+      <div class="key">Инн</div>
+      <div class="value">{{request.contractor.inn}}</div>
+
+    </div>
+    <div class="line">
+      <div class="key">Дата</div>
+      <div class="value">{{formatDate(request.date || '') }}</div>
+    </div>
+    <div class="line">
+      <div class="key">Компания</div>
+      <div class="value">{{request.contractor.caption}}</div>
+    </div>
+    <div class="line">
+      <div class="key">Описание</div>
+      <div class="value">{{request.description}}</div>
+    </div>
+    <div class="line">
+      <div class="key">Статус</div>
+      <div class="value">{{request.state.caption}}</div>
+    </div>
+    <div class="line">
+      <div class="key">Дата Выпуска</div>
+      <div class="value">{{formatDate(request.releaseDate || '')}}</div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-check" (click)="displayModal=false" label="Ok" styleClass="p-button-text"></p-button>
+  </ng-template>
+</p-dialog>
 
 <ng-container>
   <div class="card">
@@ -111,7 +153,6 @@
       [tableStyle]="{'min-width': '50rem'}">
       <ng-template pTemplate="header">
         <tr>
-
           <th>Название детали</th>
           <th>Номер партии</th>
           <th>Кол-во</th>
@@ -216,7 +257,11 @@
           <td>{{req.id}}</td>
           <td>{{req.productionPlanId}}</td>
           <td>{{req.requestId}}</td>
-          <td>{{req.requestNumber}}</td>
+          <td style="display: flex; justify-content: start; align-items: center; gap: 5px">{{req.requestNumber}}
+            <button pButton pRipple type="button" icon="pi pi-search"
+                    (click)="recountPosition(req)"
+                    class="p-button-rounded p-button-success"></button>
+          </td>
           <td>{{formatDate(req.creationDate)}}</td>
           <td> {{req.closed}}</td>
           <td>
