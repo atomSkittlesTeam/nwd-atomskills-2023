@@ -1,9 +1,6 @@
 package com.example.atom.controllers;
 
 import com.example.atom.dto.RoleDto;
-import com.example.atom.entities.Process;
-import com.example.atom.readers.ProcessReader;
-import com.example.atom.services.ProcessService;
 import com.example.atom.services.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

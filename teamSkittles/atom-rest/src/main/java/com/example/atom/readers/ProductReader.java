@@ -1,9 +1,6 @@
 package com.example.atom.readers;
 
-import com.example.atom.dto.DemoDto;
-import com.example.atom.dto.MachineDto;
 import com.example.atom.dto.ProductDto;
-import com.example.atom.dto.RequestPositionDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -14,8 +11,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @Repository
