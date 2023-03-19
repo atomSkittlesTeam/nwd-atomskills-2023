@@ -33,7 +33,7 @@ export class ProductionTasksComponent implements OnInit {
   displayModal: boolean;
   request: Request;
 
-  constructor(public requestService: RequestService) {
+  constructor(public requestService: RequestService, public messageService: MessageService) {
   }
 
   async ngOnInit() {
@@ -76,7 +76,6 @@ export class ProductionTasksComponent implements OnInit {
     let arrayRequests = await this.requestService.getRequests();
     // @ts-ignore
     this.request = arrayRequests.find(e => e.number === req.requestNumber);
-    console.log(this.request)
   }
 }
 
