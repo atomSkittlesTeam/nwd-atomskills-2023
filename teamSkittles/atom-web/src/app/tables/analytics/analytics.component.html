@@ -92,12 +92,12 @@
   </ng-container>
 </p-dialog>
 
-<p-dialog [(visible)]="displayStat" [header]="'Эффективность станка' + this.dialogHeader" [style]="{'display':'block','width': '600px', 'height': '600px'}">
-  <p-chart type="pie" [data]="data" [style]="{'display':'block','width': '500px', 'height': '500px'}"></p-chart>
+<p-dialog *ngIf="displayStat" [(visible)]="displayStat" [header]="'Эффективность станка ' + this.dialogHeader" [style]="{'width': '50vw'}">
+  <p-chart type="pie" [data]="data"></p-chart>
 </p-dialog>
 
-<p-dialog [(visible)]="displayStats" [header]="'Выработка станков'" [style]="{'display':'block','width': '600px', 'height': '600px'}">
-  <p-chart type="bar" [data]="dataAll" [style]="{'display':'block','width': '500px', 'height': '500px'}"></p-chart>
+<p-dialog *ngIf="displayStats" [(visible)]="displayStats" [header]="'Выработка станков'" [style]="{'width': '70vw'}">
+  <p-chart type="bar" [data]="dataAll"></p-chart>
 </p-dialog>
 
 <ng-container>
