@@ -11,6 +11,8 @@ import {Message} from "../dto/Message";
 import {ProductionTask} from "../dto/ProductionTask";
 import {ProductionTaskBatch} from "../dto/ProductionTaskBatch";
 import {ProductionTaskBatchItem} from "../dto/ProductionTaskBatchItem";
+import {Machine} from "../dto/Machine";
+import {MachineHistory} from "../dto/MachineHistory";
 
 @Injectable({
   providedIn: 'root'
@@ -102,11 +104,26 @@ export class RequestService extends BaseService {
 
   async getAllMachines() {
     const url = await this.getBackendUrl();
-    return await firstValueFrom(this.http.get<string[]>(url + `/production/all-machines`, {}));
+    return await firstValueFrom(this.http.get<Machine[]>(url + `/production/all-machines`, {}));
   }
 
   async getAllItemsByMachineCode(machineCode: string) {
     const url = await this.getBackendUrl();
-    return await firstValueFrom(this.http.get<ProductionTaskBatchItem[]>(url + `all-batch-items-by-machine/${machineCode}`, {}));
+    return await firstValueFrom(this.http.get<ProductionTaskBatchItem[]>(url + `/production/all-batch-items-by-machine/${machineCode}`, {}));
+  }
+
+  async getHistoryOfMachineByPort(machinePort: number) {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<MachineHistory[]>(url + `/production/history/${machinePort}`, {}));
+  }
+
+  async getAnalyticsOneMachine(machinePort: number) {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<Map<string, number>>(url + `/production/analytics/${machinePort}`, {}));
+  }
+
+  async getAnalyticsAllMachines() {
+    const url = await this.getBackendUrl();
+    return await firstValueFrom(this.http.get<Map<string, number>>(url + `/production/analytics-all`, {}));
   }
 }

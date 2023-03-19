@@ -1,9 +1,9 @@
-<p-dialog [header]="'Детализация партии ' + this.dialogHeader" [(visible)]="display"
+<p-dialog *ngIf="false" [header]="'Детализация станка ' + this.dialogHeader" [(visible)]="display"
           [style]="{width: '90%', height: '90vh'}">
   <ng-container>
 
     <div>
-      <p-table [value]="productionTaskBatchItem" dataKey="code"
+      <p-table [value]="productionTaskBatchItems" dataKey="code"
                [tableStyle]="{'width': '100%'}" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
                [rows]="10" [paginator]="true"
                currentPageReportTemplate="Показаны {first} - {last} из {totalRecords} элементов">
@@ -92,67 +92,62 @@
   </ng-container>
 </p-dialog>
 
+<p-dialog [(visible)]="displayStat" [header]="'Эффективность станка' + this.dialogHeader" [style]="{'display':'block','width': '600px', 'height': '600px'}">
+  <p-chart type="pie" [data]="data" [style]="{'display':'block','width': '500px', 'height': '500px'}"></p-chart>
+</p-dialog>
+
+<p-dialog [(visible)]="displayStats" [header]="'Выработка станков'" [style]="{'display':'block','width': '600px', 'height': '600px'}">
+  <p-chart type="bar" [data]="dataAll" [style]="{'display':'block','width': '500px', 'height': '500px'}"></p-chart>
+</p-dialog>
 
 <ng-container>
-  <div class="card">
-    <ng-container *ngTemplateOutlet="masterTable"></ng-container>
-  </div>
-  <div class="detail">
+  <div>
     <p-toolbar>
       <div class="p-toolbar-group-start">
-        <h3>Партии заказ-наряда</h3>
+        <h3>Список станков</h3>
         <div class="splitter"></div>
-        <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info"
-                [disabled]="!selectedProductionTask" (click)="refreshDetail()"></button>
+        <button pButton type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info"
+                (click)="refreshMachines()"></button>
+        <button pButton type="button" class="p-button-rounded p-button-info"
+                label="Показать выработку по всем станкам" style="margin-left: 10px"
+                (click)="showDialogStats()"></button>
       </div>
     </p-toolbar>
     <p-table
-      [value]="productionTaskBatch" [(selection)]="selectedProductionTaskBatch"
+      [value]="machineList" [(selection)]="selectedMachine"
       [tableStyle]="{'min-width': '50rem'}">
       <ng-template pTemplate="header">
         <tr>
-
-          <th>Название детали</th>
-          <th>Номер партии</th>
-          <th>Кол-во</th>
-          <th>Выполоненое кол-во</th>
-          <th>Состояние партии</th>
+          <th>Код станка</th>
           <th></th>
-
+          <th></th>
         </tr>
         <tr>
           <th>
-            <p-columnFilter type="text" field="productName"></p-columnFilter>
+            <p-columnFilter type="text" field="code"></p-columnFilter>
           </th>
-          <th>
-            <p-columnFilter type="text" field="id"></p-columnFilter>
-          </th>
-          <th>
-            <p-columnFilter type="text" field="quantity"></p-columnFilter>
-          </th>
-          <th>
-            <p-columnFilter type="text" field="quantityExec"></p-columnFilter>
-          </th>
-          <th>
-            <p-columnFilter type="text" field="closed"></p-columnFilter>
-          </th>
+          <th></th>
           <th></th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-batch>
-        <tr [pSelectableRow]="batch">
-          <td>{{batch.productName}}</td>
-          <td>{{batch.id}}</td>
-          <td>{{batch.quantity}}</td>
-          <td>{{batch.quantityExec}}</td>
-          <td>{{batch.endBatchTime != null ? 'Завершена' : 'Изготавливается'}}</td>
+      <ng-template pTemplate="body" let-machine>
+        <tr [pSelectableRow]="machine">
+          <td>{{machine.code}}</td>
           <td>
-            <p-button
-              [pTooltip]="'Просмотреть партию'"
+            <p-button *ngIf="false"
+              [pTooltip]="'Посмотреть детали, относящиеся к этому станку'"
               class="show-dialog"
               tooltipPosition="left"
               icon="pi pi-eye" styleClass="p-button-info"
-              (onClick)="showDialog(batch)"></p-button>
+              (onClick)="showDialog(machine.code)"></p-button>
+          </td>
+          <td>
+            <p-button
+              [pTooltip]="'Посмотреть детали статистику простоев по станку'"
+              class="show-dialog"
+              tooltipPosition="left"
+              icon="pi pi-eye" styleClass="p-button-warning"
+              (onClick)="showDialogStat(machine.code, machine.port)"></p-button>
           </td>
         </tr>
       </ng-template>
@@ -160,70 +155,4 @@
   </div>
 </ng-container>
 
-<ng-template #masterTable>
-  <p-toolbar>
-    <div class="p-toolbar-group-start">
-      <h3>Список заказ-нарядов</h3>
-      <div class="splitter"></div>
-      <button pButton pRipple type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info"
-              (click)="refreshMain()"></button>
-    </div>
-  </p-toolbar>
-
-  <div [class]="'master'">
-    <p-table [value]="productionTask" [(selection)]="selectedProductionTask"
-             [tableStyle]="{'min-width': '50rem'}">
-      <ng-template pTemplate="header">
-        <tr>
-
-          <th>Номер заказ-наряда</th>
-          <th>Id плана</th>
-          <th>Id заявки</th>
-          <th>Номер заявки</th>
-          <th>Дата создания заказ-наряда</th>
-          <th>Закрытие</th>
-          <th>
-
-          </th>
-        </tr>
-        <tr>
-          <th>
-            <p-columnFilter type="text" field="id"></p-columnFilter>
-          </th>
-          <th>
-            <p-columnFilter type="text" field="productionPlanId"></p-columnFilter>
-          </th>
-          <th>
-            <p-columnFilter type="text" field="requestId"></p-columnFilter>
-          </th>
-          <th>
-            <p-columnFilter type="text" field="requestNumber"></p-columnFilter>
-          </th>
-          <th>
-            <p-columnFilter type="text" field="creationDate"></p-columnFilter>
-          </th>
-          <th>
-            <p-columnFilter type="text" field="closed"></p-columnFilter>
-          </th>
-          <th>
-
-          </th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-req>
-        <tr [pSelectableRow]="req" (click)="checkRequest(req)">
-
-          <td>{{req.id}}</td>
-          <td>{{req.productionPlanId}}</td>
-          <td>{{req.requestId}}</td>
-          <td>{{req.requestNumber}}</td>
-          <td>{{formatInstance(req.creationDate)}}</td>
-          <td> {{req.closed}}</td>
-          <td>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
-</ng-template>
 

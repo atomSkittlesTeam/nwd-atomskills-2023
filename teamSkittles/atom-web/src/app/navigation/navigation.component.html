@@ -11,6 +11,8 @@
               *ngIf="userRole != 'admin' && userRole == 'chief'"></button>
       <button pButton type="button" class="p-button-success" label="Журнал поломок" routerLink="/broken-machine"
               *ngIf="userRole != 'admin' && userRole == 'chief'"></button>
+      <button pButton type="button" class="p-button-success" label="Аналитика" routerLink="/analytics"
+              *ngIf="userRole != 'admin' && userRole == 'chief'"></button>
     </div>
   </ng-container>
 </div>

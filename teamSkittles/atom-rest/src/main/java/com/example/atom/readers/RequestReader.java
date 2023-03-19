@@ -95,7 +95,7 @@ public class RequestReader {
                     }
 
                     case IN_PRODUCTION -> {
-                        dto.getState().setCaption("В производствек");
+                        dto.getState().setCaption("В производстве");
                         dto.getState().setCode("IN_PRODUCTION");
                     }
                 }

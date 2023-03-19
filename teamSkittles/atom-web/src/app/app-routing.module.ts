@@ -7,6 +7,7 @@ import {RequestComponent} from "./tables/request/request.component";
 import {ManageProductComponent} from "./manage-product/manage-product.component";
 import {ProductionTasksComponent} from "./tables/production-tasks/production-tasks.component";
 import {TaskForRepairsComponent} from "./tables/task-for-repairs/task-for-repairs.component";
+import {AnalyticsComponent} from "./tables/analytics/analytics.component";
 
 const routes: Routes = [
   {path: '', component: NavigationComponent},
@@ -17,6 +18,7 @@ const routes: Routes = [
   {path: 'manage', component: ManageProductComponent},
   {path: 'production-tasks', component: ProductionTasksComponent},
   {path: 'broken-machine', component: TaskForRepairsComponent},
+  {path: 'analytics', component: AnalyticsComponent}
   // {path: 'stat', component: StatComponent},
 ];
 
