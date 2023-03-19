@@ -125,7 +125,7 @@ public class ProductionTaskQueueWorker {
 
     @Scheduled(fixedDelay = 1000 * 60)
     @Transactional
-    private void updateProductionPlanBatchState() {
+    public void updateProductionPlanBatchState() {
         List<MachineHistoryDto> history = this.getAllStatusesMachinesHistory();
 
         Map<String, List<MachineHistoryDto>> machineHistoryMap = history.stream()
@@ -155,7 +155,8 @@ public class ProductionTaskQueueWorker {
         }
     }
 
-    private void executeByStates(ProductionTaskBatchItem batchItem,
+    @Transactional
+    public void executeByStates(ProductionTaskBatchItem batchItem,
                                  List<MachineHistoryDto> historyForBatchItem,
                                  Map<String, List<MachineHistoryDto>> machineHistoryMap) {
         // изменения по изделию
@@ -169,7 +170,8 @@ public class ProductionTaskQueueWorker {
         this.applyChanges(historyForBatchItemMilling, batchItem, MachineType.milling, machineHistoryMap);
     }
 
-    private void applyChanges(List<MachineHistoryDto> story,
+    @Transactional
+    public void applyChanges(List<MachineHistoryDto> story,
                               ProductionTaskBatchItem batchItem,
                               MachineType machineType,
                               Map<String, List<MachineHistoryDto>> machineHistoryMap) {
@@ -190,38 +192,41 @@ public class ProductionTaskQueueWorker {
                         .max(Comparator.comparing(MachineHistoryDto::getEndDateTime))
                         .orElse(null);
 
-        List<MachineHistoryDto> machineHistory = machineHistoryMap
-                .get(machineHistoryWithMaxWorkingEndDate.getCode());
+        if (machineHistoryWithMaxWorkingEndDate != null) {
+            List<MachineHistoryDto> machineHistory = machineHistoryMap
+                    .get(machineHistoryWithMaxWorkingEndDate.getCode());
 
-        boolean broken = this.wasBroken(machineHistory, machineHistoryWithMaxWorkingEndDate);
+            boolean broken = this.wasBroken(machineHistory, machineHistoryWithMaxWorkingEndDate);
 
-        if (broken) {
-            // сломалась, отправить обратно в пр-во
-            if (lathe) {
-                batchItem.setLatheStartTimestamp(null);
-                batchItem.setLatheMachineCode(null);
-            } else {
-                batchItem.setMillingStartTimestamp(null);
-                batchItem.setMillingMachineCode(null);
-            }
-        } else if (machineHistoryWithMaxWorkingEndDate != null) {
-        // готово
-            if (lathe) {
-                batchItem.setLatheFinishedTimestamp(machineHistoryWithMaxWorkingEndDate.getEndDateTime().toInstant());
-                Duration res = Duration.between(batchItem.getLatheStartTimestamp(),
-                        batchItem.getLatheFinishedTimestamp());
-                batchItem.setLatheFactTime(res.getNano());
+            if (broken) {
+                // сломалась, отправить обратно в пр-во
+                if (lathe) {
+                    batchItem.setLatheStartTimestamp(null);
+                    batchItem.setLatheMachineCode(null);
+                } else {
+                    batchItem.setMillingStartTimestamp(null);
+                    batchItem.setMillingMachineCode(null);
+                }
                 productionTaskBatchItemRepository.save(batchItem);
-            } else {
-                batchItem.setMillingFinishedTimestamp(machineHistoryWithMaxWorkingEndDate.getEndDateTime().toInstant());
-                Duration res = Duration.between(batchItem.getMillingStartTimestamp(),
-                        batchItem.getMillingFinishedTimestamp());
-                batchItem.setMillingFactTime(res.getNano());
-                ProductionTaskBatch productionTaskBatch = productionTaskBatchRepository
-                        .findById(batchItem.getBatchId()).orElse(null);
-                productionTaskBatchItemRepository.save(batchItem);
-                this.checkProductionTaskComplete(batchItem, productionTaskBatch);
-                this.putToCrm(batchItem, productionTaskBatch);
+            } else if (machineHistoryWithMaxWorkingEndDate != null) {
+                // готово
+                if (lathe) {
+                    batchItem.setLatheFinishedTimestamp(machineHistoryWithMaxWorkingEndDate.getEndDateTime().toInstant());
+                    Duration res = Duration.between(batchItem.getLatheStartTimestamp(),
+                            batchItem.getLatheFinishedTimestamp());
+                    batchItem.setLatheFactTime(res.getNano());
+                    productionTaskBatchItemRepository.save(batchItem);
+                } else {
+                    batchItem.setMillingFinishedTimestamp(machineHistoryWithMaxWorkingEndDate.getEndDateTime().toInstant());
+                    Duration res = Duration.between(batchItem.getMillingStartTimestamp(),
+                            batchItem.getMillingFinishedTimestamp());
+                    batchItem.setMillingFactTime(res.getNano());
+                    ProductionTaskBatch productionTaskBatch = productionTaskBatchRepository
+                            .findById(batchItem.getBatchId()).orElse(null);
+                    productionTaskBatchItemRepository.save(batchItem);
+                    this.checkProductionTaskComplete(batchItem, productionTaskBatch);
+                    this.putToCrm(batchItem, productionTaskBatch);
+                }
             }
         }
     }
