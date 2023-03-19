@@ -281,6 +281,7 @@ public class ProductionTaskQueueWorker {
         }
 
         productionTaskBatch.completeBatchItem(batchItem.getMillingFinishedTimestamp());
+        productionTaskBatchRepository.save(productionTaskBatch);
     }
 
 
