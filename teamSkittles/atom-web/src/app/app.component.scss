@@ -116,3 +116,25 @@
   75% {transform: rotate(5deg)}
   100% {transform: rotate(0);}
 }
+
+.cog-pic {
+  font-size: 60vh;
+  position: fixed;
+  bottom: -70px;
+  right: -150px;
+  opacity: 0.1;
+  z-index: -1;
+}
+
+.rotate-anim {
+  animation: rotation 120s infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform:rotate(0deg);
+  }
+  100% {
+    transform:rotate(360deg);
+  }
+}
