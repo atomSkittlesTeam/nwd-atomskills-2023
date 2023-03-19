@@ -26,6 +26,24 @@ export class AnalyticsComponent {
   dataAll: any;
   analyticsMap: Map<string, number>;
   analyticsAllMap: Map<string, number>;
+
+  options = {
+    scales: {
+      y: {
+        title: {
+          display: true,
+          text: 'Количество произведенных изделий, ШТ'
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Код станка'
+        }
+      }
+    }
+  }
+
   constructor(public requestService: RequestService) {
   }
 
@@ -91,6 +109,7 @@ export class AnalyticsComponent {
       labels: Array.from(this.analyticsAllMap.keys()),
       datasets: [
         {
+          label: 'График показывает распределение количества произведенных деталей по каждому станку',
           data: Array.from(this.analyticsAllMap.values()),
           backgroundColor: [
             "#42A5F5",
@@ -115,7 +134,7 @@ export class AnalyticsComponent {
   }
 
   formatInstance(date: Date) {
-    return formatDate(Number.parseFloat(date.toString())*1000, 'dd/MM/yyyy', 'en');
+    return formatDate(Number.parseFloat(date.toString()) * 1000, 'dd/MM/yyyy', 'en');
   }
 
   isEnabled(request: Request) {

@@ -93,13 +93,12 @@
 </p-dialog>
 
 <p-dialog *ngIf="displayStat" [(visible)]="displayStat" [header]="'Эффективность станка ' + this.dialogHeader" [style]="{'width': '600px'}">
-  <h3>График показывает распределение рабочего времени и простоек станка в секундах</h3>
+  <h5>График показывает распределение рабочего времени и простоек станка в секундах</h5>
   <p-chart type="pie" [data]="data"></p-chart>
 </p-dialog>
 
 <p-dialog *ngIf="displayStats" [(visible)]="displayStats" [header]="'Выработка станков'" [style]="{'width': '800px'}">
-  <h3>График показывает распределение количества произведенных деталей по каждому станку</h3>
-  <p-chart type="bar" [data]="dataAll"></p-chart>
+  <p-chart type="bar" [data]="dataAll" [options]="options"></p-chart>
 </p-dialog>
 
 <ng-container>
@@ -109,7 +108,7 @@
         <h3>Список станков</h3>
         <div class="splitter"></div>
         <button pButton type="button" icon="pi pi-refresh" class="p-button-rounded p-button-info"
-                (click)="refreshMachines()"></button>
+                (click)="refreshMachines()" pTooltip="Обновить таблицу"></button>
         <button pButton type="button" class="p-button-rounded p-button-info"
                 label="Показать выработку по всем станкам" style="margin-left: 10px"
                 (click)="showDialogStats()"></button>
