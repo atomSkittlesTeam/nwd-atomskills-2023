@@ -92,11 +92,11 @@
   </ng-container>
 </p-dialog>
 
-<p-dialog *ngIf="displayStat" [(visible)]="displayStat" [header]="'Эффективность станка ' + this.dialogHeader" [style]="{'width': '50vw'}">
+<p-dialog *ngIf="displayStat" [(visible)]="displayStat" [header]="'Эффективность станка ' + this.dialogHeader" [style]="{'width': '600px'}">
   <p-chart type="pie" [data]="data"></p-chart>
 </p-dialog>
 
-<p-dialog *ngIf="displayStats" [(visible)]="displayStats" [header]="'Выработка станков'" [style]="{'width': '70vw'}">
+<p-dialog *ngIf="displayStats" [(visible)]="displayStats" [header]="'Выработка станков'" [style]="{'width': '800px'}">
   <p-chart type="bar" [data]="dataAll"></p-chart>
 </p-dialog>
 
