@@ -13,16 +13,30 @@ $main6: #F2E544;
   --background-color: #ecf0f1;
   --accent-color: #c0392b;
   --main: #003274;
-  --main1: #FFB001;
-  --main2: #025EA1;
+  --main2: #FFB001;
+  --main1: #025EA1;
 }
 
 .p-button-success {
   background-color: var(--main1) !important;
+  outline: none !important;
+  border: unset !important;
+}
+
+.p-button.p-button-secondary {
+  color: black !important;
+  background: lightgrey !important;
+  border: none !important;
 }
 
 .p-button-info {
-  background-color: var(--main2);
+  background-color: var(--main2) !important;
+  outline: none !important;
+  border: unset !important;
+}
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+  background-color: var(--main1) !important;
 }
 
 /* Указываем box sizing */
