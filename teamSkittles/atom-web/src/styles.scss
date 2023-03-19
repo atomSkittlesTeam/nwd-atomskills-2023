@@ -13,6 +13,16 @@ $main6: #F2E544;
   --background-color: #ecf0f1;
   --accent-color: #c0392b;
   --main: #003274;
+  --main1: #FFB001;
+  --main2: #025EA1;
+}
+
+.p-button-success {
+  background-color: var(--main1) !important;
+}
+
+.p-button-info {
+  background-color: var(--main2);
 }
 
 /* Указываем box sizing */
@@ -43,6 +53,7 @@ figcaption,
 blockquote,
 dl,
 dd {
+  font-size: 20px;
   margin: 0;
 }
 
@@ -53,6 +64,16 @@ body {
   scroll-behavior: smooth;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
+}
+
+b {
+  font-size: 20px;
+}
+
+* {
+  font-family: Serif /* Replace with your custom font */
+  , sans-serif;
+  font-size: 14px;
 }
 
 /* Удаляем стандартную стилизацию для всех ul и il, у которых есть атрибут class*/
@@ -111,6 +132,7 @@ select {
 .p-toolbar {
   padding: 0.5em !important;
 }
+
 .splitter {
   border-right: 1px solid grey;
   height: 40px;
