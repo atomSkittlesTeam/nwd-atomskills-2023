@@ -6,6 +6,8 @@
                 icon="pi pi-arrow-left" styleClass="p-button-secondary"
                 routerLink="/request"></p-button>
       <div class="splitter"></div>
+      <h3>Формирование ПП</h3>
+      <div class="splitter"></div>
 
       <p-button [label]="'Автоматический расчет приоритетов'"
                 icon="pi pi-sort-amount-down-alt" styleClass="p-button-info"
@@ -68,17 +70,20 @@
           <td style="pointer-events: none;">{{req.number}}</td>
           <td style="pointer-events: none;">{{req.time}} {{req.time ? ' ч.' : ''}}</td>
           <td style="pointer-events: none;">{{formatDate(req.date)}}</td>
-          <td style="pointer-events: none;" [class.cellDisabled]="req.state.code == 'IN_PRODUCTION' || req.state.code == 'APPROVED'"> {{req.state?.caption}}</td>
+          <td style="pointer-events: none;"
+              [class.cellDisabled]="req.state.code == 'IN_PRODUCTION' || req.state.code == 'APPROVED'"> {{req.state?.caption}}</td>
           <td style="pointer-events: none;">{{formatDate(req.releaseDate)}}</td>
-          <td>
+          <td style="display: flex; justify-content:center; flex-direction: row">
             <p-button
               [pTooltip]="isEnabled(req) ? 'Утвердить позицию' : 'Позиция уже утверждена' "
               [disabled]="!isEnabled(req)"
+              tooltipPosition="left"
               icon="pi pi-check" styleClass="p-button-success"
               (onClick)="approvePosition(req.id)"></p-button>
             <p-button
               *ngIf="req.state?.code == 'APPROVED' || req.state?.code == 'IN_PRODUCTION' "
               [pTooltip]="req.state?.code == 'APPROVED' ? 'Сформировать заказ-наряд' : 'Заказ-наряд уже сформирован'"
+              tooltipPosition="left"
               [disabled]="req.state?.code == 'IN_PRODUCTION'"
               [style]="{marginLeft: '5px'}"
               icon="pi pi-cog" styleClass="p-button-warning"
