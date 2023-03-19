@@ -1,9 +1,6 @@
 package com.example.atom.controllers;
 
 import com.example.atom.dto.*;
-import com.example.atom.entities.Product;
-import com.example.atom.entities.ProductionPlan;
-import com.example.atom.entities.Request;
 import com.example.atom.readers.RequestReader;
 import com.example.atom.services.ProductionPlanService;
 import com.example.atom.services.RequestService;
